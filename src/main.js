@@ -384,6 +384,8 @@ function syncProject() {
     .filter((thread) => thread.project === plot.name)
     .map((thread) => ({
       id: thread.id,
+      isShell: thread.isShell,
+      shellStatus: thread.shellStatus,
       title: thread.title,
       worktree: thread.worktree,
       lastActivityAt: thread.lastActivityAt,
@@ -398,6 +400,7 @@ function syncProject() {
 
   hud.setProject({
     name: plot.name,
+    label: plot.labelText || plot.name,
     accent: plot.accent,
     path: pathForProject(plot.name),
     threads: list,
@@ -627,6 +630,7 @@ function applyThreads(list) {
   legendProjects = colony.plotOrder
     .map((plot) => ({
       name: plot.name,
+      label: plot.labelText || plot.name,
       accent: plot.accent,
       count: list.filter((t) => !t.archived && !archivedSet.has(t.id) && t.project === plot.name).length,
       urgent: colony.urgentPlots?.has(plot.id) ?? false,

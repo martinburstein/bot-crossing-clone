@@ -68,3 +68,16 @@ test('viewer location is explicit and independent of process working directory',
  assert.equal(resolveSwarmRoot({base,env:{BOT_CROSSING_SWARM_ROOT:'../Other'}}),path.resolve(base,'../Other'))
  assert.throws(()=>resolveSwarmRoot({base,env:{},config:{root:''}}),/Configure/)
 })
+
+test('ROYGBIV and external Swarms workers project by exact binding without fake Open links',()=>{
+ const seven={...roster,shells:roster.shells.slice(0,7)}
+ const run={...active,assignments:active.assignments.slice(0,7).map(a=>({...a,binding:null}))}
+ run.assignments[0].binding={backend:'swarms',runId:run.runId,workerId:'worker-1'}
+ const worker={id:'swarms:worker-1',backend:'swarms',runId:run.runId,workerId:'worker-1',shellId:'s01',running:true,canOpen:false}
+ const projected=adapter.projectShells([],{roster:seven,active:run,externalWorkers:[worker]})
+ assert.equal(projected.length,7);assert.equal(projected[0].shellStatus,'Working');assert.equal(projected[0].canOpen,false)
+ assert.equal(new Set(projected.map(s=>s.project)).size,7)
+ assert.equal(adapter.projectShells([],{roster:seven,active:run,externalWorkers:[{...worker,runId:'other'}]})[0].shellStatus,'Not observed')
+ const renamed={...seven,shells:seven.shells.map(s=>({...s,name:'New '+s.name}))}
+ assert.deepEqual(adapter.projectShells([],{roster:renamed,active:null}).map(s=>s.project),adapter.projectShells([],{roster:seven,active:null}).map(s=>s.project))
+})

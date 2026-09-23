@@ -404,7 +404,7 @@ export class Hud {
    */
   setLegend(projects, activeName = null, hidden = [], folded = []) {
     const signature =
-      projects.map((p) => `${p.name}:${p.count}:${p.accent}:${p.urgent ? 1 : 0}`).join('|') +
+      projects.map((p) => `${p.name}:${p.label}:${p.count}:${p.accent}:${p.urgent ? 1 : 0}`).join('|') +
       `~${activeName}~` +
       hidden.map((p) => `${p.name}:${p.count}`).join('|') +
       `~${folded.length}`
@@ -417,11 +417,11 @@ export class Hud {
       const b = document.createElement('button')
       b.type = 'button'
       b.className = 'repo'
-      b.title = `${p.count} thread${p.count === 1 ? '' : 's'} in ${p.name}`
+      b.title = `${p.count} thread${p.count === 1 ? '' : 's'} in ${p.label || p.name}`
       b.setAttribute('aria-pressed', String(p.name === activeName))
       b.innerHTML =
         `<i class="swatch" style="background:${hex(p.accent)};color:${hex(p.accent)}"></i>` +
-        `<span class="n">${escapeHtml(p.name)}</span>` +
+        `<span class="n">${escapeHtml(p.label || p.name)}</span>` +
         (p.urgent ? '<i class="alarm"></i>' : '') +
         `<span class="count">${p.count}</span>`
       b.addEventListener('click', () => this.actions.pickProject?.(p.name))
@@ -507,7 +507,7 @@ export class Hud {
     // nothing is happening keeps whatever "4m ago" it was first drawn with, for as long as
     // you leave the panel open.
     const signature =
-      `${project.name}~${project.path}~${project.accent}~${project.selectedId}~${Math.floor(Date.now() / 60000)}~` +
+      `${project.name}~${project.label}~${project.path}~${project.accent}~${project.selectedId}~${Math.floor(Date.now() / 60000)}~` +
       project.threads.map((t) => `${t.id}:${t.status}:${t.title}:${t.lastActivityAt}`).join('|')
     panel.classList.add('drilled')
     if (this._last.project === signature) return
@@ -516,7 +516,7 @@ export class Hud {
     const swatch = this.$('.side .who .swatch')
     swatch.style.background = hex(project.accent)
     swatch.style.color = hex(project.accent) // the halo is `currentColor`
-    this.$('.side .name').textContent = project.name
+    this.$('.side .name').textContent = project.label || project.name
     const path = this.$('.side .path')
     path.textContent = project.path ? shortPath(project.path) : 'folder unknown'
     path.title = project.path || ''

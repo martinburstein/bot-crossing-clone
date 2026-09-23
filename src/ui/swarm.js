@@ -32,14 +32,14 @@ export class SwarmPanel {
   render(stale) {
     const working=this.shells.filter(s=>s.running).length
     this.summary.textContent=stale ? 'Swarm · live status unknown' : `Swarm · ${this.shells.length} shells · ${working} working`
-    const signature=JSON.stringify([stale,this.shells.map(s=>[s.id,s.shellColor,s.shellStatus,s.assignmentState,s.assignmentRole,s.scrollUrl,s.runId])])
+    const signature=JSON.stringify([stale,this.shells.map(s=>[s.id,s.shellName,s.shellColor,s.shellStatus,s.assignmentState,s.assignmentRole,s.scrollUrl,s.runId,s.protocolExecution,s.attemptCount,s.workerBackend,s.dependencies,s.reviewer,s.workflow])])
     if(this.signature===signature) return
     this.signature=signature
     this.body.replaceChildren()
     const note=document.createElement('p')
     const runId=this.shells.find(s=>s.runId)?.runId
     note.textContent=runId
-      ? `Active run: ${runId}. Queued shells start as worker slots and required inputs become available. Click a shell to follow its real worker.`
+      ? `Active run: ${runId} · ${this.shells.find(s=>s.workflow)?.workflow || 'task graph'}. Workers start as slots and accepted inputs become available.`
       : 'Say “activate the swarm” with a task. Each shell receives an AGENT.md scroll. Workers run within the available capacity.'
     const list=document.createElement('ol')
     for(const shell of this.shells) {
@@ -50,6 +50,11 @@ export class SwarmPanel {
       status.textContent=`${stale?'Unknown':shell.shellStatus} · ${shell.assignmentRole || 'No scroll loaded'} · ${shell.assignmentState}`
       status.dataset.live=stale?'Unknown':shell.shellStatus
       li.append(button,status)
+      if(shell.runId) {
+        const detail=document.createElement('small')
+        detail.textContent=[shell.workerBackend, shell.protocolExecution && `Protocol: ${shell.protocolExecution}`, `Attempts: ${shell.attemptCount}`, shell.dependencies.length && `Inputs: ${shell.dependencies.join(', ')}`, shell.reviewer && `Reviewer: ${shell.reviewer}`].filter(Boolean).join(' · ')
+        li.append(detail)
+      }
       if(shell.scrollUrl) {
         const link=document.createElement('a')
         link.href=shell.scrollUrl;link.textContent='Read AGENT.md ↗';link.target='_blank';link.rel='noopener'

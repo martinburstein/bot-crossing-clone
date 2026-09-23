@@ -366,12 +366,13 @@ export async function apiMiddleware(req, res, next) {
     if (url.pathname === '/api/threads' && req.method === 'GET') {
       let swarmState, swarmWarning
       try { swarmState = await loadSwarm() } catch(error) { swarmWarning = `Swarm shells unavailable: ${error.message}` }
-      const workerBindings = swarmState?.active?.assignments.map(a=>a.binding).filter(Boolean) || []
+      const workerBindings = swarmState?.active?.assignments.map(a=>a.binding).filter(b=>b && b.backend!=='swarms') || []
       let threads = await reconcileArchived(await scanThreads({workerBindings}))
       // A harness that is present but cannot read its own store says so here, rather than
       // appearing healthy in the list while quietly contributing nothing.
       const warnings = (await harnessStatus()).filter((h) => h.detected && h.error).map((h) => h.error)
       if (swarmState) threads = projectShells(threads, swarmState)
+      if (swarmState?.runtimeWarnings) warnings.push(...swarmState.runtimeWarnings)
       if (swarmWarning) warnings.push(swarmWarning)
       return send(res, 200, { threads, scannedAt: Date.now(), warnings })
     }

@@ -1,6 +1,6 @@
 # Bot Crossing — your agent threads, as a colony
 
-This fork adds ten persistent, color-coded Swarm stations, observed subagent status,
+This fork adds an expandable ROYGBIV base of seven persistent Swarm stations, observed Codex/Python worker status,
 and a read-only adapter to a separate Swarm protocol installation. See the
 [fork change summary](FORK-CHANGES.md) for differences from the original, and
 [Swarm installation notes](SWARM-VIEWER.md) for configuration.

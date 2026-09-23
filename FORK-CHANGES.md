@@ -2,11 +2,11 @@
 
 Baseline: a497242, “Codex and Cursor support, Windows and Linux fixes, and a read-only colony (#21)”. Original authorship and license remain intact.
 
-## Ten Swarm stations
+## ROYGBIV Swarm stations
 
-Ten persistent shell identities occupy distinct hexagons. Suit colors and matching plot accents identify each station; the astronaut design otherwise stays the same. Stable plot keys let assignment labels change without moving stations. The Swarm panel shows tasks, observed status, review state and each agent's scroll. Shells cannot be archived from the viewer.
+Seven base shell identities (Red, Orange, Yellow, Green, Blue, Indigo, Violet) occupy distinct hexagons. The external roster can expand. Suit colors and matching plot accents identify each station; the astronaut design otherwise stays the same. Stable plot keys let assignment labels change without moving stations. The Swarm panel shows tasks, observed status, review state and each agent's scroll. Shells cannot be archived from the viewer. The former ten-color Dyson run remains archived outside this repository.
 
-Worker matching uses the exact parent task and agent path, with duplicate observations removed. Ready, queued, working and unobserved assignments remain distinguishable. A visual shell is not itself a running agent, and ten visible stations do not override the agent runtime's concurrency limit.
+Codex worker matching uses the exact parent task and agent path, with duplicate observations removed. Python Swarms matching uses exact run, worker and shell identities after the external state reader checks attempt IDs and heartbeat freshness. Ready, queued, working and unobserved assignments remain distinguishable. A visual shell is not itself a running agent, and visible stations do not override the agent runtime's concurrency limit.
 
 ## Runtime observation
 
