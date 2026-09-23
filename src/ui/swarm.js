@@ -1,4 +1,5 @@
 import './mission.css'
+import {constructionFor} from '../game/swarm-construction.js'
 
 export class SwarmPanel {
   constructor(root, select) {
@@ -32,14 +33,14 @@ export class SwarmPanel {
   render(stale) {
     const working=this.shells.filter(s=>s.running).length
     this.summary.textContent=stale ? 'Swarm · live status unknown' : `Swarm · ${this.shells.length} shells · ${working} working`
-    const signature=JSON.stringify([stale,this.shells.map(s=>[s.id,s.shellName,s.shellColor,s.shellStatus,s.assignmentState,s.assignmentRole,s.scrollUrl,s.runId,s.protocolExecution,s.attemptCount,s.workerBackend,s.dependencies,s.reviewer,s.workflow])])
+    const signature=JSON.stringify([stale,this.shells.map(s=>[s.id,s.shellName,s.shellColor,s.shellStatus,s.assignmentState,s.assignmentRole,s.scrollUrl,s.runId,s.protocolExecution,s.attemptCount,s.workerBackend,s.dependencies,s.reviewer,s.workflow,s.milestones])])
     if(this.signature===signature) return
     this.signature=signature
     this.body.replaceChildren()
     const note=document.createElement('p')
     const runId=this.shells.find(s=>s.runId)?.runId
     note.textContent=runId
-      ? `Active run: ${runId} · ${this.shells.find(s=>s.workflow)?.workflow || 'task graph'}. Workers start as slots and accepted inputs become available.`
+      ? this.shells[0]?.runClosed ? `Archived project: ${runId}. Construction is preserved until the next activation.` : `Active run: ${runId} · ${this.shells.find(s=>s.workflow)?.workflow || 'task graph'}. Workers start as slots and accepted inputs become available.`
       : 'Say “activate the swarm” with a task. Each shell receives an AGENT.md scroll. Workers run within the available capacity.'
     const list=document.createElement('ol')
     for(const shell of this.shells) {
@@ -50,8 +51,14 @@ export class SwarmPanel {
       status.textContent=`${stale?'Unknown':shell.shellStatus} · ${shell.assignmentRole || 'No scroll loaded'} · ${shell.assignmentState}`
       status.dataset.live=stale?'Unknown':shell.shellStatus
       li.append(button,status)
+      const construction=constructionFor(shell),progress=document.createElement('small')
+      progress.className='swarm-progress'
+      progress.textContent=`${construction.cells} hexagon${construction.cells===1?'':'s'} · ${construction.minor} minor · ${construction.major} major`
+      li.append(progress)
+      if(construction.latest) {const checkpoint=document.createElement('small');checkpoint.className='swarm-progress';checkpoint.textContent=construction.latest.title;li.append(checkpoint)}
       if(shell.runId) {
         const detail=document.createElement('small')
+        detail.className='swarm-progress'
         detail.textContent=[shell.workerBackend, shell.protocolExecution && `Protocol: ${shell.protocolExecution}`, `Attempts: ${shell.attemptCount}`, shell.dependencies.length && `Inputs: ${shell.dependencies.join(', ')}`, shell.reviewer && `Reviewer: ${shell.reviewer}`].filter(Boolean).join(' · ')
         li.append(detail)
       }

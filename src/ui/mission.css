@@ -2,3 +2,4 @@
 .hud.hidden ~ .mission-panel{display:none}
 .mission-freshness{margin:0;padding:0 16px 12px;font:11px/1.5 Arial,sans-serif;color:#a9bac8}
 .shell-swatch{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;border:1px solid #ffffff55;vertical-align:middle}
+.swarm-progress { display: block; margin: 4px 0 0; color: #b4c6cf; font-size: 11px; line-height: 1.4; }

@@ -3,7 +3,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { loadSwarm, projectShells, scrollFor } from './swarm.mjs'
+import { loadSwarm, projectShells, scrollFor, SWARM_ROOT } from './swarm.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
 import {
   defaultHarness,
@@ -363,6 +363,10 @@ export async function apiMiddleware(req, res, next) {
   }
 
   try {
+    if (url.pathname === '/api/swarm/health' && req.method === 'GET') {
+      const swarm=await loadSwarm()
+      return send(res,200,{application:'bot-crossing-swarm',protocol:2,milestones:1,viewerRoot:path.resolve(here,'..'),swarmRoot:SWARM_ROOT,shells:swarm.roster.shells.length,runId:swarm.active?.runId || null})
+    }
     if (url.pathname === '/api/threads' && req.method === 'GET') {
       let swarmState, swarmWarning
       try { swarmState = await loadSwarm() } catch(error) { swarmWarning = `Swarm shells unavailable: ${error.message}` }

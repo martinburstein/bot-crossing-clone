@@ -573,6 +573,7 @@ export class Astronauts {
   }
 
   _updateAgent(agent, entry) {
+    const newSwarmProject=entry.thread?.isShell && agent.thread?.constructionRunId!==entry.thread.constructionRunId
     agent.thread = entry.thread
     const suit = entry.thread?.suitColor ?? SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length]
     if (agent.suit !== suit) { agent.suit = suit; agent.colorDirty = true }
@@ -594,6 +595,11 @@ export class Astronauts {
     if (entry.status !== agent.status) {
       agent.status = entry.status
       this._applyStatus(agent, entry.status)
+    }
+    if(newSwarmProject && entry.site) {
+      agent.pos.copy(entry.site)
+      agent.site.copy(entry.site)
+      agent.state='walking';agent.stateAge=0;agent.pathVersion=-1
     }
   }
 

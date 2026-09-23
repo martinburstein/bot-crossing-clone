@@ -1,5 +1,7 @@
 # Changes in this fork
 
+The dedicated `?swarm=1` view now starts projects with seven home platforms and avatars. Evidence-backed minor milestones add or upgrade items; major milestones add outward hexagons without moving existing construction. Runtime activity alone earns no progress. A read-only health endpoint lets the external Swarm launcher start/reuse this exact modded clone. See [SWARM-MILESTONES.md](SWARM-MILESTONES.md).
+
 Baseline: a497242, “Codex and Cursor support, Windows and Linux fixes, and a read-only colony (#21)”. Original authorship and license remain intact.
 
 ## ROYGBIV Swarm stations

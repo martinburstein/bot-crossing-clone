@@ -5,6 +5,7 @@ dist
 # paths of the repos you work in, so it stays out of the repository.
 data/*.json
 data/*.tmp
+data/milestone-preview/
 
 # Per-machine Claude Code permissions — personal paths live in here.
 .claude/settings.local.json

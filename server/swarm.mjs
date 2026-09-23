@@ -6,27 +6,29 @@ export {SWARM_ROOT} from './swarm-location.mjs'
 const reader=root=>import(pathToFileURL(path.join(root,'lib','state.mjs')).href)
 export async function loadSwarm(root=SWARM_ROOT) { return (await reader(root)).loadSwarm(root) }
 export async function scrollFor(shellId,root=SWARM_ROOT) { return (await reader(root)).scrollFor(shellId,root) }
-export function projectShells(threads, {roster, active, externalWorkers=[]}, root = SWARM_ROOT) {
+export function projectShells(threads, {roster, active, displayRun, externalWorkers=[]}, root = SWARM_ROOT) {
+  const run=active || displayRun
   threads=[...threads,...externalWorkers]
   const claimed = new Set()
   const shells = roster.shells.map((shell, index) => {
-    const task = active?.assignments.find(a=>a.shellId === shell.id)
-    const binding = task?.binding
+    const task = run?.assignments.find(a=>a.shellId === shell.id)
+    const binding = active ? task?.binding : null
     const matches = !binding ? [] : binding.backend==='swarms'
       ? threads.filter(t=>t.backend==='swarms' && t.workerId===binding.workerId && t.runId===binding.runId && t.shellId===shell.id)
       : threads.filter(t=>t.parentThreadId === binding.parentThreadId && t.agentPath === binding.agentPath)
     const worker = matches.length === 1 ? matches[0] : null
     if(worker) claimed.add(worker.id)
-    const shellStatus = !task ? 'Ready' : !binding ? 'Queued' : !worker ? 'Not observed' : worker.archived ? 'Worker archived' : worker.hasError ? 'Error' : worker.running ? 'Working' : 'Idle'
+    const shellStatus = run?.closedAt ? (run.outcome==='accepted'?'Complete':'Cancelled') : !task ? 'Ready' : !binding ? 'Queued' : !worker ? 'Not observed' : worker.archived ? 'Worker archived' : worker.hasError ? 'Error' : worker.running ? 'Working' : 'Idle'
     return {...worker,
       id:`swarm:${shell.id}`, isShell:true, shellId:shell.id, shellName:shell.name,
       suitColor:parseInt(shell.color.slice(1),16), shellColor:shell.color, shellStatus,
       assignmentState:task?.state || 'standby', assignmentRole:task?.role || shell.role || '',
+      milestones:task?.milestones || [], constructionRunId:run?.runId || 'standby', runClosed:!!run?.closedAt,
       protocolExecution:task?.execution || null, attemptCount:task?.attempts?.length || 0,
       dependencies:task?.dependsOn || [], reviewer:task?.reviewer || null, workflow:active?.workflow?.kind || null,
       workerBackend:binding?.backend || (binding?'codex':null),
-      scrollUrl:task ? `/api/swarm/scroll?shell=${shell.id}` : null,
-      runId:active?.runId || null, boundThreadId:worker?.id || null,
+      scrollUrl:active && task ? `/api/swarm/scroll?shell=${shell.id}` : null,
+      runId:run?.runId || null, boundThreadId:worker?.id || null,
       title:`${shell.name} · ${task?.role || 'Ready — no task loaded'}`,
       // Stable identity owns a hexagon; task changes must not relocate it.
       project:shell.stationKey || `Swarm · ${shell.id}`, projectPath:path.join(root,'shells',shell.id),

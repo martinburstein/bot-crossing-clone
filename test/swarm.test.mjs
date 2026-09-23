@@ -81,3 +81,12 @@ test('ROYGBIV and external Swarms workers project by exact binding without fake 
  const renamed={...seven,shells:seven.shells.map(s=>({...s,name:'New '+s.name}))}
  assert.deepEqual(adapter.projectShells([],{roster:renamed,active:null}).map(s=>s.project),adapter.projectShells([],{roster:seven,active:null}).map(s=>s.project))
 })
+
+test('archived construction remains visible without reviving workers and a new project clears it',()=>{
+ const archive={...active,closedAt:20,outcome:'accepted',assignments:active.assignments.map(a=>({...a,state:'accepted',milestones:[{id:'verified',level:'major',title:'Verified phase'}]}))}
+ const observed={id:'codex:worker',...binding,running:true}
+ const shells=adapter.projectShells([observed],{roster,active:null,displayRun:archive}).filter(t=>t.isShell)
+ assert.ok(shells.every(s=>s.milestones.length===1 && s.shellStatus==='Complete' && !s.running && !s.canOpen && !s.scrollUrl))
+ const next={...active,runId:'next-project',assignments:active.assignments.map(a=>({...a,binding:null,milestones:[]}))}
+ assert.ok(adapter.projectShells([],{roster,active:next,displayRun:archive}).every(s=>s.milestones.length===0 && s.shellStatus==='Queued'))
+})

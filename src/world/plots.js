@@ -198,17 +198,18 @@ function isConnected(out) {
   return seen.size === cells.size
 }
 
-export function allocateCells(projects, previous = new Map()) {
-  const laid = layOut(projects, previous)
+export function allocateCells(projects, previous = new Map(), reservedCells = []) {
+  const laid = layOut(projects, previous, reservedCells)
   // Remembering where a zone sat is worth a great deal, right up until it leaves the colony
   // as scattered islands. Then the memory is describing a map that no longer exists, and
   // starting over — compact, from the middle, the way a first run does it — is the lesser
   // upheaval. It only happens when the alternative is visibly broken.
-  return isConnected(laid) ? laid : layOut(projects, new Map())
+  return isConnected(laid) ? laid : layOut(projects, new Map(), reservedCells)
 }
 
-function layOut(projects, previous) {
+function layOut(projects, previous, reservedCells = []) {
   const reserved = key(SHIP_CELL.q, SHIP_CELL.r)
+  const excluded = new Set(reservedCells.map(c=>key(c.q,c.r)))
   const wanted = projects.map((p) => ({ id: p.id, want: cellsNeeded(p.size) }))
   const total = wanted.reduce((n, w) => n + w.want, 0)
 
@@ -225,10 +226,10 @@ function layOut(projects, previous) {
   for (const project of projects) {
     for (const cell of previous.get(project.id) || []) farthest = Math.max(farthest, hexDistance(cell, ORIGIN))
   }
-  for (let ring = 0; (pool.length < total + 30 || ring <= farthest) && ring < 12; ring++) {
+  for (let ring = 0; (pool.length < total + 30 || ring <= farthest) && ring < Math.max(12,farthest+3); ring++) {
     for (const cell of hexRing(ring)) {
       const k = key(cell.q, cell.r)
-      if (k === reserved) continue
+      if (k === reserved || excluded.has(k)) continue
       pool.push(cell)
       free.add(k)
     }
@@ -406,7 +407,7 @@ function hexPrism(radius, height) {
 // ── plot mesh ─────────────────────────────────────────────────────────────────────────
 
 export class Plot {
-  constructor({ id, name, index, cells, accent }) {
+  constructor({ id, name, index, cells, accent, milestoneOnly = false }) {
     this.id = id
     this.name = name
     this.index = index
@@ -452,7 +453,7 @@ export class Plot {
     this._buildDeck()
     this._buildBorder()
     this._buildPosts()
-    this._buildClutter()
+    if (!milestoneOnly) this._buildClutter()
     this.slots = this._buildSlots()
   }
 

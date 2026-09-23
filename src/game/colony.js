@@ -20,6 +20,7 @@ import { MAX_AGENT_CAP } from '../core/settings.js'
 import { Particles } from '../agents/particles.js'
 import { Navigation } from '../agents/navigation.js'
 import { liveThreadsForColony } from './hidden-projects.js'
+import {constructionFor,allocateSwarmCells} from './swarm-construction.js'
 
 /**
  * The colony: everything that turns a list of agent threads into a place.
@@ -341,8 +342,8 @@ export class Colony {
         if (status === 'waiting' || status === 'blocked' || status === 'working') active.add(plot.id)
         stats.agents++
 
-        const building = this._syncBuilding(thread, plot, i)
-        seenBuildings.add(thread.id)
+        const building = thread.isShell ? this._syncSwarmBuildings(thread,plot,seenBuildings) : this._syncBuilding(thread, plot, i)
+        if(!thread.isShell) seenBuildings.add(thread.id)
 
         roster.push({
           id: thread.id,
@@ -353,7 +354,7 @@ export class Colony {
           // at one spot, so it needs the building, not just a place to stand near it.
           anchor: building.mesh.position.clone(),
           // Already on the colony's books, so it does not need an entrance.
-          known: knownIds.has(thread.id),
+          known: thread.isShell || knownIds.has(thread.id),
         })
       })
     }
@@ -377,15 +378,18 @@ export class Colony {
     // The previous layout is an input, so a zone only moves when its own footprint changes
     // — never because a different repo gained or lost a thread. `plotCells` carries it
     // between polls, and the colony file carries it between sessions.
-    const layout = allocateCells(
-      projects.map(([name, list]) => ({ id: name, size: list.length })),
-      this.plotCells
-    )
+    const swarmProjects=projects.filter(([,list])=>list[0]?.isShell)
+    const memoryKeys=new Map(swarmProjects.map(([id,list])=>[id,`${id}@${list[0].constructionRunId}`]))
+    const remembered=new Map([...memoryKeys].map(([id,key])=>[id,this.plotCells.get(key)]))
+    const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,cells:constructionFor(list[0]).cells})),remembered)
+    const ordinary=allocateCells(projects.filter(([,list])=>!list[0]?.isShell).map(([id,list])=>({id,size:list.length})),this.plotCells,[...swarmLayout.values()].flat())
+    const layout=new Map([...swarmLayout,...ordinary])
     // Remembered, not replaced: a project that has just lost its last thread keeps its
     // ground on the books, and the oldest entries fall off the end.
     for (const [name, cells] of layout) {
-      this.plotCells.delete(name)
-      this.plotCells.set(name, cells)
+      const memoryKey=memoryKeys.get(name) || name
+      this.plotCells.delete(memoryKey)
+      this.plotCells.set(memoryKey, cells)
     }
     while (this.plotCells.size > LAYOUT_MEMORY) this.plotCells.delete(this.plotCells.keys().next().value)
 
@@ -424,7 +428,7 @@ export class Colony {
       if (!cells?.length) return
       const accent = list[0]?.isShell ? list[0].projectAccent : this._pickAccent(name)
       this.usedAccents.add(accent)
-      const plot = new Plot({ id: name, name, index, cells, accent })
+      const plot = new Plot({ id: name, name, index, cells, accent, milestoneOnly: !!list[0]?.isShell })
       plot.signature = wanted.get(name)
       this.plots.set(name, plot)
       this.plotGroup.add(plot.group)
@@ -515,6 +519,25 @@ export class Colony {
     entry.accent = plot.accent
     entry.retiring = false
     return entry
+  }
+
+  _syncSwarmBuildings(thread,plot,seen) {
+    const plan=constructionFor(thread)
+    let latest=null
+    for(const item of plan.structures) {
+      const id=`milestone:${thread.constructionRunId}:${thread.shellId}:${item.key}`
+      const entry=this._syncBuilding({id},plot,item.slot)
+      seen.add(id)
+      entry.ownerId=thread.id
+      entry.milestone=true
+      entry.mesh.scale.set(item.major?1:0.65,(item.major?1:0.65)*(1+Math.log2(item.level)*0.15),item.major?1:0.65)
+      // A new checkpoint upgrades an existing item with the same construction reveal.
+      if(entry.milestoneLevel!==undefined && entry.milestoneLevel!==item.level) {entry.progress=0;entry.mesh.userData.setProgress(0)}
+      entry.milestoneLevel=item.level
+      latest=entry
+    }
+    // A fresh project has a platform and astronaut, not a pre-earned building.
+    return latest || {mesh:{position:plot.worldSlot(0),userData:{footprint:0.5}}}
   }
 
   _removeBuilding(id, entry) {
@@ -757,13 +780,13 @@ export class Colony {
   }
 
   _isLive(id) {
-    const thread = this.threads.get(id)
+    const thread = this.threads.get(this.buildings.get(id)?.ownerId || id)
     return Boolean(thread && thread.running)
   }
 
   /** A site somebody is standing at: running, or stopped waiting on you. */
   _isActive(id) {
-    const thread = this.threads.get(id)
+    const thread = this.threads.get(this.buildings.get(id)?.ownerId || id)
     return Boolean(thread && (thread.running || thread.unread || thread.hasError))
   }
 

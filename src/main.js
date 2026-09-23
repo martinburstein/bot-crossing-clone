@@ -30,7 +30,8 @@ import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-project
  * can never silently drop an archive. Everything else is wiring.
  */
 
-const POLL_MS = 15000
+const SWARM_VIEW = new URLSearchParams(location.search).get('swarm') === '1'
+const POLL_MS = SWARM_VIEW ? 3000 : 15000
 const app = document.getElementById('app')
 
 app.insertAdjacentHTML(
@@ -58,6 +59,15 @@ let lastLayout = ''
 let selectedId = null
 /** Which zone's sidebar is open. A repo, not a thread — they outlive the threads on them. */
 let selectedProject = null
+let framedSwarmRun = null
+function frameSwarm() {
+  rig.resetView()
+  const radius=Math.max(25,...colony.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+8)))
+  rig.maxDistance=Math.max(150,radius*4)
+  rig.worldLimit=Math.max(82,radius+20)
+  if(engine.camera.far<radius*6) {engine.camera.far=radius*6;engine.camera.updateProjectionMatrix()}
+  rig.focus(new THREE.Vector3(),{distance:Math.max(110,radius*3.5)})
+}
 let hoverId = null
 let statusCursor = 0
 let pendingSave = 0
@@ -66,7 +76,7 @@ const hoverGround = new THREE.Vector3()
 // ── actions the HUD can trigger ────────────────────────────────────────────────────────
 
 const actions = {
-  resetView: () => rig.resetView(),
+  resetView: () => SWARM_VIEW ? frameSwarm() : rig.resetView(),
 
   screenshot: () => {
     // Render one more frame, then read the buffer before the compositor clears it — the
@@ -586,7 +596,7 @@ window.addEventListener('keydown', (e) => {
       break
     case '-':
     case '_':
-      rig.desiredDistance = Math.min(150, rig.desiredDistance * 1.22)
+      rig.desiredDistance = Math.min(rig.maxDistance, rig.desiredDistance * 1.22)
       break
     // One step at a time, outward: the thread, then the zone it belongs to.
     case 'Escape':
@@ -600,6 +610,7 @@ window.addEventListener('keydown', (e) => {
 // ── data ──────────────────────────────────────────────────────────────────────────────
 
 function applyThreads(list) {
+  if(SWARM_VIEW) list=list.filter(t=>t.isShell)
   // A thread you have said you looked at stops counting as unread until it moves on again.
   // Done here rather than in `statusFor` so the card, the badge and the astronaut all agree.
   const viewed = state.viewedAt || {}
@@ -609,7 +620,7 @@ function applyThreads(list) {
   })
   list = threads
   const archivedSet = new Set(state.archived)
-  const hiddenSet = new Set(state.hiddenProjects || [])
+  const hiddenSet = SWARM_VIEW ? new Set() : new Set(state.hiddenProjects || [])
 
   // Which threads the colony has met before. Walking out of the ship is meant to *mean*
   // something — a thread that just appeared — and without this every reload staged a
@@ -625,6 +636,10 @@ function applyThreads(list) {
   if (firstSeen) queueSave()
 
   const stats = colony.setThreads(list, archivedSet, hiddenSet, known)
+  if(SWARM_VIEW) {
+    const run=list.find(t=>t.isShell)?.constructionRunId
+    if(run && framedSwarmRun!==run) {framedSwarmRun=run;frameSwarm()}
+  }
   hud.setStats(stats)
 
   legendProjects = colony.plotOrder
