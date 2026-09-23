@@ -18,3 +18,8 @@ assets-src
 
 # Local capture output — not part of the project.
 recordings
+.cache/
+
+# Local agent settings and generated research evidence are not published with the viewer.
+.codex/
+artifacts/

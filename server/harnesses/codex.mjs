@@ -22,12 +22,15 @@
 import fsp from 'node:fs/promises'
 import path from 'node:path'
 import os from 'node:os'
-import { exists, jsonLines, listDirs, listFiles, num, readHead, readTail } from '../lib/fsutil.mjs'
+import { exists, jsonLines, listDirs, listFiles, num, readHead } from '../lib/fsutil.mjs'
 
 const HOME = os.homedir()
 const CODEX_HOME = process.env.CODEX_HOME || path.join(HOME, '.codex')
 const SESSIONS_DIR = path.join(CODEX_HOME, 'sessions')
 const SESSION_INDEX = path.join(CODEX_HOME, 'session_index.jsonl')
+// Explicitly opt in to worker astronauts; ordinary conversations remain the default view.
+const INCLUDE_SUBAGENTS = process.env.BOT_CROSSING_INCLUDE_SUBAGENTS === '1'
+const PARENT_THREAD_ID = process.env.BOT_CROSSING_PARENT_THREAD_ID || ''
 
 const HEAD_BYTES = 128 * 1024
 const TAIL_BYTES = 64 * 1024
@@ -39,6 +42,22 @@ const STATE_DB = /^state_(\d+)\.sqlite$/
 
 /** Prefixed, per the contract in `server/harnesses/README.md`. */
 const ID = (raw) => `codex:${raw}`
+
+/** Source is JSON in SQLite, but an object in session_meta. Older installs use a string. */
+function agentSource(source) {
+  if (typeof source === 'string') {
+    if (source === 'subagent') return { isSubagent: true }
+    try { source = JSON.parse(source) } catch { return {} }
+  }
+  if (!source || typeof source !== 'object' || !source.subagent) return {}
+  const spawn = source.subagent?.thread_spawn
+  return {
+    isSubagent: true,
+    parentId: typeof spawn?.parent_thread_id === 'string' && UUID.test(spawn.parent_thread_id)
+      ? spawn.parent_thread_id : '',
+    agentPath: typeof spawn?.agent_path === 'string' ? spawn.agent_path : '',
+  }
+}
 
 /**
  * `node:sqlite` is imported lazily and its absence is survivable.
@@ -103,14 +122,15 @@ async function databaseRows() {
     const columns = new Set(db.prepare('PRAGMA table_info(threads)').all().map((r) => r.name))
     if (!['id', 'cwd'].every((n) => columns.has(n))) return new Map()
 
-    // Threads a task spawned are not conversations anybody had; each would stand on the map as
-    // an astronaut nobody talks to.
-    const children = new Set()
+    // Keep child rows until after merging transcripts, or their rollouts resurrect hidden workers.
+    const children = new Map()
     if (tables.has('thread_spawn_edges')) {
       const edge = new Set(db.prepare('PRAGMA table_info(thread_spawn_edges)').all().map((r) => r.name))
       if (edge.has('child_thread_id')) {
-        for (const r of db.prepare('SELECT child_thread_id FROM thread_spawn_edges').all()) {
-          if (typeof r.child_thread_id === 'string') children.add(r.child_thread_id)
+        const parent = edge.has('parent_thread_id') ? 'parent_thread_id' : "'' AS parent_thread_id"
+        for (const r of db.prepare(`SELECT child_thread_id, ${parent} FROM thread_spawn_edges`).all()) {
+          if (typeof r.child_thread_id === 'string') children.set(r.child_thread_id,
+            typeof r.parent_thread_id === 'string' && UUID.test(r.parent_thread_id) ? r.parent_thread_id : '')
         }
       }
     }
@@ -125,6 +145,7 @@ async function databaseRows() {
           ${column(columns, 'first_user_message')} AS first_user_message,
           ${column(columns, 'source')} AS source,
           ${column(columns, 'thread_source')} AS thread_source,
+          ${column(columns, 'agent_path')} AS agent_path,
           ${column(columns, 'git_branch')} AS git_branch,
           ${column(columns, 'model')} AS model,
           ${column(columns, 'reasoning_effort')} AS reasoning_effort,
@@ -135,9 +156,18 @@ async function databaseRows() {
         FROM threads t
       `)
       .all()
-      .filter((r) => UUID.test(r.id || '') && !children.has(r.id) && r.thread_source !== 'subagent')
+      .filter((r) => UUID.test(r.id || ''))
 
-    return new Map(rows.map((r) => [r.id, r]))
+    const result = new Map(rows.map((r) => {
+      const agent = agentSource(r.source)
+      return [r.id, { ...r, isSubagent: children.has(r.id) || r.thread_source === 'subagent' || Boolean(agent.isSubagent),
+        parentId: children.get(r.id) || agent.parentId || '', agentPath: r.agent_path || agent.agentPath || '' }]
+    }))
+    // Spawn edges can arrive before the corresponding thread row.
+    for (const [id, parentId] of children) {
+      if (UUID.test(id) && !result.has(id)) result.set(id, { isSubagent: true, parentId, edgeOnly: true })
+    }
+    return result
   } catch {
     return new Map()
   } finally {
@@ -160,7 +190,7 @@ async function scanRollouts() {
           if (!id || !UUID.test(id)) continue
           try {
             const st = await fsp.stat(file)
-            byId.set(id, { id, file, size: st.size, mtime: st.mtimeMs })
+            byId.set(id, { id, file, size: st.size, mtime: st.mtimeMs, ctime: st.ctimeMs, ino: st.ino, dev: st.dev })
           } catch {
             /* vanished between listing and stat */
           }
@@ -199,6 +229,9 @@ function readHeadMeta(records) {
     const p = r?.payload
     if (!p || typeof p !== 'object') continue
     if (r.type === 'session_meta') {
+      meta.sessionMetaSeen = true
+      Object.assign(meta, agentSource(p.source))
+      if (p.thread_source === 'subagent') meta.isSubagent = true
       meta.cwd ||= p.cwd || ''
       meta.gitBranch ||= p.git?.branch || ''
       meta.createdAt ||= Date.parse(p.timestamp || r.timestamp || '') || 0
@@ -228,21 +261,133 @@ function readLifecycle(records) {
   return last
 }
 
+/**
+ * Long turns can put megabytes between task_started and EOF. Walk backward in small chunks
+ * until the newest lifecycle event, rather than treating an absent tail marker as idle.
+ * Oversized JSONL records are skipped: lifecycle envelopes are small, tool output need not be.
+ * Memory stays bounded even when one tool response spans many chunks.
+ */
+async function latestLifecycle(fh, size) {
+  const maxRecordBytes = HEAD_BYTES
+  let suffix = Buffer.alloc(0)
+  let oversized = false
+  let activityAt = 0
+  const parse = (record) => {
+    // Avoid parsing every model/tool response during a long turn.
+    if (activityAt && !record.includes('event_msg')) return null
+    const records = jsonLines(record.toString('utf8'))
+    activityAt ||= Date.parse(records.at(-1)?.timestamp || '') || 0
+    return readLifecycle(records)
+  }
+    let position = size
+    while (position > 0) {
+      const start = Math.max(0, position - TAIL_BYTES)
+      const chunk = await readRange(fh, start, position - start)
+      let end = chunk.length
+      for (let i = chunk.length - 1; i >= 0; i--) {
+        if (chunk[i] !== 10) continue
+        if (!oversized && end - i - 1 + suffix.length <= maxRecordBytes) {
+          const found = parse(Buffer.concat([chunk.subarray(i + 1, end), suffix]))
+          if (found) return { lifecycle: found, activityAt }
+        }
+        suffix = Buffer.alloc(0)
+        oversized = false
+        end = i
+      }
+      if (!oversized && end + suffix.length <= maxRecordBytes) {
+        suffix = Buffer.concat([chunk.subarray(0, end), suffix])
+      } else {
+        suffix = Buffer.alloc(0)
+        oversized = true
+      }
+      position = start
+    }
+    const lifecycle = oversized ? null : parse(suffix)
+    return { lifecycle, activityAt }
+}
+
+async function readRange(fh, start, length) {
+  const buffer = Buffer.allocUnsafe(length)
+  const { bytesRead } = await fh.read(buffer, 0, length, start)
+  if (bytesRead !== length) throw new Error('Transcript changed during read')
+  return buffer
+}
+
+/** Advance only new bytes, retaining a bounded partial line across polls. */
+async function appendLifecycle(fh, previous, size) {
+  let { lifecycle, pending, oversized, completeOffset, activityAt = 0 } = previous
+  let offset = previous.size
+  while (offset < size) {
+    const chunk = await readRange(fh, offset, Math.min(TAIL_BYTES, size - offset))
+    let start = 0
+    for (let i = 0; i <= chunk.length; i++) {
+      if (i !== chunk.length && chunk[i] !== 10) continue
+      if (!oversized && pending.length + i - start <= HEAD_BYTES) {
+        pending = Buffer.concat([pending, chunk.subarray(start, i)])
+      } else {
+        pending = Buffer.alloc(0)
+        oversized = true
+      }
+      if (i < chunk.length) {
+        if (!oversized) {
+          const records = jsonLines(pending.toString('utf8'))
+          lifecycle = readLifecycle(records) || lifecycle
+          activityAt = Math.max(activityAt, Date.parse(records.at(-1)?.timestamp || '') || 0)
+        }
+        pending = Buffer.alloc(0)
+        oversized = false
+        completeOffset = offset + i + 1
+      }
+      start = i + 1
+    }
+    offset += chunk.length
+  }
+  return { lifecycle, pending, oversized, completeOffset, activityAt }
+}
+
 /** Parsing is kept against mtime and size, so an unchanged transcript is read once. */
 const parseCache = new Map()
 async function transcriptFacts(entry, needHead) {
   const cached = parseCache.get(entry.id)
-  if (cached && cached.mtime === entry.mtime && cached.size === entry.size && (cached.head || !needHead)) {
+  if (cached && cached.mtime === entry.mtime && cached.ctime === entry.ctime && cached.size === entry.size && cached.ino === entry.ino && cached.dev === entry.dev && (cached.head || !needHead)) {
     return cached.facts
   }
   const facts = { lifecycle: null, meta: null }
+  let fh
   try {
-    facts.lifecycle = readLifecycle(jsonLines(await readTail(entry.file, TAIL_BYTES)))
-    if (needHead) facts.meta = readHeadMeta(jsonLines(await readHead(entry.file, HEAD_BYTES)))
+    fh = await fsp.open(entry.file, 'r')
+    const st = await fh.stat()
+    let appended = Boolean(cached && cached.ino === st.ino && cached.dev === st.dev && st.size > cached.size)
+    if (appended) {
+      const prefix = await readRange(fh, 0, cached.prefix.length)
+      const checkpoint = await readRange(fh, cached.size - cached.checkpoint.length, cached.checkpoint.length)
+      appended = prefix.equals(cached.prefix) && checkpoint.equals(cached.checkpoint)
+    }
+    let lifecycleState
+    if (appended) {
+      lifecycleState = await appendLifecycle(fh, { ...cached, lifecycle: cached.facts.lifecycle }, st.size)
+    } else {
+      const latest = await latestLifecycle(fh, st.size)
+      const tail = await readRange(fh, Math.max(0, st.size - HEAD_BYTES), Math.min(st.size, HEAD_BYTES))
+      const newline = tail.lastIndexOf(10)
+      lifecycleState = { ...latest, pending: newline >= 0 ? tail.subarray(newline + 1) : tail,
+        oversized: newline < 0 && st.size > HEAD_BYTES,
+        completeOffset: newline >= 0 ? st.size - tail.length + newline + 1 : 0 }
+      if (lifecycleState.oversized) lifecycleState.pending = Buffer.alloc(0)
+    }
+    facts.lifecycle = lifecycleState.lifecycle
+    facts.activityAt = lifecycleState.activityAt
+    if (needHead) facts.meta = appended && cached.headReady ? cached.facts.meta : readHeadMeta(jsonLines(await readHead(entry.file, HEAD_BYTES)))
+    const prefix = await readRange(fh, 0, Math.min(st.size, 4096))
+    const checkpoint = await readRange(fh, Math.max(0, st.size - 128), Math.min(st.size, 128))
+    parseCache.set(entry.id, { ...lifecycleState, mtime: st.mtimeMs, ctime: st.ctimeMs, size: st.size, ino: st.ino, dev: st.dev,
+      prefix, checkpoint, head: needHead, headReady: Boolean(facts.meta?.sessionMetaSeen && (facts.meta.prompt || st.size >= HEAD_BYTES)), facts })
   } catch {
-    /* mid-write, or gone */
+    // Do not cache failures: an unchanged file must be retried after a transient sharing error.
+    return { lifecycle: null, meta: cached?.facts.meta || null }
+  } finally {
+    await fh?.close().catch(() => {})
   }
-  parseCache.set(entry.id, { mtime: entry.mtime, size: entry.size, head: needHead, facts })
   return facts
 }
 
@@ -251,7 +396,8 @@ function projectOf(cwd) {
   return { projectPath: dir, project: dir ? path.basename(dir) : 'unknown' }
 }
 
-async function scanThreads() {
+async function scanThreads({ workerBindings = [] } = {}) {
+  const boundParents = new Set(workerBindings.map(b=>b.parentThreadId.replace(/^codex:/,'')))
   const [rows, rollouts, index] = await Promise.all([databaseRows(), scanRollouts(), readIndex()])
   const ids = new Set([...rows.keys(), ...rollouts.keys()])
   const now = Date.now()
@@ -260,9 +406,21 @@ async function scanThreads() {
   for (const id of ids) {
     const row = rows.get(id)
     const entry = rollouts.get(id)
-    // The head is only worth reading for a session the database cannot describe.
-    const facts = entry ? await transcriptFacts(entry, !row) : { lifecycle: null, meta: null }
+    if (row?.edgeOnly && !entry) continue
+    // Known hidden database workers need no transcript I/O. The final check below also covers
+    // workers discovered only in session_meta and rows whose parent metadata is incomplete.
+    if (row?.isSubagent && !INCLUDE_SUBAGENTS && !workerBindings.length) continue
+    if (row?.isSubagent && PARENT_THREAD_ID && row.parentId && row.parentId !== PARENT_THREAD_ID && !boundParents.has(row.parentId)) continue
+    // Source metadata in the cached head also identifies transcript-only workers.
+    const facts = entry ? await transcriptFacts(entry, true) : { lifecycle: null, meta: null }
     const meta = facts.meta || {}
+    // An unreadable or unfinished transcript cannot safely be classified as an ordinary task.
+    if ((!row || row.edgeOnly) && !meta.sessionMetaSeen) continue
+    const isSubagent = Boolean(row?.isSubagent || meta.isSubagent)
+    const parentId = row?.parentId || meta.parentId || ''
+    const agentPath = clean(row?.agentPath || meta.agentPath)
+    const explicitlyBound = workerBindings.some(b=>b.parentThreadId === ID(parentId) && b.agentPath === agentPath)
+    if (isSubagent && !explicitlyBound && (!INCLUDE_SUBAGENTS || (PARENT_THREAD_ID && parentId !== PARENT_THREAD_ID))) continue
 
     const cwd = row?.cwd || meta.cwd || ''
     const { projectPath, project } = projectOf(cwd)
@@ -272,7 +430,10 @@ async function scanThreads() {
 
     out.push({
       id: ID(id),
-      title: title.slice(0, 120),
+      title: (isSubagent ? `[Subagent] ${agentPath.split('/').filter(Boolean).at(-1) || title}` : title).slice(0, 120),
+      isSubagent,
+      parentThreadId: parentId ? ID(parentId) : '',
+      agentPath,
       preview: prompt.slice(0, 240),
       project,
       projectPath,
@@ -288,7 +449,9 @@ async function scanThreads() {
       // Codex records no focus history, so "have you looked at this" is unknowable — not false.
       lastFocusedAt: 0,
       unread: false,
-      running: facts.lifecycle?.type === 'task_started' && now - lastActivityAt < ACTIVE_WINDOW_MS,
+      // Windows may defer mtime updates while Codex holds the rollout open. Record timestamps
+      // are transcript activity too; database renames/pins are not.
+      running: facts.lifecycle?.type === 'task_started' && Boolean(entry) && now - Math.max(entry.mtime, facts.activityAt || 0) < ACTIVE_WINDOW_MS,
       hasError: facts.lifecycle?.type === 'task_complete' && facts.lifecycle.error,
       starred: false,
       routine: '',

@@ -5,6 +5,8 @@ import { Engine } from './core/engine.js'
 import { CameraRig } from './core/camera.js'
 import { Colony, STATUS_LABEL, STATUS_ORDER, statusFor, transcriptProgress } from './game/colony.js'
 import { Hud } from './ui/hud.js'
+import { MissionPanel } from './ui/mission.js'
+import { SwarmPanel } from './ui/swarm.js'
 import { PLANETS } from './world/planet.js'
 import { loadKit } from './world/kit.js'
 import { crewRig, loadCrew } from './agents/crew.js'
@@ -224,7 +226,7 @@ const actions = {
 
   openThread: async () => {
     const thread = threads.find((t) => t.id === selectedId)
-    if (!thread) return
+    if (!thread || thread.canOpen === false) return
     try {
       await openThread(thread)
       colony.astronauts.celebrate(thread.id)
@@ -241,7 +243,7 @@ const actions = {
   // `reconcileArchived` in server/api.mjs for why that stopped being worth doing.
   archiveThread: () => {
     const thread = threads.find((t) => t.id === selectedId)
-    if (!thread) return
+    if (!thread || thread.isShell) return
     const foldedBefore = new Set(colony.dormantProjects || [])
     state.archived = [...new Set([...state.archived, thread.id])]
     state.archivedAt = { ...state.archivedAt, [thread.id]: Date.now() }
@@ -272,6 +274,8 @@ const actions = {
 }
 
 const hud = new Hud(app, settings, actions)
+const mission = new MissionPanel(app, id => select(id, { fly: true }))
+const swarm = new SwarmPanel(app, id => select(id, { fly: true }))
 // The sidebar is permanent, so the card beside an astronaut has a wall to stay clear of.
 const sideWidth = () => (window.innerWidth <= 820 ? 0 : 334)
 hud.setSideWidth(sideWidth())
@@ -656,8 +660,14 @@ async function poll() {
   try {
     const res = await fetchThreads()
     applyThreads(res.threads || [])
+    const shells = (res.threads || []).filter(t=>t.isShell)
+    swarm.update(shells)
+    if (shells.length) mission.el.hidden = true
+    else void mission.update(res.threads || [])
     hud.removeBoot()
   } catch (err) {
+    if (swarm.el.hidden) mission.stale()
+    swarm.stale()
     hud.toast(err.message || 'Could not reach the thread scanner', 'err')
     hud.removeBoot()
   } finally {

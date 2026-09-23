@@ -69,12 +69,12 @@ function disambiguateProjects(threads) {
  * A harness that throws is skipped rather than allowed to take the scan down with it: one
  * broken adapter should cost you that harness's threads, not the whole colony.
  */
-export async function scanThreads() {
+export async function scanThreads(options = {}) {
   const harnesses = await detectedHarnesses()
   const lists = await Promise.all(
     harnesses.map(async (h) => {
       try {
-        const threads = await h.scanThreads()
+        const threads = await h.scanThreads(options)
         return threads.map((t) => ({ ...t, harness: h.id, harnessName: h.name }))
       } catch (err) {
         console.warn(`bot-crossing: harness "${h.id}" failed to scan —`, err?.message || err)

@@ -1,5 +1,10 @@
 # Bot Crossing — your agent threads, as a colony
 
+This fork adds ten persistent, color-coded Swarm stations, observed subagent status,
+and a read-only adapter to a separate Swarm protocol installation. See the
+[fork change summary](FORK-CHANGES.md) for differences from the original, and
+[Swarm installation notes](SWARM-VIEWER.md) for configuration.
+
 **[botcrossing.com](https://botcrossing.com)**
 
 Every coding-agent thread on this machine is a little astronaut. They walk out of the ship, claim

@@ -3,6 +3,7 @@ import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { apiMiddleware } from './api.mjs'
+import { artifactMiddleware } from './dyson-artifacts.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const DIST = path.join(here, '..', 'dist')
@@ -27,7 +28,8 @@ function resolveInDist(pathname) {
   return file === DIST || file.startsWith(DIST + path.sep) ? file : null
 }
 
-const server = http.createServer(async (req, res) => {
+const artifacts = artifactMiddleware()
+const server = http.createServer((req, res) => artifacts(req, res, async () => {
   const url = new URL(req.url, 'http://localhost')
 
   if (url.pathname.startsWith('/api/')) {
@@ -56,7 +58,7 @@ const server = http.createServer(async (req, res) => {
   } catch {
     res.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found')
   }
-})
+}))
 
 server.listen(PORT, HOST, () => {
   console.log(`Bot Crossing → http://${HOST}:${PORT}`)

@@ -3,6 +3,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { loadSwarm, projectShells, scrollFor } from './swarm.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
 import {
   defaultHarness,
@@ -363,11 +364,23 @@ export async function apiMiddleware(req, res, next) {
 
   try {
     if (url.pathname === '/api/threads' && req.method === 'GET') {
-      const threads = await reconcileArchived(await scanThreads())
+      let swarmState, swarmWarning
+      try { swarmState = await loadSwarm() } catch(error) { swarmWarning = `Swarm shells unavailable: ${error.message}` }
+      const workerBindings = swarmState?.active?.assignments.map(a=>a.binding).filter(Boolean) || []
+      let threads = await reconcileArchived(await scanThreads({workerBindings}))
       // A harness that is present but cannot read its own store says so here, rather than
       // appearing healthy in the list while quietly contributing nothing.
       const warnings = (await harnessStatus()).filter((h) => h.detected && h.error).map((h) => h.error)
+      if (swarmState) threads = projectShells(threads, swarmState)
+      if (swarmWarning) warnings.push(swarmWarning)
       return send(res, 200, { threads, scannedAt: Date.now(), warnings })
+    }
+
+    if (url.pathname === '/api/swarm/scroll' && req.method === 'GET') {
+      const scroll = await scrollFor(url.searchParams.get('shell'))
+      if (scroll === null) return send(res,404,{error:'No active scroll for this shell'})
+      res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'})
+      return res.end(scroll)
     }
 
     if (url.pathname === '/api/harnesses' && req.method === 'GET') {

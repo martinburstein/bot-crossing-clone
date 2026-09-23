@@ -540,7 +540,7 @@ export class Hud {
       b.type = 'button'
       b.className = `thread ${statusClass(t.status)}`
       b.setAttribute('aria-pressed', String(t.id === project.selectedId))
-      b.title = STATUS_LABEL[t.status] || t.status
+      b.title = t.isShell ? t.shellStatus : STATUS_LABEL[t.status] || t.status
       b.innerHTML =
         '<i class="pip"></i>' +
         `<span class="t">${escapeHtml(t.title || 'Untitled thread')}</span>` +
@@ -585,7 +585,7 @@ export class Hud {
     card.classList.add('on')
 
     this.$('.thread-pop .title').textContent = thread.title || 'Untitled thread'
-    const status = STATUS_LABEL[agent.status] || agent.status
+    const status = thread.isShell ? thread.shellStatus : STATUS_LABEL[agent.status] || agent.status
     const meta = this.$('.thread-pop .meta')
     const bits = [
       `<span class="tag"><i class="swatch" style="background:${hex(agent.trim.getHex())}"></i>${escapeHtml(status)}</span>`,
@@ -605,6 +605,7 @@ export class Hud {
     // often is how a HUD starts costing frames.
     this._cardSize = { w: card.offsetWidth, h: card.offsetHeight }
     this.$('#btn-open').disabled = thread.canOpen === false
+    this.$('#btn-archive').disabled = !!thread.isShell
     // Only offered when there is something to dismiss. A third button on every card would
     // crowd the two that are always worth having, and "Viewed" on a thread that is not asking
     // for anything is a control with no effect.

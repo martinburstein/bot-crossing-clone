@@ -471,7 +471,8 @@ export class Astronauts {
     // for them. Without this the clamp above would quietly drop whoever sorted last, which is
     // better than an empty planet but still not what the scan said.
     const leaving = this.agents.reduce((n, a) => n + (a.state === 'leaving' ? 1 : 0), 0)
-    const wanted = entries.slice(0, Math.max(1, cap - leaving))
+    const prioritized = [...entries.filter(e=>e.thread?.isShell), ...entries.filter(e=>!e.thread?.isShell)]
+    const wanted = prioritized.slice(0, Math.max(1, cap - leaving))
     const seen = new Set()
 
     // The ramp is one door and the ship is a solid obstacle around it, so an entrance is a
@@ -532,7 +533,7 @@ export class Astronauts {
       faceFrame: FACE.boot,
       faceTimer: 0,
       faceIndex: 0,
-      suit: SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length],
+      suit: entry.thread?.suitColor ?? SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length],
       eye: new THREE.Color(1, 1, 1),
       trim: new THREE.Color(0xffffff),
       hop: 0,
@@ -573,6 +574,8 @@ export class Astronauts {
 
   _updateAgent(agent, entry) {
     agent.thread = entry.thread
+    const suit = entry.thread?.suitColor ?? SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length]
+    if (agent.suit !== suit) { agent.suit = suit; agent.colorDirty = true }
     if (entry.site) {
       const moved = Math.hypot(entry.site.x - agent.site.x, entry.site.z - agent.site.z) > 0.05
       agent.site.copy(entry.site)

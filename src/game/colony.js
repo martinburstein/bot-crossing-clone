@@ -67,6 +67,7 @@ export function statusFor(thread, now = Date.now()) {
   if (thread.running) return 'working'
   if (thread.prState === 'MERGED') return 'celebrating'
   if (thread.unread) return 'waiting'
+  if (thread.isShell) return 'idle'
   if (now - thread.lastActivityAt > STALE_MS) return 'sleeping'
   return 'idle'
 }
@@ -405,19 +406,33 @@ export class Colony {
       this.plots.delete(name)
     }
 
-    projects.forEach(([name], index) => {
-      if (this.plots.has(name)) return
+    projects.forEach(([name, list], index) => {
+      const labelText = list[0]?.isShell ? list[0].projectLabel : name
+      const existing = this.plots.get(name)
+      if (existing) {
+        if (existing.labelText !== labelText) {
+          this.labelGroup.remove(existing.label)
+          existing.label?.userData.dispose?.()
+          existing.label = createLabel(labelText, existing.accent)
+          existing.label.position.set(existing.labelAnchor.x, 3.2, existing.labelAnchor.z)
+          existing.labelText = labelText
+          this.labelGroup.add(existing.label)
+        }
+        return
+      }
       const cells = layout.get(name)
       if (!cells?.length) return
-      const accent = this._pickAccent(name)
+      const accent = list[0]?.isShell ? list[0].projectAccent : this._pickAccent(name)
+      this.usedAccents.add(accent)
       const plot = new Plot({ id: name, name, index, cells, accent })
       plot.signature = wanted.get(name)
       this.plots.set(name, plot)
       this.plotGroup.add(plot.group)
 
-      const label = createLabel(name, accent)
+      const label = createLabel(labelText, accent)
       label.position.set(plot.labelAnchor.x, 3.2, plot.labelAnchor.z)
       plot.label = label
+      plot.labelText = labelText
       this.labelGroup.add(label)
     })
 
