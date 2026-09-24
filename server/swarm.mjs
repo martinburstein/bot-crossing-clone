@@ -6,7 +6,7 @@ export {SWARM_ROOT} from './swarm-location.mjs'
 const reader=root=>import(pathToFileURL(path.join(root,'lib','state.mjs')).href)
 export async function loadSwarm(root=SWARM_ROOT) { return (await reader(root)).loadSwarm(root) }
 export async function scrollFor(shellId,root=SWARM_ROOT) { return (await reader(root)).scrollFor(shellId,root) }
-export function projectShells(threads, {roster, active, displayRun, externalWorkers=[]}, root = SWARM_ROOT) {
+export function projectShells(threads, {roster, active, displayRun, projectHistory, externalWorkers=[]}, root = SWARM_ROOT) {
   const run=active || displayRun
   threads=[...threads,...externalWorkers]
   const claimed = new Set()
@@ -23,7 +23,10 @@ export function projectShells(threads, {roster, active, displayRun, externalWork
       id:`swarm:${shell.id}`, isShell:true, shellId:shell.id, shellName:shell.name,
       suitColor:parseInt(shell.color.slice(1),16), shellColor:shell.color, shellStatus,
       assignmentState:task?.state || 'standby', assignmentRole:task?.role || shell.role || '',
-      milestones:task?.milestones || [], constructionRunId:run?.runId || 'standby', runClosed:!!run?.closedAt,
+      // Assignment state belongs to the current run; construction belongs to
+      // the stable project and is rebuilt from canonical milestone receipts.
+      milestones:projectHistory?.milestonesByShell?.[shell.id] || task?.milestones || [],
+      constructionRunId:projectHistory?.projectId || run?.projectId || run?.runId || 'standby', runClosed:!!run?.closedAt,
       protocolExecution:task?.execution || null, attemptCount:task?.attempts?.length || 0,
       dependencies:task?.dependsOn || [], reviewer:task?.reviewer || null, workflow:active?.workflow?.kind || null,
       workerBackend:binding?.backend || (binding?'codex':null),

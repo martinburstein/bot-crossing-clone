@@ -6,7 +6,7 @@ import {allocateCells} from '../src/world/plots.js'
 const colors=Array.from({length:7},(_,i)=>({id:'station-'+i,shellId:'s0'+(i+1),cells:1}))
 const key=c=>`${c.q},${c.r}`
 const distance=(a,b={q:0,r:0})=>(Math.abs(a.q-b.q)+Math.abs(a.r-b.r)+Math.abs(a.q+a.r-b.q-b.r))/2
-test('minor milestones add and upgrade items; major milestones add exactly one hex; run reset clears it',()=>{
+test('construction reflects supplied active receipts without inventing growth',()=>{
   assert.deepEqual(constructionFor({}).structures,[])
   let milestones=Array.from({length:7},(_,i)=>({id:'minor-'+i,level:'minor',title:'Checkpoint '+i}))
   let plan=constructionFor({milestones,sizeBytes:100000000,running:true})

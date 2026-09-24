@@ -82,11 +82,16 @@ test('ROYGBIV and external Swarms workers project by exact binding without fake 
  assert.deepEqual(adapter.projectShells([],{roster:renamed,active:null}).map(s=>s.project),adapter.projectShells([],{roster:seven,active:null}).map(s=>s.project))
 })
 
-test('archived construction remains visible without reviving workers and a new project clears it',()=>{
+test('archived project construction persists across successor runs but stays isolated by project',()=>{
  const archive={...active,closedAt:20,outcome:'accepted',assignments:active.assignments.map(a=>({...a,state:'accepted',milestones:[{id:'verified',level:'major',title:'Verified phase'}]}))}
  const observed={id:'codex:worker',...binding,running:true}
  const shells=adapter.projectShells([observed],{roster,active:null,displayRun:archive}).filter(t=>t.isShell)
  assert.ok(shells.every(s=>s.milestones.length===1 && s.shellStatus==='Complete' && !s.running && !s.canOpen && !s.scrollUrl))
- const next={...active,runId:'next-project',assignments:active.assignments.map(a=>({...a,binding:null,milestones:[]}))}
- assert.ok(adapter.projectShells([],{roster,active:next,displayRun:archive}).every(s=>s.milestones.length===0 && s.shellStatus==='Queued'))
+ const next={...active,runId:'next-run',projectId:'pet-lab',assignments:active.assignments.map(a=>({...a,binding:null,milestones:[]}))}
+ const history={projectId:'pet-lab',milestonesByShell:Object.fromEntries(archive.assignments.map(a=>[a.shellId,a.milestones.map(m=>({...m,sourceRunId:archive.runId}))]))}
+ const continued=adapter.projectShells([],{roster,active:next,displayRun:archive,projectHistory:history})
+ assert.ok(continued.every(s=>s.milestones.length===1 && s.shellStatus==='Queued' && s.constructionRunId==='pet-lab'))
+ const different={...next,runId:'different-project',projectId:'garden'}
+ const clean={projectId:'garden',milestonesByShell:{}}
+ assert.ok(adapter.projectShells([],{roster,active:different,projectHistory:clean}).every(s=>s.milestones.length===0 && s.shellStatus==='Queued'))
 })
