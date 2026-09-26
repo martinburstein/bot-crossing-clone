@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f6f5">
+  <title>Goldfish · native pet preview</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Goldfish preview home"><span class="brand-mark">✳</span> little orbit</a>
+      <span class="preview-badge"><i></i> ART PREVIEW</span>
+    </header>
+
+    <section class="intro" aria-labelledby="title">
+      <p class="eyebrow">A tiny companion, in motion</p>
+      <h1 id="title">Meet <em>Goldie.</em></h1>
+      <p class="lede">A little goldfish for your desktop. Move your pointer around the tank to turn the fish.</p>
+    </section>
+
+    <section class="card" aria-label="Goldfish animation preview">
+      <div class="tank" id="tank" role="region" tabindex="0" aria-label="Goldfish tank preview; scroll horizontally to view the larger sizes">
+        <div class="tank-canvas" id="tank-canvas">
+        <div class="tank-glow"></div>
+        <span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><span class="bubble bubble-three"></span>
+        <div class="fish-wrap" id="fish-wrap">
+          <div class="fish" id="fish" role="img" aria-label="Goldfish facing left"></div>
+          <span class="fish-shadow"></span>
+        </div>
+        <span class="tank-caption">move around to look</span>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="state-line"><div><span class="eyebrow">CURRENT MOOD</span><strong id="state-label" aria-live="polite">Idle</strong></div><span class="frame-indicator" id="frame-label">frame 1 / 6</span></div>
+        <div class="state-buttons" id="state-buttons" aria-label="Choose an animation state"></div>
+        <div class="footer-line"><span class="native-size">192 × 208 <span>native pixels</span></span><label class="zoom-control">Preview size <select id="zoom" aria-label="Preview size"><option value="1">1× · native</option><option value="2" selected>2×</option><option value="3">3×</option></select></label></div>
+      </div>
+    </section>
+
+    <p class="honesty"><span>✦</span> Preview only · Native Codex playback has not been verified.</p>
+    <footer>Made of 73 hand-shaped frames <span>·</span> 9 moods <span>·</span> 16 directions</footer>
+  </main>
+  <script type="module" src="app.mjs"></script>
+</body>
+</html>
