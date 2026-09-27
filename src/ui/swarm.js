@@ -33,7 +33,7 @@ export class SwarmPanel {
   render(stale) {
     const working=this.shells.filter(s=>s.running).length
     this.summary.textContent=stale ? 'Swarm · live status unknown' : `Swarm · ${this.shells.length} shells · ${working} working`
-    const signature=JSON.stringify([stale,this.shells.map(s=>[s.id,s.shellName,s.shellColor,s.shellStatus,s.assignmentState,s.assignmentRole,s.scrollUrl,s.runId,s.protocolExecution,s.attemptCount,s.workerBackend,s.dependencies,s.reviewer,s.workflow,s.milestones])])
+    const signature=JSON.stringify([stale,this.shells.map(s=>[s.id,s.shellName,s.shellColor,s.shellStatus,s.assignmentState,s.assignmentRole,s.scrollUrl,s.runId,s.protocolExecution,s.attemptCount,s.workerBackend,s.dependencies,s.reviewer,s.workflow,s.milestones,s.growthPolicy])])
     if(this.signature===signature) return
     this.signature=signature
     this.body.replaceChildren()
@@ -53,7 +53,7 @@ export class SwarmPanel {
       li.append(button,status)
       const construction=constructionFor(shell),progress=document.createElement('small')
       progress.className='swarm-progress'
-      progress.textContent=`${construction.cells} hexagon${construction.cells===1?'':'s'} · ${construction.minor} minor · ${construction.major} major`
+      progress.textContent=`${construction.cells} hexagon${construction.cells===1?'':'s'} · ${construction.minor} minor · ${construction.major} major${construction.capacityExpansions?' · '+construction.capacityExpansions+' space earned':''}`
       li.append(progress)
       if(construction.latest) {const checkpoint=document.createElement('small');checkpoint.className='swarm-progress';checkpoint.textContent=construction.latest.title;li.append(checkpoint)}
       if(shell.runId) {

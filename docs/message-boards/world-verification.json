@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "projectId": "ws-828f1f440a6f7a6dbb6df596",
+  "oldFile": "C:/Users/marti/OneDrive/Desktop/Swarm/worlds/ws-828f1f440a6f7a6dbb6df596/2026-09-27T20-44-00-037Z-before-message-boards-e845218c.world.json",
+  "newFile": "C:/Users/marti/OneDrive/Desktop/Swarm/worlds/ws-828f1f440a6f7a6dbb6df596/2026-09-27T21-00-45-697Z-message-boards-final-e81d874b.world.json",
+  "oldCanonicalFilesUnchanged": 73,
+  "preservedExistingStructures": true,
+  "preservedOldHexagonCoordinates": true,
+  "liveLayoutMatchesSave": true,
+  "boards": 8,
+  "messages": 3,
+  "capacityExpansions": [
+    {
+      "shell": "s01",
+      "count": 1
+    },
+    {
+      "shell": "s02",
+      "count": 0
+    },
+    {
+      "shell": "s03",
+      "count": 0
+    },
+    {
+      "shell": "s04",
+      "count": 0
+    },
+    {
+      "shell": "s05",
+      "count": 0
+    },
+    {
+      "shell": "s06",
+      "count": 0
+    },
+    {
+      "shell": "s07",
+      "count": 0
+    }
+  ]
+}

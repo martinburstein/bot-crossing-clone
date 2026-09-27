@@ -380,7 +380,7 @@ export class Colony {
     // between polls, and the colony file carries it between sessions.
     const swarmProjects=projects.filter(([,list])=>list[0]?.isShell)
     const memoryKeys=new Map(swarmProjects.map(([id,list])=>[id,`${id}@${list[0].constructionRunId}`]))
-    const remembered=new Map([...memoryKeys].map(([id,key])=>[id,this.plotCells.get(key)]))
+    const remembered=new Map(swarmProjects.map(([id,list])=>[id,this.plotCells.get(memoryKeys.get(id)) || list[0].growthPolicy?.preservedLayouts?.[list[0].constructionRunId]?.[list[0].shellId]]))
     const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,cells:constructionFor(list[0]).cells})),remembered)
     const ordinary=allocateCells(projects.filter(([,list])=>!list[0]?.isShell).map(([id,list])=>({id,size:list.length})),this.plotCells,[...swarmLayout.values()].flat())
     const layout=new Map([...swarmLayout,...ordinary])

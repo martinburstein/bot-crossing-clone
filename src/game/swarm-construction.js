@@ -2,20 +2,33 @@
 export function constructionFor(shell) {
   const milestones=(shell.milestones || []).filter(m=>!m.retractedAt)
   const structures=new Map()
-  let cell=0,minor=0
+  let cell=0,minor=0,major=0,migrated=false
   const perCell=new Map()
+  const growthAwards=[]
+  const policy=shell.growthPolicy,capacity=policy?.version===2
+  const expandIfFull=milestone=>{
+    if(!capacity || (perCell.get(cell)||0)<6)return
+    const fromCell=cell++
+    growthAwards.push({id:`capacity:${fromCell}:${milestone?.sourceRunId||''}:${milestone?.id||'legacy'}`,
+      fromCell,toCell:cell,reason:'Six verified item slots filled',sourceMilestoneId:milestone?.id||null})
+  }
   for(const milestone of milestones) {
+    const legacy=capacity && (!Number.isFinite(milestone.at)||milestone.at<=policy.legacyThrough)
+    if(capacity&&!legacy&&!migrated){expandIfFull(milestones[milestones.indexOf(milestone)-1]);migrated=true}
     if(milestone.level==='major') {
-      cell++
+      cell++;major++
       structures.set(`${cell}:0`,{key:`${cell}:0`,slot:cell*7,level:1,title:milestone.title,major:true})
     } else if(milestone.level==='minor') {
       minor++
       const count=(perCell.get(cell) || 0)+1;perCell.set(cell,count)
       const slot=1+(count-1)%6,key=`${cell}:${slot}`
       structures.set(key,{key,slot:cell*7+slot,level:1+Math.floor((count-1)/6),title:milestone.title,major:false})
+      if(capacity&&!legacy)expandIfFull(milestone)
     }
   }
-  return {cells:1+cell,minor,major:cell,structures:[...structures.values()],latest:milestones.at(-1) || null}
+  if(capacity&&!migrated)expandIfFull(milestones.at(-1))
+  return {cells:1+cell,minor,major,capacityExpansions:growthAwards.length,growthAwards,
+    structures:[...structures.values()],latest:milestones.at(-1) || null}
 }
 
 const directions=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]]

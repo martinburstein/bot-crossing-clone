@@ -1,0 +1,25 @@
+
+> bot-crossing@1.0.0 build
+> npm run assets --silent && vite build
+
+build-kit: no source pack, keeping the existing public/assets/spacebase.glb
+build-kit: no source pack, keeping the existing public/assets/forest.glb
+build-crew: no source pack, keeping the existing public/assets/crew.glb
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 61 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                         0.74 kB │ gzip:   0.45 kB
+dist/dyson/index.html                   6.12 kB │ gzip:   2.76 kB
+dist/assets/dyson-CsVBwuq6.css          4.49 kB │ gzip:   1.51 kB
+dist/assets/main-1zkPO9gp.css          21.67 kB │ gzip:   5.42 kB
+dist/assets/dyson-kgHURPrr.js          28.28 kB │ gzip:   8.33 kB
+dist/assets/main-B7PSNtKT.js          322.84 kB │ gzip: 123.65 kB
+dist/assets/three.module-BWt9sNe9.js  590.91 kB │ gzip: 150.54 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.88s

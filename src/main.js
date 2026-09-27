@@ -7,6 +7,8 @@ import { Colony, STATUS_LABEL, STATUS_ORDER, statusFor, transcriptProgress } fro
 import { Hud } from './ui/hud.js'
 import { MissionPanel } from './ui/mission.js'
 import { SwarmPanel } from './ui/swarm.js'
+import {MessageBoards} from './world/message-boards.js'
+import {MessageBoardPanel} from './ui/message-boards.js'
 import { PLANETS } from './world/planet.js'
 import { loadKit } from './world/kit.js'
 import { crewRig, loadCrew } from './agents/crew.js'
@@ -286,6 +288,11 @@ const actions = {
 const hud = new Hud(app, settings, actions)
 const mission = new MissionPanel(app, id => select(id, { fly: true }))
 const swarm = new SwarmPanel(app, id => select(id, { fly: true }))
+const messageBoards=new MessageBoards(engine.scene)
+const boardPanel=new MessageBoardPanel(app,id=>{
+  const board=messageBoards.boards.get(id)
+  if(board)rig.focus(board.position,{distance:25})
+})
 // The sidebar is permanent, so the card beside an astronaut has a wall to stay clear of.
 const sideWidth = () => (window.innerWidth <= 820 ? 0 : 334)
 hud.setSideWidth(sideWidth())
@@ -461,7 +468,7 @@ engine.canvas.addEventListener('pointermove', (e) => {
   // Pointing at a quiet plot is what makes its name appear.
   const plot = plotUnder(e, p)
   colony.setHoveredPlot(plot)
-  engine.canvas.style.cursor = agent || plot ? 'pointer' : 'grab'
+  engine.canvas.style.cursor = messageBoards.pick(engine.camera,p.x,p.y) || agent || plot ? 'pointer' : 'grab'
 })
 
 /**
@@ -485,6 +492,8 @@ function plotUnder(e, p) {
 engine.canvas.addEventListener('pointerup', (e) => {
   if (e.button !== 0 || !rig.wasClick) return
   const p = ndc(e)
+  const board=messageBoards.pick(engine.camera,p.x,p.y)
+  if(board){boardPanel.open(board);return}
   const agent = colony.pick(p.x, p.y, p.aspect)
   if (agent) {
     select(agent.id, {})
@@ -681,12 +690,15 @@ async function poll() {
     applyThreads(res.threads || [])
     const shells = (res.threads || []).filter(t=>t.isShell)
     swarm.update(shells)
+    messageBoards.sync(shells,colony.plotOrder)
+    boardPanel.update(res.messageBoards,shells)
     if (shells.length) mission.el.hidden = true
     else void mission.update(res.threads || [])
     hud.removeBoot()
   } catch (err) {
     if (swarm.el.hidden) mission.stale()
     swarm.stale()
+    boardPanel.stale()
     hud.toast(err.message || 'Could not reach the thread scanner', 'err')
     hud.removeBoot()
   } finally {

@@ -378,7 +378,7 @@ export async function apiMiddleware(req, res, next) {
       if (swarmState) threads = projectShells(threads, swarmState)
       if (swarmState?.runtimeWarnings) warnings.push(...swarmState.runtimeWarnings)
       if (swarmWarning) warnings.push(swarmWarning)
-      return send(res, 200, { threads, scannedAt: Date.now(), warnings })
+      return send(res, 200, { threads, scannedAt: Date.now(), warnings,messageBoards:swarmState?.messageBoards || null })
     }
 
     if (url.pathname === '/api/swarm/scroll' && req.method === 'GET') {
