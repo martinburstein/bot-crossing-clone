@@ -682,6 +682,34 @@ body {
   flex: none;
 }
 
+.magi-alignment {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  padding: 0 5px;
+  color: var(--muted);
+  font: 600 9px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.magi-alignment[hidden] { display: none; }
+.magi-alignment-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #253039;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+}
+.magi-alignment-pip.active { background: #ff4d58; box-shadow: 0 0 8px currentColor; }
+.magi-alignment[data-mode="green"] .magi-alignment-pip.active { background: #53f0a2; }
+.magi-alignment[data-mode="rainbow"] .magi-alignment-pip.active {
+  background: linear-gradient(125deg, #ff5261, #ffcd4c, #53f0a2, #62b8ff, #d77dff, #ff5261);
+  background-size: 220% 220%;
+  animation: magi-rainbow 3.6s linear infinite;
+}
+.magi-alignment strong { margin-left: 3px; color: var(--text); font-size: 9px; }
+@keyframes magi-rainbow { to { background-position: 220% 0; } }
+@media (prefers-reduced-motion: reduce) { .magi-alignment-pip { animation: none !important; } }
+
 .side .brandbar .btn {
   width: 30px;
   min-width: 30px;

@@ -4,6 +4,7 @@ import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { loadSwarm, projectShells, scrollFor, SWARM_ROOT } from './swarm.mjs'
+import { magiHealth, magiSourceUrl, projectMagiState, readMagiState } from './magi.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
 import {
   defaultHarness,
@@ -363,6 +364,23 @@ export async function apiMiddleware(req, res, next) {
   }
 
   try {
+    const magiMode = Boolean(magiSourceUrl())
+    if (magiMode && ['/api/open', '/api/new-session', '/api/reveal', '/api/swarm/health', '/api/swarm/scroll', '/api/harnesses'].includes(url.pathname)) {
+      return send(res, 404, { error: 'This read-only MAGI cover does not expose legacy harness or Swarm controls' })
+    }
+    if (url.pathname === '/api/magi/health' && req.method === 'GET') {
+      const health = await magiHealth()
+      return send(res, health.ready ? 200 : 503, health)
+    }
+    if (url.pathname === '/api/threads' && req.method === 'GET' && magiSourceUrl()) {
+      try {
+        const state = await readMagiState()
+        const projection = projectMagiState(state)
+        return send(res, 200, { threads: projection.threads, scannedAt: Date.now(), warnings: [], messageBoards: null, mode: 'magi', alignment: projection.alignment })
+      } catch {
+        return send(res, 503, { error: 'MAGI state is unavailable or invalid', mode: 'magi', threads: [], alignment: null })
+      }
+    }
     if (url.pathname === '/api/swarm/health' && req.method === 'GET') {
       const swarm=await loadSwarm()
       return send(res,200,{application:'bot-crossing-swarm',protocol:2,milestones:1,viewerRoot:path.resolve(here,'..'),swarmRoot:SWARM_ROOT,shells:swarm.roster.shells.length,runId:swarm.active?.runId || null})
@@ -424,12 +442,14 @@ export async function apiMiddleware(req, res, next) {
     }
 
     if (url.pathname === '/api/open' && req.method === 'POST') {
+      if (magiSourceUrl()) return send(res, 403, { ok: false, error: 'Opening coding-agent threads is disabled in read-only MAGI view' })
       const { harness, ref } = await readJsonBody(req)
       const shown = await present(await harnessOpenThread(harness, ref))
       return send(res, shown.ok ? 200 : 400, shown)
     }
 
     if ((url.pathname === '/api/new-session' || url.pathname === '/api/reveal') && req.method === 'POST') {
+      if (magiSourceUrl()) return send(res, 403, { ok: false, error: 'Local coding-agent actions are disabled in read-only MAGI view' })
       const { folder, harness } = await readJsonBody(req)
       const dir = await resolveFolder(folder)
       if (!dir) return send(res, 400, { ok: false, error: 'That folder is not on this machine any more' })

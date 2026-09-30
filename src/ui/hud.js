@@ -397,6 +397,19 @@ export class Hud {
     }
   }
 
+  setMagiAlignment(alignment) {
+    const host = this.$('.magi-alignment')
+    if (!host) return
+    host.hidden = !alignment
+    if (!alignment) return
+    const pips = [...host.querySelectorAll('.magi-alignment-pip')]
+    alignment.clusters.forEach((active, index) => pips[index]?.classList.toggle('active', Boolean(active)))
+    host.dataset.mode = alignment.mode
+    host.querySelector('strong').textContent = `${alignment.count}/3`
+    host.setAttribute('aria-label', `${alignment.count} of 3 MAGI clusters running. Reservations do not count.`)
+    host.title = 'One confirmed running worker per cluster: 3 rainbow · 2 green · 1 red · 0 off. Reservations do not count.'
+  }
+
   /**
    * Every repo, in the sidebar. This was a strip of chips along the bottom of the screen;
    * it is a list now because the sidebar is where all the chrome lives, and because a list
@@ -907,6 +920,7 @@ const TEMPLATE = `
 <aside class="side panel">
   <header class="brandbar">
     <div class="brand"><i class="dot"></i>Bot Crossing</div>
+    <div class="magi-alignment" hidden aria-label="MAGI alignment unavailable"><span class="magi-alignment-pip"></span><span class="magi-alignment-pip"></span><span class="magi-alignment-pip"></span><strong>0/3</strong></div>
     <button class="btn icon ghost" id="btn-shot" title="Screenshot (P)">${ICON.camera}</button>
     <button class="btn icon ghost" id="btn-help" title="Help (?)">${ICON.help}</button>
     <button class="btn icon ghost" id="btn-hide" title="Hide all UI (H)">${ICON.eye}</button>

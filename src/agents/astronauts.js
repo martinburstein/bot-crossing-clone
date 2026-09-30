@@ -40,6 +40,21 @@ const AGENT_LOOK = {
   leaving: { trim: 0x6f7f75, eye: [1.0, 1.0, 1.1] },
 }
 
+// Read-only MAGI face lighting mirrors the standalone viewer's 3/2/1/0 alignment cue.
+// It changes the face instance color only; suit, antenna and status lamps keep their design.
+function magiFaceColor(mode, timeMs, reducedMotion, target) {
+  if (mode === 'off') return target.setRGB(0, 0, 0)
+  if (mode === 'red') return target.set('#ff4d58').multiplyScalar(1.8)
+  if (mode === 'green') return target.set('#53f0a2').multiplyScalar(1.8)
+  const hue = ((reducedMotion ? 0 : timeMs / 12000) % 1 + 1) % 1
+  const rgb = [0, 8, 4].map(n => {
+    const k = (n + hue * 12) % 12
+    return Math.round((.64 - .36 * Math.max(-1, Math.min(k - 3, 9 - k, 1))) * 255).toString(16).padStart(2, '0')
+  })
+  const pulse = reducedMotion ? 1 : .65 + .35 * (.5 + .5 * Math.sin(timeMs / 2800 * Math.PI * 2))
+  return target.set(`#${rgb.join('')}`).multiplyScalar(pulse)
+}
+
 const WALK_SPEED = 2.1
 const TURN_RATE = 7.5
 /**
@@ -126,6 +141,7 @@ export class Astronauts {
     this.settings = settings
     this.agents = []
     this.byId = new Map()
+    this.alignmentLights = null
     this.capacity = 0
     this.group = new THREE.Group()
     this.group.name = 'astronauts'
@@ -497,6 +513,13 @@ export class Astronauts {
       if (!seen.has(agent.id) && agent.state !== 'leaving') this._sendHome(agent)
     }
     return this.agents.length
+  }
+
+  setAlignmentLights(alignment) {
+    this.alignmentLights = alignment || null
+    for (const agent of this.agents) {
+      agent.colorDirty = true
+    }
   }
 
   _spawnAgent(entry, walksOut = true) {
@@ -1229,6 +1252,11 @@ export class Astronauts {
         face.setColorAt(i, agent.eye)
         staticDirty = true
       }
+      if (this.alignmentLights) {
+        magiFaceColor(this.alignmentLights.mode, Date.now(), this.settings.get('reducedMotion'), this._alignmentEye || (this._alignmentEye = new THREE.Color()))
+        face.setColorAt(i, this._alignmentEye)
+        staticDirty = true
+      }
 
       // Antenna tip and chest lamp pulse; a blocked agent's lamp stutters like a fault light.
       const pulse =
@@ -1249,7 +1277,7 @@ export class Astronauts {
 
     const n = i
     // The glowing parts pulse every frame; the rest only re-upload when something moved slot.
-    const animated = new Set(['tip', 'lamp'])
+    const animated = this.alignmentLights ? new Set(['tip', 'lamp', 'face']) : new Set(['tip', 'lamp'])
     for (const [name, mesh] of Object.entries(this.parts)) {
       mesh.count = name === 'hammer' ? hands : n
       mesh.instanceMatrix.needsUpdate = true

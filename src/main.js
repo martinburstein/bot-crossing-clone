@@ -33,6 +33,7 @@ import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-project
  */
 
 const SWARM_VIEW = new URLSearchParams(location.search).get('swarm') === '1'
+const MAGI_VIEW = new URLSearchParams(location.search).get('magi') === '1'
 const POLL_MS = SWARM_VIEW ? 3000 : 15000
 const app = document.getElementById('app')
 
@@ -689,6 +690,9 @@ async function poll() {
     const res = await fetchThreads()
     applyThreads(res.threads || [])
     const shells = (res.threads || []).filter(t=>t.isShell)
+    const magiLive = MAGI_VIEW && res.mode === 'magi' && res.alignment
+    colony.astronauts.setAlignmentLights(magiLive ? res.alignment : null)
+    hud.setMagiAlignment(magiLive ? res.alignment : null)
     swarm.update(shells)
     messageBoards.sync(shells,colony.plotOrder)
     boardPanel.update(res.messageBoards,shells)
@@ -696,6 +700,16 @@ async function poll() {
     else void mission.update(res.threads || [])
     hud.removeBoot()
   } catch (err) {
+    if (MAGI_VIEW) {
+      // A failed source read invalidates the last snapshot. Remove it from the scene and turn
+      // off alignment rather than letting an old running state masquerade as current.
+      applyThreads([])
+      colony.astronauts.setAlignmentLights(null)
+      hud.setMagiAlignment(null)
+      swarm.update([])
+      messageBoards.sync([], colony.plotOrder)
+      boardPanel.update(null, [])
+    }
     if (swarm.el.hidden) mission.stale()
     swarm.stale()
     boardPanel.stale()
