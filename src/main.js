@@ -22,6 +22,8 @@ import {
   revealFolder,
 } from './game/api.js'
 import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-projects.js'
+import {standbyMagiThreads} from './game/magi-world.js'
+import {MagiPanel} from './ui/magi-panel.js'
 
 /**
  * Boot and the outer game loop.
@@ -32,8 +34,8 @@ import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-project
  * can never silently drop an archive. Everything else is wiring.
  */
 
-const SWARM_VIEW = new URLSearchParams(location.search).get('swarm') === '1'
-const MAGI_VIEW = new URLSearchParams(location.search).get('magi') === '1'
+const MAGI_VIEW = new URLSearchParams(location.search).get('legacy') !== '1'
+const SWARM_VIEW = MAGI_VIEW || new URLSearchParams(location.search).get('swarm') === '1'
 const POLL_MS = SWARM_VIEW ? 3000 : 15000
 const app = document.getElementById('app')
 
@@ -47,7 +49,8 @@ app.insertAdjacentHTML(
 )
 
 const settings = new Settings()
-if (!hasStoredSettings()) settings.applyPreset(DEFAULT_PRESET)
+if (!hasStoredSettings()) {settings.applyPreset(DEFAULT_PRESET);if(MAGI_VIEW){settings.set('planet','mars');settings.set('timeOfDay',.46)}}
+if(MAGI_VIEW)document.body.classList.add('magi-world')
 
 const engine = new Engine(settings).mount(app)
 const rig = new CameraRig(engine.camera, engine.canvas, settings)
@@ -69,7 +72,7 @@ function frameSwarm() {
   rig.maxDistance=Math.max(150,radius*4)
   rig.worldLimit=Math.max(82,radius+20)
   if(engine.camera.far<radius*6) {engine.camera.far=radius*6;engine.camera.updateProjectionMatrix()}
-  rig.focus(new THREE.Vector3(),{distance:Math.max(110,radius*3.5)})
+  rig.focus(new THREE.Vector3(),{distance:Math.max(110,radius*(MAGI_VIEW?2.65:3.5))})
 }
 let hoverId = null
 let statusCursor = 0
@@ -289,6 +292,10 @@ const actions = {
 const hud = new Hud(app, settings, actions)
 const mission = new MissionPanel(app, id => select(id, { fly: true }))
 const swarm = new SwarmPanel(app, id => select(id, { fly: true }))
+const magiPanel = MAGI_VIEW ? new MagiPanel(app,colony,id=>select(id,{fly:true}),clusterId=>{
+  const camp=colony.astronauts.magiLife.camps.get(clusterId)
+  if(camp)rig.focus(camp.group.position,{distance:66})
+}) : null
 const messageBoards=new MessageBoards(engine.scene)
 const boardPanel=new MessageBoardPanel(app,id=>{
   const board=messageBoards.boards.get(id)
@@ -682,31 +689,41 @@ function applyThreads(list) {
   }
 }
 
+// Last known visuals survive a reload during an outage. Activity is always cleared below.
+function previousMagiProjection() {
+  try {
+    const saved=JSON.parse(localStorage.getItem('botcrossing.15-3A.lastProjection')||'null')
+    if(Array.isArray(saved)&&saved.length===15&&saved.every((t,i)=>t.id===`magi:w${String(i+1).padStart(2,'0')}`&&t.worldProfile==='15-3A'))return saved
+  } catch { /* Optional local display cache. */ }
+  return standbyMagiThreads()
+}
 let polling = false
 async function poll() {
   if (polling) return
   polling = true
   try {
-    const res = await fetchThreads()
+    const res = await fetchThreads(MAGI_VIEW)
+    if(MAGI_VIEW&&res.mode==='magi')try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
     applyThreads(res.threads || [])
     const shells = (res.threads || []).filter(t=>t.isShell)
-    const magiLive = MAGI_VIEW && res.mode === 'magi' && res.alignment
-    colony.astronauts.setAlignmentLights(magiLive ? res.alignment : null)
-    hud.setMagiAlignment(magiLive ? res.alignment : null)
-    swarm.update(shells)
-    messageBoards.sync(shells,colony.plotOrder)
-    boardPanel.update(res.messageBoards,shells)
+    colony.astronauts.setAlignmentLights(null)
+    hud.setMagiAlignment(null)
+    swarm.update(MAGI_VIEW?[]:shells)
+    magiPanel?.update(shells,{standby:res.mode==='standby'})
+    messageBoards.sync(MAGI_VIEW?[]:shells,colony.plotOrder)
+    boardPanel.update(res.messageBoards,MAGI_VIEW?[]:shells)
     if (shells.length) mission.el.hidden = true
     else void mission.update(res.threads || [])
     hud.removeBoot()
   } catch (err) {
     if (MAGI_VIEW) {
-      // A failed source read invalidates the last snapshot. Remove it from the scene and turn
-      // off alignment rather than letting an old running state masquerade as current.
-      applyThreads([])
+      // Preserve earned visuals during an outage, but invalidate all prior activity.
+      const unknown=(threads.length?threads:previousMagiProjection()).map(t=>({...t,running:false,hasError:false,assignmentState:'unknown',shellStatus:'Connection unavailable',tokenUsage:t.tokenUsage?{...t.tokenUsage,cached:true}:null}))
+      applyThreads(unknown)
       colony.astronauts.setAlignmentLights(null)
       hud.setMagiAlignment(null)
       swarm.update([])
+      magiPanel?.update(unknown,{stale:true})
       messageBoards.sync([], colony.plotOrder)
       boardPanel.update(null, [])
     }
@@ -802,6 +819,8 @@ engine.add({
   update(dt, elapsed) {
     rig.update(dt)
     colony.update(dt, elapsed, rig.target)
+    if(MAGI_VIEW&&engine.scene.fog){engine.scene.fog.near=rig.distance+45;engine.scene.fog.far=rig.distance+320}
+    magiPanel?.tick(elapsed)
     // Whatever the camera is orbiting is what should be in focus.
     engine.setFocusDistance(rig.distance)
 
@@ -820,7 +839,7 @@ engine.start()
 boot()
 
 // Handy for poking at the running colony from the console.
-window.botCrossing = { engine, rig, colony, settings, hud, poll, get threads() { return threads } }
+window.botCrossing = { engine, rig, colony, settings, hud, magiPanel, poll, get threads() { return threads } }
 
 /** `execCommand('copy')` over a throwaway textarea — the copy that predates permissions. */
 function copyFallback(text) {

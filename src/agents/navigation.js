@@ -29,10 +29,10 @@ const MAX_EXPANSIONS = 6000
 const SQRT2 = Math.SQRT2
 
 export class Navigation {
-  constructor() {
+  constructor({half=HALF}={}) {
     this.cell = CELL
-    this.half = HALF
-    this.size = Math.ceil((HALF * 2) / CELL)
+    this.half = half
+    this.size = Math.ceil((half * 2) / CELL)
     const n = this.size * this.size
 
     this.blocked = new Uint8Array(n)

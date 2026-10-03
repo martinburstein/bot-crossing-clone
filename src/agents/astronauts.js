@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import { buildFaceAtlas, FACE, FACE_LOOPS, FRAME_COLS, FRAME_ROWS } from './faces.js'
 import { attachMatrixAt, decorateSkinned, frameFor } from './crew.js'
+import {MagiLife} from './magi-life.js'
 
 /**
  * Every astronaut in the colony, drawn in seven draw calls.
@@ -167,6 +168,7 @@ export class Astronauts {
     /** Uniform bucket grid for the separation query, so it stays O(n) as the crew grows. */
     this._buckets = new Map()
     this.nav = null
+    this.magiLife = new MagiLife(scene, settings)
   }
 
   // ── construction ────────────────────────────────────────────────────────────────────
@@ -212,6 +214,7 @@ export class Astronauts {
     // The hammer, held in the right hand while a thread is running. Wood and steel rather
     // than suit white, so it reads as a tool at the distance the colony is watched from.
     parts.hammer = this._mesh(hammerGeometry(R), suit(0.62, { vertexColors: true }), capacity, true)
+    parts.snack = this._mesh(new THREE.CylinderGeometry(.12,.1,.23,8),suit(.48,{color:0xe9a45b}),capacity,true)
 
     // Face: the features only, drawn straight onto the visor beneath. Built as a sphere cap
     // a hair larger than the visor, so it lies exactly on the curved surface instead of
@@ -512,6 +515,7 @@ export class Astronauts {
     for (const agent of this.agents) {
       if (!seen.has(agent.id) && agent.state !== 'leaving') this._sendHome(agent)
     }
+    this.magiLife.sync(this.agents,this.world)
     return this.agents.length
   }
 
@@ -537,6 +541,7 @@ export class Astronauts {
       thread: entry.thread,
       status: entry.status,
       site: entry.site ? entry.site.clone() : new THREE.Vector3(),
+      home: entry.home ? entry.home.clone() : (entry.site?.clone() || new THREE.Vector3()),
       // The thing being worked on, and where round it this astronaut is standing to do it.
       anchor: entry.anchor ? entry.anchor.clone() : null,
       workSpot: new THREE.Vector3(),
@@ -598,6 +603,7 @@ export class Astronauts {
   _updateAgent(agent, entry) {
     const newSwarmProject=entry.thread?.isShell && agent.thread?.constructionRunId!==entry.thread.constructionRunId
     agent.thread = entry.thread
+    if(entry.home) agent.home.copy(entry.home)
     const suit = entry.thread?.suitColor ?? SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length]
     if (agent.suit !== suit) { agent.suit = suit; agent.colorDirty = true }
     if (entry.site) {
@@ -678,6 +684,7 @@ export class Astronauts {
 
     this._rebuildBuckets()
     this._routeBudget = PATH_BUDGET
+    this.magiLife.update(this.agents,this.world,elapsed)
 
     for (let i = this.agents.length - 1; i >= 0; i--) {
       const agent = this.agents[i]
@@ -735,13 +742,22 @@ export class Astronauts {
   }
 
   _step(agent, dt, elapsed, anim) {
+    if(agent.mounted && agent.thread.running) {
+      agent.pos.copy(agent.magiSeat);agent.yaw=agent.magiYaw;agent.targetYaw=agent.magiYaw
+      agent.scale=1;agent.state='at-site';agent.vel.set(0,0,0);agent.groundSpeed=0;agent.hop=0
+      return
+    }
     const fromX = agent.pos.x
     const fromZ = agent.pos.z
     agent.blocked = false
     // Distance is always measured to the real goal; steering follows the route to it.
+    const originalSite=agent.site
+    if(agent.magiActivity)agent.site=agent.magiGoal
     const steer = this._steerTarget(agent, this._wp)
+    const goal=agent.site
+    agent.site=originalSite
     const toSite = this._v.set(steer.x - agent.pos.x, 0, steer.z - agent.pos.z)
-    const dist = Math.hypot(agent.site.x - agent.pos.x, agent.site.z - agent.pos.z)
+    const dist = Math.hypot(goal.x - agent.pos.x, goal.z - agent.pos.z)
 
     switch (agent.state) {
       case 'spawning': {
@@ -780,7 +796,9 @@ export class Astronauts {
       }
 
       case 'at-site': {
-        if (agent.status === 'idle') {
+        if (agent.magiActivity) {
+          this._magiRoutine(agent,dt)
+        } else if (agent.status === 'idle' && agent.thread.assignmentState!=='unknown') {
           // Idlers potter around their plot, and `_drift` owns their velocity outright.
           this._drift(agent, dt, elapsed)
         } else if (agent.status === 'working' && agent.anchor) {
@@ -948,6 +966,22 @@ export class Astronauts {
   }
 
   /** A slow wander inside the plot, re-targeted every few seconds. */
+  _magiRoutine(agent,dt) {
+    const goal=agent.magiGoal
+    const distance=Math.hypot(goal.x-agent.pos.x,goal.z-agent.pos.z)
+    agent.magiSettled=distance<.65
+    if(!agent.magiSettled) {
+      const site=agent.site
+      agent.site=goal
+      const target=this._steerTarget(agent,this._wp)
+      agent.site=site
+      const direction=this._v.set(target.x-agent.pos.x,0,target.z-agent.pos.z)
+      this._walk(agent,direction,distance,dt,.7)
+    } else {
+      agent.vel.set(0,0,0);this._faceToward(agent,agent.magiLook,dt);this._settle(agent,dt)
+    }
+  }
+
   _drift(agent, dt, elapsed) {
     if (elapsed > agent.wanderAt) {
       agent.wanderAt = elapsed + 3 + Math.random() * 5
@@ -1121,9 +1155,12 @@ export class Astronauts {
     // just under the line.
     const speed = agent.groundSpeed || 0
     let key
-    if (agent.state === 'spawning') key = 'spawn'
+    if (agent.mounted) key = 'drive'
+    else if (agent.state === 'spawning') key = 'spawn'
     else if (speed > 0.12) key = speed > WALK_SPEED * 1.25 ? 'run' : 'walk'
-    else {
+    else if(agent.magiActivity && agent.magiSettled && agent.status==='idle') {
+      key={tinker:'tinker',talk:'talk',board:'readBoard',snack:'snack'}[agent.magiActivity] || 'idle'
+    } else {
       switch (agent.status) {
         case 'working':
           key = 'work'
@@ -1171,7 +1208,7 @@ export class Astronauts {
   // ── writing the instance buffers ────────────────────────────────────────────────────
 
   _writeMatrices(elapsed, anim) {
-    const { helmet, visor, pack, antenna, tip, lamp, face, hammer } = this.parts
+    const { helmet, visor, pack, antenna, tip, lamp, face, hammer, snack } = this.parts
     const rig = this.rig
     const crew = this.crew
     const root = this._m
@@ -1187,6 +1224,7 @@ export class Astronauts {
 
     let i = 0
     let hands = 0
+    let snacks = 0
     let staticDirty = false
     for (const agent of this.agents) {
       // Never write past the end of the instance buffers. Going over is not a rendering
@@ -1234,7 +1272,11 @@ export class Astronauts {
 
         // The hammer only exists while a thread is running, so it gets its own instance
         // counter — an unused slot in the middle of an instanced mesh still draws.
-        if (agent.clipKey === 'work') {
+        if(agent.clipKey==='snack') {
+          attachMatrixAt(rig,agent.frame,this.handSlot,bone);worn.multiplyMatrices(root,bone)
+          setPart(child,worn,snack,snacks++,0,-.13,.06,0,0,Math.PI)
+        }
+        if (agent.clipKey === 'work' || agent.clipKey === 'tinker') {
           attachMatrixAt(rig, agent.frame, this.handSlot, bone)
           worn.multiplyMatrices(root, bone)
           setPart(child, worn, hammer, hands++, P.gripX, P.gripY, P.gripZ, P.gripRx, 0, P.gripRz)
@@ -1279,7 +1321,7 @@ export class Astronauts {
     // The glowing parts pulse every frame; the rest only re-upload when something moved slot.
     const animated = this.alignmentLights ? new Set(['tip', 'lamp', 'face']) : new Set(['tip', 'lamp'])
     for (const [name, mesh] of Object.entries(this.parts)) {
-      mesh.count = name === 'hammer' ? hands : n
+      mesh.count = name === 'hammer' ? hands : name === 'snack' ? snacks : n
       mesh.instanceMatrix.needsUpdate = true
       if (mesh.instanceColor && (staticDirty || animated.has(name))) mesh.instanceColor.needsUpdate = true
     }
@@ -1399,6 +1441,7 @@ export class Astronauts {
   }
 
   dispose() {
+    this.magiLife.dispose()
     for (const mesh of Object.values(this.parts)) {
       mesh.geometry.dispose()
       mesh.material.dispose()

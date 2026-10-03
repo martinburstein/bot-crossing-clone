@@ -178,3 +178,16 @@ test('viewedAt is carried through the v1 migration with the ids it keys on', asy
     assert.deepEqual(Object.keys(state.viewedAt), [`claude-code:${id}`])
   })
 })
+
+test('15-3A display saves are isolated from the legacy colony and retain conflict protection',async()=>{
+  await withServer(async({call,dir,put})=>{
+    await put({plots:{legacy:[[7,7]]},archived:['legacy-agent']})
+    const before=await fsp.readFile(path.join(dir,'colony.json'),'utf8')
+    const first=await call('/api/magi/colony',{method:'PUT',body:JSON.stringify({plots:{magi:[[1,0]]},archived:[]})})
+    assert.equal(first.status,200);const saved=await first.json()
+    assert.deepEqual((await(await call('/api/magi/colony')).json()).plots,{magi:[[1,0]]})
+    assert.equal(await fsp.readFile(path.join(dir,'colony.json'),'utf8'),before)
+    const stale=await call('/api/magi/colony',{method:'PUT',body:JSON.stringify({baseUpdatedAt:saved.updatedAt-1,plots:{bad:[]}})})
+    assert.equal(stale.status,409)
+  })
+})

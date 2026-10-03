@@ -14,7 +14,8 @@ const post = (url, payload) =>
     body: JSON.stringify(payload),
   })
 
-export const fetchThreads = () => req('/api/threads')
+export const fetchThreads = (magi=false) => req(magi?'/api/magi/world':'/api/threads')
+const STATE_URL=typeof location!=='undefined'&&new URLSearchParams(location.search).get('legacy')!=='1'?'/api/magi/colony':'/api/state'
 
 /**
  * The colony file, and the base every later save is measured against.
@@ -35,7 +36,7 @@ function adoptBase(state, updatedAt) {
 }
 
 export const fetchState = async () => {
-  const state = await req('/api/state')
+  const state = await req(STATE_URL)
   adoptBase(state)
   return state
 }
@@ -58,7 +59,7 @@ const SAVE_TRIES = 3
 export async function saveState(state) {
   let local = state
   for (let attempt = 0; attempt < SAVE_TRIES; attempt++) {
-    const res = await fetch('/api/state', {
+    const res = await fetch(STATE_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...local, baseUpdatedAt }),

@@ -5,6 +5,8 @@ import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { loadSwarm, projectShells, scrollFor, SWARM_ROOT } from './swarm.mjs'
 import { magiHealth, magiSourceUrl, projectMagiState, readMagiState } from './magi.mjs'
+import {readMagiTokens} from './magi-tokens.mjs'
+import {standbyMagiThreads} from '../src/game/magi-world.js'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
 import {
   defaultHarness,
@@ -17,6 +19,7 @@ import {
 const here = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = process.env.BOT_CROSSING_DATA || path.join(here, '..', 'data')
 const STATE_FILE = path.join(DATA_DIR, 'colony.json')
+const MAGI_STATE_FILE = path.join(DATA_DIR, 'colony-15-3A.json')
 
 const STATE_VERSION = 2
 
@@ -65,9 +68,9 @@ const emptyState = () => ({
 const asObject = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {})
 const asArray = (v) => (Array.isArray(v) ? v : [])
 
-async function readState() {
+async function readState(file=STATE_FILE) {
   try {
-    const raw = migrate(JSON.parse(await fsp.readFile(STATE_FILE, 'utf8')))
+    const raw = migrate(JSON.parse(await fsp.readFile(file, 'utf8')))
     return {
       version: STATE_VERSION,
       archived: asArray(raw.archived),
@@ -102,7 +105,7 @@ let writeQueue = Promise.resolve()
 let tmpSeq = 0
 const serialise = (fn) => (writeQueue = writeQueue.then(fn, fn))
 
-async function writeState(next) {
+async function writeState(next,file=STATE_FILE) {
   const state = {
     version: STATE_VERSION,
     archived: asArray(next.archived),
@@ -116,10 +119,10 @@ async function writeState(next) {
     updatedAt: Date.now(),
   }
   await fsp.mkdir(DATA_DIR, { recursive: true })
-  const tmp = `${STATE_FILE}.${process.pid}.${++tmpSeq}.tmp`
+  const tmp = `${file}.${process.pid}.${++tmpSeq}.tmp`
   try {
     await fsp.writeFile(tmp, JSON.stringify(state, null, 2))
-    await fsp.rename(tmp, STATE_FILE)
+    await fsp.rename(tmp, file)
   } catch (err) {
     await fsp.rm(tmp, { force: true }).catch(() => {})
     throw err
@@ -372,10 +375,13 @@ export async function apiMiddleware(req, res, next) {
       const health = await magiHealth()
       return send(res, health.ready ? 200 : 503, health)
     }
-    if (url.pathname === '/api/threads' && req.method === 'GET' && magiSourceUrl()) {
+    if (url.pathname === '/api/magi/world' && req.method === 'GET' && !magiMode) {
+      return send(res,200,{threads:standbyMagiThreads(),mode:'standby',scannedAt:Date.now(),warnings:[],messageBoards:null,alignment:null})
+    }
+    if (['/api/threads','/api/magi/world'].includes(url.pathname) && req.method === 'GET' && magiMode) {
       try {
         const state = await readMagiState()
-        const projection = projectMagiState(state)
+        const projection = projectMagiState(state,Date.now(),await readMagiTokens(state,{cacheFile:path.join(DATA_DIR,'magi-token-receipts.json')}))
         return send(res, 200, { threads: projection.threads, scannedAt: Date.now(), warnings: [], messageBoards: null, mode: 'magi', alignment: projection.alignment })
       } catch {
         return send(res, 503, { error: 'MAGI state is unavailable or invalid', mode: 'magi', threads: [], alignment: null })
@@ -410,8 +416,9 @@ export async function apiMiddleware(req, res, next) {
       return send(res, 200, { harnesses: await harnessStatus() })
     }
 
-    if (url.pathname === '/api/state' && req.method === 'GET') {
-      return send(res, 200, await readState())
+    const colonyFile=url.pathname==='/api/magi/colony'?MAGI_STATE_FILE:STATE_FILE
+    if (['/api/state','/api/magi/colony'].includes(url.pathname) && req.method === 'GET') {
+      return send(res, 200, await readState(colonyFile))
     }
 
     /**
@@ -431,13 +438,13 @@ export async function apiMiddleware(req, res, next) {
      * A missing or zero base is a first write and is allowed: nothing to lose on a fresh
      * install, and it keeps the endpoint drivable from `curl`.
      */
-    if (url.pathname === '/api/state' && req.method === 'PUT') {
+    if (['/api/state','/api/magi/colony'].includes(url.pathname) && req.method === 'PUT') {
       const body = await readJsonBody(req)
       const base = Number(body.baseUpdatedAt) || 0
       return serialise(async () => {
-        const current = await readState()
+        const current = await readState(colonyFile)
         if (base && current.updatedAt !== base) return send(res, 409, current)
-        return send(res, 200, await writeState(body))
+        return send(res, 200, await writeState(body,colonyFile))
       })
     }
 

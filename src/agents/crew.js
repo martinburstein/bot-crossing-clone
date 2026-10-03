@@ -61,6 +61,11 @@ const CLIP = {
   hit: { name: 'Hit_A', loop: true },
   spawn: { name: 'Spawn_Ground', loop: false },
   interact: { name: 'Interact', loop: true },
+  tinker: {name:'Working_A',loop:true},
+  talk: {name:'Idle_A',loop:true,pose:'talk',duration:4},
+  readBoard: {name:'Idle_B',loop:true,pose:'read',duration:5},
+  snack: {name:'Idle_A',loop:true,pose:'snack',duration:4},
+  drive: {name:'Sit_Floor_Idle',loop:true,pose:'drive',duration:3},
 }
 
 const CREW_URL = `${import.meta.env.BASE_URL}assets/crew.glb`
@@ -167,8 +172,9 @@ function bakeClips(root, skeleton, mesh, animations) {
       continue
     }
     // A looping clip needs its wrap-around frame; a one-shot ends where it ends.
-    const frames = Math.max(2, Math.round(clip.duration * BAKE_FPS) + 1)
-    clips[key] = { start: frameCount, frames, duration: clip.duration, loop: spec.loop, name: spec.name }
+    const duration=spec.duration || clip.duration
+    const frames = Math.max(2, Math.round(duration * BAKE_FPS) + 1)
+    clips[key] = { start: frameCount, frames, duration, loop: spec.loop, name: spec.name,pose:spec.pose }
     frameCount += frames
   }
 
@@ -210,6 +216,7 @@ function bakeClips(root, skeleton, mesh, animations) {
       // the astronaut snaps back to standing on the last frame of sitting down.
       const t = spec.loop ? raw : Math.min(raw, Math.max(0, spec.duration - 1e-3))
       mixer.setTime(t)
+      const restore=applyCampPose(skeleton.bones,spec.pose,t)
       root.updateMatrixWorld(true)
       skeleton.update()
 
@@ -225,6 +232,7 @@ function bakeClips(root, skeleton, mesh, animations) {
         if (b < 0) return
         skeleton.bones[b].matrixWorld.toArray(attach, attachOffset + slot * 16)
       })
+      restore()
     }
 
     action.stop()
@@ -254,6 +262,25 @@ function bakeClips(root, skeleton, mesh, animations) {
     clips,
     fps: BAKE_FPS,
   }
+}
+
+// Additive camp gestures are baked into the same GPU animation table as locomotion.
+// Restore local quaternions after every sample so untracked bones cannot accumulate drift.
+function applyCampPose(bones,pose,time) {
+  if(!pose)return ()=>{}
+  const saved=[]
+  const rotate=(name,x=0,y=0,z=0)=>{
+    const bone=bones.find(b=>b.name.replace(/[.\s_]/g,'').toLowerCase()===name)
+    if(!bone)return
+    saved.push([bone,bone.quaternion.clone()])
+    bone.quaternion.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(x,y,z)))
+  }
+  const wave=Math.sin(time*Math.PI/2),sip=.5-.5*Math.cos(time*Math.PI/2)
+  if(pose==='talk') {rotate('head',.05*wave,.16*wave);rotate('upperarmr',-.35-.13*wave,0,.22);rotate('lowerarmr',-.55,0,.12*wave);rotate('chest',0,.06*wave)}
+  if(pose==='read') {rotate('head',.12+.06*Math.sin(time*Math.PI*2/5),.16*Math.sin(time*Math.PI*2/5));rotate('upperarml',-.45);rotate('lowerarml',-.75)}
+  if(pose==='snack') {rotate('upperarmr',-.55-.38*sip,0,.12);rotate('lowerarmr',-1.15-.42*sip);rotate('head',.08*sip);rotate('handr',0,0,.1*sip)}
+  if(pose==='drive') {rotate('upperarmr',-.65,0,.15);rotate('upperarml',-.65,0,-.15);rotate('lowerarmr',-.5);rotate('lowerarml',-.5);rotate('head',0,.08*Math.sin(time*Math.PI*2/3))}
+  return ()=>saved.forEach(([bone,q])=>bone.quaternion.copy(q))
 }
 
 /**

@@ -1,0 +1,210 @@
+{
+  "collectedAt": "2026-10-03",
+  "scope": "Astronaut vehicles in the eight 2007 Mars Mission sets, including human side builds and detachable scouts. No 2008 vehicles, alien craft or static bases.",
+  "entries": [
+    {
+      "id": "eagle",
+      "name": "Eagle command shuttle",
+      "set": 7690,
+      "kind": "air",
+      "role": "Survey",
+      "cue": "Long amber canopy, swept white wings, twin orange engines",
+      "file": "humans/7690-eagle.png",
+      "sha256": "ee6cc5beb87094bb88627c1e26082094163f90b3a64841dca644ba30b38a34cf",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4523179.pdf",
+      "page": 66,
+      "catalog": "https://brickset.com/sets/7690-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "defender",
+      "name": "Mothership-assault defence sled",
+      "set": 7691,
+      "kind": "ground",
+      "role": "Support",
+      "cue": "Twin runners, open control seats, four orange launch tubes",
+      "file": "humans/7691-defender.png",
+      "sha256": "0ebd43fc3ab0608d61139722a2c4750a2adb6d2e4adcda0646e308082f46220d",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4516029.pdf",
+      "page": 22,
+      "catalog": "https://brickset.com/sets/7691-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "dropship",
+      "name": "MX-71 Recon Dropship",
+      "set": 7692,
+      "kind": "air",
+      "role": "Transport",
+      "cue": "Sloping front wings, long spine, three rear engines and amber cargo pods",
+      "file": "humans/7692-dropship.png",
+      "sha256": "bf86cbb420b67609ad3cf4c16d221d37914ceac83479d8a1e05dd9875255a613",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4524070.pdf",
+      "page": 69,
+      "catalog": "https://brickset.com/sets/7692-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "cargo-rover",
+      "name": "Recon drilling rover",
+      "set": 7692,
+      "kind": "ground",
+      "role": "Mining",
+      "cue": "Six orange wheels, curved amber cab, rear drill and roll bar",
+      "file": "humans/7692-rover.png",
+      "sha256": "403db85da7a2d40072b232caffd9b99448834f127d7e4f4b36122fc79f00adb6",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4524070.pdf",
+      "page": 8,
+      "catalog": "https://brickset.com/sets/7692-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "mining-truck",
+      "name": "Alien Strike mining truck",
+      "set": 7693,
+      "kind": "ground",
+      "role": "Mining",
+      "cue": "Four orange wheels, curved amber cab, articulated vertical drill",
+      "file": "humans/7693-mining-truck.png",
+      "sha256": "9effa336ce691e73e038851e627bcfb1a2bc7fe158e861bd3bf927062a46bc20",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4523183.pdf",
+      "page": 16,
+      "catalog": "https://brickset.com/sets/7693-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "trike",
+      "name": "MT-31 Trike",
+      "set": 7694,
+      "kind": "ground",
+      "role": "Scout",
+      "cue": "Two huge front wheels, single trailing wheel, narrow white fuselage",
+      "file": "humans/7694-trike.png",
+      "sha256": "80bcb6a4106b7710a791b2899aced03c31717d7e2d1139019f89c922892a0287",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4517775.pdf",
+      "page": 21,
+      "catalog": "https://brickset.com/sets/7694-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "astro-fighter",
+      "name": "MX-11 Astro Fighter",
+      "set": 7695,
+      "kind": "air",
+      "role": "Scout",
+      "cue": "Small swept wings, bubble canopy, single over-cockpit instrument",
+      "file": "humans/7695-fighter.png",
+      "sha256": "b76ba8cecf4b1a05b8a347a1d84275af3cdc2fb606e27872a15db66b175efcf3",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4517774.pdf",
+      "page": 13,
+      "catalog": "https://brickset.com/sets/7695-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "claw-tank",
+      "name": "MT-51 Claw-Tank",
+      "set": 7697,
+      "kind": "ground",
+      "role": "Handling",
+      "cue": "Twin orange front tracks, rear wheels, raised cab and reaching claw",
+      "file": "humans/7697-claw-tank.png",
+      "sha256": "5111edd1a7fd46376ee5deaa61edea1012be656669875c063652b296a3f705b6",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4515381.pdf",
+      "page": 62,
+      "catalog": "https://brickset.com/sets/7697-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "drill-unit",
+      "name": "MT-101 Armored Drilling Unit",
+      "set": 7699,
+      "kind": "ground",
+      "role": "Excavation",
+      "cue": "Six oversized wheels, sloped armoured cab, raised drilling boom",
+      "file": "humans/7699-drilling-unit.png",
+      "sha256": "fa874193a91d1ef90e1c3169fcd942103567acf6e3de6d8b8ed1ea18b7754142",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4517777.pdf",
+      "page": 41,
+      "catalog": "https://brickset.com/sets/7699-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "drill-flyer",
+      "name": "MT-101 transport scout",
+      "set": 7699,
+      "kind": "air",
+      "role": "Survey",
+      "cue": "Detachable wedge flyer, twin amber cargo pods and tall split tail",
+      "file": "humans/7699-scout-flyer.png",
+      "sha256": "f6f7d176e4b30f8f39ccbe016848d708c2d14edab2b9454d69accbae7199ae0d",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4517776.pdf",
+      "page": 27,
+      "catalog": "https://brickset.com/sets/7699-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    },
+    {
+      "id": "drill-pod",
+      "name": "MT-101 scout bike",
+      "set": 7699,
+      "kind": "ground",
+      "role": "Inspection",
+      "cue": "Two inline orange wheels beneath a compact amber roll cage",
+      "file": "humans/7699-scout-rover.png",
+      "sha256": "e9aa2f85188b10975c3ce54b0ceed3218fc26bbd55cb85ada2307bddc124beb2",
+      "source": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4517776.pdf",
+      "page": 8,
+      "catalog": "https://brickset.com/sets/7699-1",
+      "rights": "LEGO Group. Reference study only; not a game texture."
+    }
+  ],
+  "originals": [
+    {
+      "file": "originals/7690-1.jpg",
+      "sha256": "1fc4ab4ca6ab82e855cf5deffe085fc3e63e0a86e05f67a56e5b6ecbb2fbd932",
+      "catalog": "https://brickset.com/sets/7690-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    },
+    {
+      "file": "originals/7691-1.jpg",
+      "sha256": "ad128ec42c45bac8023ed2c3633256837a8803579335b90d3f7674a578afd80f",
+      "catalog": "https://brickset.com/sets/7691-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    },
+    {
+      "file": "originals/7692-1.jpg",
+      "sha256": "37d346dfb980c4d99d77a145abce01ec3af89ce1085d55ae120522c182209d63",
+      "catalog": "https://brickset.com/sets/7692-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    },
+    {
+      "file": "originals/7693-1.jpg",
+      "sha256": "eac5b79fb0cd1a809e80b2c9e84f209e80828f87b69d3afd681381d3882f5193",
+      "catalog": "https://brickset.com/sets/7693-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    },
+    {
+      "file": "originals/7694-1.jpg",
+      "sha256": "5195cb973037d3fc2a5813496bcaa3f628a6f5cf16d08cc90283fed18d48f13c",
+      "catalog": "https://brickset.com/sets/7694-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    },
+    {
+      "file": "originals/7695-1.jpg",
+      "sha256": "97ea52a3b9a9301ff1dedd3ff24ffecff8ea9f19b3008dce9bef7c3d2f9fb2b1",
+      "catalog": "https://brickset.com/sets/7695-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    },
+    {
+      "file": "originals/7697-1.jpg",
+      "sha256": "b1a19cf28d21065b467f3eb7307fc77265377d3dc581e4ef92c847474e8e3674",
+      "catalog": "https://brickset.com/sets/7697-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    },
+    {
+      "file": "originals/7699-1.jpg",
+      "sha256": "ad8102b1f69927af67645c520714d2bc5d11743c8e8217d7e2ddcdcad1674cc5",
+      "catalog": "https://brickset.com/sets/7699-1",
+      "note": "Complete set context; alien components are excluded from the model scope."
+    }
+  ]
+}

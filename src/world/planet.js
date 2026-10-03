@@ -67,9 +67,14 @@ export const PLANETS = {
   },
 }
 
-const GROUND_SIZE = 340
+let GROUND_SIZE = 340
 /** Everything inside this radius is the buildable colony, and is kept nearly flat. */
-export const COLONY_RADIUS = 46
+export let COLONY_RADIUS = 46
+export function fitColonyTerrain(radius) {
+  const next=Math.max(46,Math.ceil(radius/16)*16)
+  if(next<=COLONY_RADIUS)return false
+  COLONY_RADIUS=next;GROUND_SIZE=Math.max(340,next*2+160);_samplers.clear();return true
+}
 const DETAIL_SEGMENTS = { low: 72, medium: 128, high: 190 }
 
 /**

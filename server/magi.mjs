@@ -1,3 +1,4 @@
+import {MAGI_COLOR} from '../src/game/magi-world.js'
 const WORKER_IDS = Array.from({ length: 15 }, (_, i) => `w${String(i + 1).padStart(2, '0')}`)
 const CLUSTERS = [
   { id: 'melchior', workerIds: WORKER_IDS.slice(0, 5), color: '#55d890' },
@@ -95,7 +96,7 @@ function alignment(state) {
   return { count, mode: ['off', 'red', 'green', 'rainbow'][count], clusters: active }
 }
 
-export function projectMagiState(state, now = Date.now()) {
+export function projectMagiState(state, now = Date.now(), usage = new Map()) {
   assertProjection(state, now)
   const colors = alignment(state)
   const threads = WORKER_IDS.map((workerId, index) => {
@@ -109,7 +110,9 @@ export function projectMagiState(state, now = Date.now()) {
     const milestones = state.milestones.filter(item => item.workerId === workerId)
     return {
       id: `magi:${workerId}`, isShell: true, shellId: workerId, shellName: worker.name,
-      shellColor: cluster.color, projectAccent: cluster.color, project: `MAGI ${workerId}`,
+      shellColor: MAGI_COLOR, projectAccent: 0xe9a45b, suitColor: 0xf3f1ec, project: `MAGI ${workerId}`,
+      worldProfile:'15-3A', clusterId:cluster.id, title:worker.name,
+      tokenUsage: usage.get(workerId) || null, vehicleId:worker.vehicleId || null,
       projectLabel: worker.name, projectPath: '', projectRoot: '', constructionRunId: `magi:${state.projectId}`,
       milestones, running, hasError, archived: false, unread: false, canOpen: false,
       createdAt: index + 1, lastActivityAt: state.observedAt, sizeBytes: 0, dependencies: [], reviewer: null,

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { PLANETS, createTerrain, createScatter, terrainHeight } from '../world/planet.js'
+import { PLANETS, createTerrain, createScatter, terrainHeight,fitColonyTerrain } from '../world/planet.js'
 import { Sky } from '../world/sky.js'
 import {
   Plot,
@@ -208,6 +208,7 @@ export class Colony {
       disposeTree(this.scatterGroup)
     }
     const clear = []
+    clear.push(...(this.astronauts?.magiLife?.clearings() || []))
     for (const plot of this.plotOrder) {
       for (const local of plot.localCenters) {
         clear.push({ x: plot.center.x + local.x, z: plot.center.z + local.z, r: 8.6 })
@@ -349,7 +350,8 @@ export class Colony {
           id: thread.id,
           thread,
           status,
-          site: this._workSite(plot, building, i),
+          site: thread.worldProfile==='15-3A' ? new THREE.Vector3(plot.center.x+3.5,DECK_TOP,plot.center.z) : this._workSite(plot, building, i),
+          home: plot.center,
           // Where the work actually is. A working astronaut circles it rather than standing
           // at one spot, so it needs the building, not just a place to stand near it.
           anchor: building.mesh.position.clone(),
@@ -371,6 +373,9 @@ export class Colony {
     this._rebuildNavigation()
     this.stats = { ...stats, done: stats.celebrating }
     this.astronauts.setRoster(roster, this._world())
+    const campSignature=[...this.astronauts.magiLife.camps.keys()].join(',')
+    if(campSignature!==this._campSignature){this._campSignature=campSignature;this._buildScatter()}
+    this._rebuildNavigation()
     return this.stats
   }
 
@@ -381,7 +386,7 @@ export class Colony {
     const swarmProjects=projects.filter(([,list])=>list[0]?.isShell)
     const memoryKeys=new Map(swarmProjects.map(([id,list])=>[id,`${id}@${list[0].constructionRunId}`]))
     const remembered=new Map(swarmProjects.map(([id,list])=>[id,this.plotCells.get(memoryKeys.get(id)) || list[0].growthPolicy?.preservedLayouts?.[list[0].constructionRunId]?.[list[0].shellId]]))
-    const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,cells:constructionFor(list[0]).cells})),remembered)
+    const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,worldProfile:list[0].worldProfile,cells:constructionFor(list[0]).cells})),remembered)
     const ordinary=allocateCells(projects.filter(([,list])=>!list[0]?.isShell).map(([id,list])=>({id,size:list.length})),this.plotCells,[...swarmLayout.values()].flat())
     const layout=new Map([...swarmLayout,...ordinary])
     // Remembered, not replaced: a project that has just lost its last thread keeps its
@@ -441,6 +446,9 @@ export class Colony {
     })
 
     this.plotOrder = [...this.plots.values()]
+    const extent=Math.max(46,...this.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+12)))
+    if(fitColonyTerrain(extent)) this._buildTerrain()
+    if(extent+8>this.nav.half){this.nav=new Navigation({half:Math.ceil((extent+8)/16)*16});this.astronauts.setNavigation(this.nav)}
     // Zones that just moved, appeared or grew are zones the scatter does not know about.
     if (this.scatterGroup && this._plotFootprint() !== this._scatterFootprint) this._buildScatter()
     // Which hex cells are decked. Ground height is asked for once per moving agent per
@@ -563,11 +571,11 @@ export class Colony {
    * of buildings, which is exactly where the crew needs to walk.
    */
   _rebuildNavigation() {
-    const obstacles = []
+    const obstacles = this.astronauts?.magiLife?.obstacles() || []
     for (const entry of this.buildings.values()) {
       if (entry.retiring) continue
       const p = entry.mesh.position
-      const r = (entry.mesh.userData.footprint || 1.2) * 0.8 + AGENT_RADIUS
+      const r = (entry.mesh.userData.footprint || 1.2) * Math.max(entry.mesh.scale.x,entry.mesh.scale.z) * 0.8 + AGENT_RADIUS
       obstacles.push({ x: p.x, z: p.z, r })
     }
     // Ground clutter counts too. A crate is only knee-high, but an astronaut walking

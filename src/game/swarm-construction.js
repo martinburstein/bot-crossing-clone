@@ -1,5 +1,7 @@
+import {tokenConstruction,allocateMagiCells} from './magi-world.js'
 // Pure projection: no timers, transcript sizes, model calls or protocol mutations.
 export function constructionFor(shell) {
+  if(shell.worldProfile==='15-3A') return tokenConstruction(shell)
   const milestones=(shell.milestones || []).filter(m=>!m.retractedAt)
   const structures=new Map()
   let cell=0,minor=0,major=0,migrated=false
@@ -43,6 +45,7 @@ function ring(radius) {
 // Perimeter homes leave every color an outward route; roots never occupy the center.
 export function allocateSwarmCells(projects,previous=new Map()) {
   if(!projects.length) return new Map()
+  if(projects.every(p=>p.worldProfile==='15-3A')) return allocateMagiCells(projects,previous)
   projects=[...projects].sort((a,b)=>a.shellId.localeCompare(b.shellId))
   let radius=Math.max(2,Math.ceil(projects.length/6))
   let homes=ring(radius).filter(c=>key(c)!=='-2,1')
