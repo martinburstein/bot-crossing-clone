@@ -19,7 +19,7 @@ export class MagiPanel {
     const rule=el('div',undefined,'magi-rules');rule.append(el('span','25k tokens → small addition'),el('span','250k tokens → new hexagon'))
     this.total=el('p','','magi-total')
     const garage=el('button','Explore the vehicle hangar','magi-hangar-button');garage.onclick=()=>this.openHangar()
-    const runs=el('select');runs.setAttribute('aria-label','Saved runs');runs.append(new Option('Live world',''))
+    const runs=el('select',undefined,'magi-run-selector');runs.setAttribute('aria-label','Saved runs');runs.append(new Option('Live world',''))
     fetch('/api/magi/archives').then(r=>r.json()).then(data=>{for(const run of data.runs||[])runs.append(new Option(run.label,run.id));runs.value=new URLSearchParams(location.search).get('run')||''}).catch(()=>{})
     runs.onchange=()=>{const url=new URL(location.href);if(runs.value)url.searchParams.set('run',runs.value);else url.searchParams.delete('run');location.assign(url)}
     this.groups=el('div',undefined,'magi-groups')
