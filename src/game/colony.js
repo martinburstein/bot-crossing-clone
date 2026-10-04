@@ -12,7 +12,7 @@ import {
   PLOT_PALETTE,
   PLOT_CELL,
 } from '../world/plots.js'
-import { createBuilding, buildingUniforms, Scaffolds } from '../world/buildings.js'
+import { createBuilding, buildingUniforms } from '../world/buildings.js'
 import { Ship } from '../world/ship.js'
 import { Astronauts } from '../agents/astronauts.js'
 import { Indicators, BADGE } from '../agents/indicators.js'
@@ -147,7 +147,6 @@ export class Colony {
     // missing. A badge is a single quad; the spare instances cost almost nothing.
     this.indicators = new Indicators(scene, settings, MAX_AGENT_CAP)
     this.particles = new Particles(scene, settings)
-    this.scaffolds = new Scaffolds(scene, 320)
     this.nav = new Navigation()
     this.astronauts.setNavigation(this.nav)
 
@@ -774,7 +773,6 @@ export class Colony {
     this.particles.ambient(dt, this.camera, this.planet)
     this.particles.update(dt)
     this._updatePlots(night, elapsed)
-    this._updateScaffolds()
     this._updateLabels(dt)
   }
 
@@ -794,12 +792,6 @@ export class Colony {
   _isLive(id) {
     const thread = this.threads.get(this.buildings.get(id)?.ownerId || id)
     return Boolean(thread && thread.running)
-  }
-
-  /** A site somebody is standing at: running, or stopped waiting on you. */
-  _isActive(id) {
-    const thread = this.threads.get(this.buildings.get(id)?.ownerId || id)
-    return Boolean(thread && (thread.running || thread.unread || thread.hasError))
   }
 
   _badgeFor(agent) {
@@ -874,26 +866,6 @@ export class Colony {
     for (const plot of this.plotOrder) plot.setNight(night, urgent?.has(plot.id) ?? false, elapsed)
   }
 
-  _updateScaffolds() {
-    const sites = []
-    for (const [id, entry] of this.buildings) {
-      // Scaffolding says a thread is running here — the README's own promise. It used to be
-      // gated on the building being unfinished as well, which was fine while "unfinished"
-      // was most of them and useless the moment buildings stopped standing in a hole.
-      if (entry.progress <= 0.03) continue
-      if (!this._isActive(id)) continue
-      const p = entry.mesh.position
-      sites.push({
-        x: p.x,
-        z: p.z,
-        y: p.y,
-        radius: (entry.mesh.userData.footprint || 1.4) + 0.35,
-        height: Math.max(0.6, entry.mesh.userData.height * entry.progress + 0.5),
-      })
-    }
-    this.scaffolds.update(sites)
-  }
-
   // ── interaction ─────────────────────────────────────────────────────────────────────
 
   pick(ndcX, ndcY, aspect) {
@@ -920,7 +892,6 @@ export class Colony {
     this.astronauts.dispose()
     this.indicators.dispose()
     this.particles.dispose()
-    this.scaffolds.dispose()
     disposeTree(this.worldGroup)
     disposeTree(this.plotGroup)
     disposeTree(this.labelGroup)

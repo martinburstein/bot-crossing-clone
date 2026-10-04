@@ -82,7 +82,6 @@ than have you work around it.
 | One hex zone | One repo. Bigger repos claim more tiles — one per seven threads, grown as a contiguous blob from the middle outward. A zone stays where it is: see below |
 | One astronaut + one building | One session |
 | How finished a building looks | How large its transcript is, on a log scale |
-| Scaffolding | Somebody is at that site right now |
 | Walking out of the ship | A thread that just appeared |
 | Walking back into the ship | You archived it |
 
