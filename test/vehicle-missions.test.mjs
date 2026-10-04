@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import * as THREE from 'three'
-import {standbyMagiThreads} from '../src/game/magi-world.js'
+import {standbyMagiThreads,clusterWorkFront,MAGI_CLUSTERS} from '../src/game/magi-world.js'
 import {MagiLife} from '../src/agents/magi-life.js'
 import {vehicleJob,VEHICLE_JOBS} from '../src/game/vehicle-jobs.js'
 
@@ -26,6 +26,23 @@ test('jobs match vehicle functions and a defence preference cannot invent an inc
   assert.equal(vehicleJob({...thread,assignmentRole:'review',taskTitle:'Review incoming meteor defences'},'defender').vehicle,'drill-pod')
 })
 
+test('work fronts stay outward from each starting group and move when its frontier grows',()=>{
+  for(const cluster of MAGI_CLUSTERS){
+    const center=new THREE.Vector3(11.4*cluster.q,0,7.6*Math.sqrt(3)*(cluster.r+cluster.q/2)),outward=center.clone().normalize()
+    const sites=clusterWorkFront(cluster.id)
+    assert.equal(sites.length,3)
+    assert.ok(sites.every(s=>new THREE.Vector3(s.x,0,s.z).sub(center).dot(outward)>7),'work must face away from the colony center')
+    assert.ok(sites.every(s=>new THREE.Vector3(s.normal.x,0,s.normal.z).dot(outward)>.45))
+  }
+  const f=fixture(),a=f.active(0,'Dig post holes');f.tick()
+  const item=f.life.fleet.get(a.id),old=item.stops[0].clone()
+  f.world.magiCells=()=>[{q:-7,r:0}]
+  f.life.sync(f.agents,f.world)
+  assert.ok(item.stops[0].x<old.x-10,'new tiles move the active work front outward')
+  assert.equal(item.stopIndex,0);assert.equal(item.path,null)
+  f.life.dispose()
+})
+
 test('exactly three confirmed cluster pilots deploy immediately, do different jobs and stop on disconnect',()=>{
   const f=fixture(),active=[f.active(0,'Deliver supplies'),f.active(5,'Dig post holes'),f.active(10,'Report from camp to camp')]
   f.active(1,'Duplicate cluster persona');f.tick()
@@ -44,7 +61,7 @@ test('exactly three confirmed cluster pilots deploy immediately, do different jo
 test('post drilling operates tools at work stops without spinning stationary wheels',()=>{
   const f=fixture(),a=f.active(5,'Dig post holes');f.tick()
   const item=f.life.fleet.get(a.id)
-  for(let i=0;i<200&&!item.operating;i++)f.tick()
+  for(let i=0;i<600&&!item.operating;i++)f.tick()
   assert.equal(item.operating,true)
   const position=item.model.position.clone(),wheel=item.model.userData.wheels[0].rotation.x
   f.tick(10)

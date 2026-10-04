@@ -29,8 +29,9 @@ const MAX_EXPANSIONS = 6000
 const SQRT2 = Math.SQRT2
 
 export class Navigation {
-  constructor({half=HALF}={}) {
+  constructor({half=HALF,maxExpansions=MAX_EXPANSIONS}={}) {
     this.cell = CELL
+    this.maxExpansions = maxExpansions
     this.half = half
     this.size = Math.ceil((half * 2) / CELL)
     const n = this.size * this.size
@@ -204,7 +205,7 @@ export class Navigation {
         found = true
         break
       }
-      if (++expansions > MAX_EXPANSIONS) break
+      if (++expansions > this.maxExpansions) break
 
       const cx = current % size
       const cz = (current - cx) / size

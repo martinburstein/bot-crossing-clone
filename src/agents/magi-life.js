@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import {MAGI_CLUSTERS,HANGAR} from '../game/magi-world.js'
+import {MAGI_CLUSTERS,HANGAR,clusterWorkFront} from '../game/magi-world.js'
 import {createVehicle,chooseVehicle} from '../world/mars-vehicles.js'
 import {createHangar} from '../world/mars-hangar.js'
 import {createMessageBoard} from '../world/message-boards.js'
@@ -29,24 +29,23 @@ export class MagiLife {
   job(agent) {return vehicleJob(agent.thread,this.choices[agent.thread.shellId]||agent.thread.vehicleId)}
   choice(agent) {return this.job(agent).vehicle}
   setNavigationObstacles(obstacles,half) {
-    if(!this.vehicleNav||this.vehicleNav.half!==half)this.vehicleNav=new Navigation({half})
+    if(!this.vehicleNav||this.vehicleNav.half!==half)this.vehicleNav=new Navigation({half,maxExpansions:24000})
     this.vehicleNav.rebuild(obstacles.filter(o=>!o.parking).map(o=>({...o,r:o.r+2})))
   }
   missionStops(job,agent,bay) {
-    const camp=this.camps.get(agent.thread.clusterId),gate=camp?.group.position.clone().multiplyScalar(.68)||bay.work.clone()
-    gate.y=0
-    if(['drill','claw','intercept'].includes(job.operation))return [bay.work.clone().add(new THREE.Vector3(0,0,10)),bay.work.clone().add(new THREE.Vector3(0,0,16)),bay.work.clone()]
-    if(job.operation==='report') {
+    const allCells=this.world?.magiCells?.(),sites=clusterWorkFront(agent.thread.clusterId,this.world?.magiCells?.(agent.thread.clusterId),allCells)
+    const stops=sites.map(s=>{const v=new THREE.Vector3(s.x,0,s.z);v.workNormal=s.normal;return v})
+    if(!stops.length)return [bay.work.clone()]
+    if(job.operation==='report'||job.id==='remote-survey'||job.id==='air-scout') {
       const index=MAGI_CLUSTERS.findIndex(c=>c.id===agent.thread.clusterId),next=this.camps.get(MAGI_CLUSTERS[(index+1)%3].id)
-      return [gate,next?.group.position.clone().multiplyScalar(.68)||gate.clone(),bay.work.clone()]
+      const nextId=MAGI_CLUSTERS[(index+1)%3].id,remote=clusterWorkFront(nextId,this.world?.magiCells?.(nextId),allCells)[0]
+      const transit=()=>{const p=bay.work.clone();p.transit=true;return p}
+      const destination=next&&remote?new THREE.Vector3(remote.x,0,remote.z):stops[1]||stops[0]
+      destination.workNormal=remote?.normal
+      // Break long inter-camp searches at the clear apron; transit is not a work stop.
+      return [stops[0],transit(),destination,transit(),stops[1]||stops[0]]
     }
-    if(job.id==='remote-survey'||job.id==='air-scout') {
-      const index=MAGI_CLUSTERS.findIndex(c=>c.id===agent.thread.clusterId),next=this.camps.get(MAGI_CLUSTERS[(index+1)%3].id)
-      const remote=next?.group.position.clone().multiplyScalar(.68)||gate.clone().add(new THREE.Vector3(12,0,0))
-      return [gate,remote,bay.work.clone()]
-    }
-    if(job.operation==='scan'){const radius=job.id==='perimeter'?10:5;return [gate.clone().add(new THREE.Vector3(-radius,0,0)),gate.clone().add(new THREE.Vector3(radius,0,0)),bay.work.clone()]}
-    return [gate,bay.work.clone()]
+    return stops
   }
   moveMission(item,dt) {
     const nav=this.vehicleNav,p=item.model.position,target=item.stops[item.stopIndex]
@@ -69,10 +68,11 @@ export class MagiLife {
     }
     item.routeBlocked=false
     if(item.pathAt===item.path.length){
+      if(target.workNormal)item.model.rotation.y=Math.atan2(target.workNormal.x,target.workNormal.z)-item.model.userData.seatYaw
       item.visitedStops.push(item.stopIndex)
       if(item.visitedStops.length>12)item.visitedStops.shift()
-      item.dwell=item.job.operation==='intercept'?12:['drill','claw'].includes(item.job.operation)?7:3
-      item.stopIndex=(item.stopIndex+1)%item.stops.length;item.path=null;item.operating=true;item.operationTime=0
+      item.dwell=target.transit?0:item.job.operation==='intercept'?12:['drill','claw'].includes(item.job.operation)?7:3
+      item.stopIndex=(item.stopIndex+1)%item.stops.length;item.path=null;item.operating=!target.transit;item.operationTime=0
     }
     return distance
   }
@@ -96,9 +96,33 @@ export class MagiLife {
       const camp=createCamp(cluster);this.scene.add(camp.group);this.camps.set(cluster.id,camp)
     }
     for(const agent of eligible){agent.magiGoal ||= new THREE.Vector3();agent.magiLook ||= new THREE.Vector3()}
+    for(const [id,item] of this.fleet){
+      const agent=eligible.find(a=>a.id===id)
+      if(!agent)continue
+      const stops=this.missionStops(item.job,agent,item.bay)
+      const movedFront=stops.length!==item.stops.length||stops.some((p,i)=>p.distanceToSquared(item.stops[i])>.01)
+      if(movedFront){
+        item.stops=stops;item.stopIndex=0;item.path=null;item.dwell=0
+      }
+      // A newly earned tile can place buildings over the previous work front.
+      // Relocate a covered rental to free ground before routing; never drive out through a wall.
+      const nav=this.vehicleNav,p=item.model.position
+      if(item.phase==='working'&&nav?.isBlocked(p.x,p.z)){
+        const free=nav.nearestFree(p.x,p.z)
+        if(free){p.x=nav.toWorld(free.ix);p.z=nav.toWorld(free.iz)}
+        else {p.copy(stops[0]);item.phase='working';item.travel=1}
+        item.path=null;item.dwell=0
+      }
+      if(item.phase==='working'&&movedFront&&nav&&!nav.findPath(p.x,p.z,stops[0].x,stops[0].z)){
+        p.copy(stops[0]);item.path=null;item.dwell=0;item.travel=1
+      }
+    }
   }
   obstacles() {return [...this.camps.values()].flatMap(c=>c.obstacles).concat(this.hangar?.obstacles||[])}
-  clearings() {return [...this.camps.values()].map(c=>({x:c.group.position.x,z:c.group.position.z,r:6})).concat(this.hangar?.clearings||[])}
+  clearings() {
+    const fronts=[...this.camps.keys()].flatMap(id=>clusterWorkFront(id,this.world?.magiCells?.(id),this.world?.magiCells?.()).map(p=>({x:p.x,z:p.z,r:8})))
+    return [...this.camps.values()].map(c=>({x:c.group.position.x,z:c.group.position.z,r:6})).concat(this.hangar?.clearings||[],fronts)
+  }
   pickHangar(camera,x,y){return !!this.hangar?.pick(camera,x,y)}
   release(id,item,agent,world) {
     item.active=false;item.phase='parked'

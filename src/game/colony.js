@@ -474,6 +474,7 @@ export class Colony {
     return {
       shipDoor: () => this.ship.shipDoor(),
       groundAt: (x, z) => this.groundAt(x, z),
+      magiCells: clusterId => [...(this.threads?.values()||[])].filter(t=>t.worldProfile==='15-3A'&&(!clusterId||t.clusterId===clusterId)).flatMap(t=>this.plots.get(t.project)?.cells||[]),
     }
   }
 
