@@ -25,6 +25,7 @@ import {
 import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-projects.js'
 import {standbyMagiThreads} from './game/magi-world.js'
 import {MagiPanel} from './ui/magi-panel.js'
+import {mountDisplayToggle} from './ui/display-toggle.js'
 
 /**
  * Boot and the outer game loop.
@@ -292,6 +293,7 @@ const actions = {
 }
 
 const hud = new Hud(app, settings, actions)
+if (MAGI_VIEW) mountDisplayToggle(app)
 const mission = new MissionPanel(app, id => select(id, { fly: true }))
 const swarm = new SwarmPanel(app, id => select(id, { fly: true }))
 const magiPanel = MAGI_VIEW ? new MagiPanel(app,colony,id=>select(id,{fly:true}),clusterId=>{
