@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {auditVehicle} from '../tools/vehicle-geometry-audit.mjs'
-import {VEHICLES} from '../src/world/mars-vehicles.js'
+import {VEHICLES,createVehicle} from '../src/world/mars-vehicles.js'
 import {MAGI_CLUSTERS,allocateMagiCells,standbyMagiThreads,clusterOpening,infrastructureCell} from '../src/game/magi-world.js'
 import * as THREE from 'three'
 import {createHangar} from '../src/world/mars-hangar.js'
@@ -23,6 +23,28 @@ test('every vehicle stays connected and clears other mechanisms and bodywork thr
    assert.equal(report.components,1,JSON.stringify(report))
    assert.deepEqual(report.clearanceFailures,[],JSON.stringify(report))
  }
+})
+
+test('claw tank links circulate around both tracks and batching preserves their transforms',()=>{
+ const plain=createVehicle('claw-tank',{merge:false}),batched=createVehicle('claw-tank')
+ const start=plain.userData.tracks.map(t=>t.links.map(l=>l.position.clone()))
+ for(const time of [.4,1.4,2.8,4.2,5.1]){
+  plain.userData.animate(time,true);batched.userData.animate(time,true)
+  for(let side=0;side<2;side++){
+   const track=plain.userData.tracks[side],rendered=batched.userData.tracks[side]
+   for(let i=0;i<track.links.length;i++){
+    const link=track.links[i],matrix=new THREE.Matrix4();rendered.instance.getMatrixAt(i,matrix)
+    assert.ok(link.position.distanceTo(start[side][i])>.05,'each tread must travel, not just spin in place')
+    assert.ok(matrix.elements.every((v,j)=>Math.abs(v-link.matrix.elements[j])<1e-6))
+   }
+  }
+ }
+ const period=(2.2+2*Math.PI*.38)/.8
+ plain.userData.animate(period,true)
+ for(let s=0;s<2;s++)for(let i=0;i<24;i++)assert.ok(plain.userData.tracks[s].links[i].position.distanceTo(start[s][i])<1e-9)
+ plain.userData.animate(2,true,true)
+ for(let s=0;s<2;s++)for(let i=0;i<24;i++)assert.ok(plain.userData.tracks[s].links[i].position.distanceTo(start[s][i])<1e-9)
+ plain.userData.dispose();batched.userData.dispose()
 })
 test('each outward opening is the first shared expansion and growth avoids the hangar and lander',()=>{
  const projects=standbyMagiThreads().map(t=>({...t,cells:1})),base=allocateMagiCells(projects)

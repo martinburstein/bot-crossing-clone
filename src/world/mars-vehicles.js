@@ -36,11 +36,14 @@ export function createVehicle(id,{merge=true}={}) {
   const root=new THREE.Group();root.name=`mars-${id}`
   const body=new THREE.Group();root.add(body)
   const mats=Object.fromEntries(Object.keys(colors).map(k=>[k,material(k)]))
-  const wheels=[],rotors=[],arms=[],thrusters=[],parts=[],canopies=[]
+  const wheels=[],rotors=[],arms=[],thrusters=[],parts=[],canopies=[],tracks=[]
   function mesh(geo,key,x=0,y=0,z=0,parent=body) {
     const m=new THREE.Mesh(geo,mats[key]);m.name=`${key}-${parts.length}`;m.position.set(x,y,z);m.castShadow=key!=='glass';m.receiveShadow=true;parent.add(m);parts.push(m);return m
   }
-  function box(x,y,z,w,h,d,key='hull',parent=body,r=.07) {return mesh(new RoundedBoxGeometry(w,h,d,2,Math.min(r,w/4,h/4,d/4)),key,x,y,z,parent)}
+  function box(x,y,z,w,h,d,key='hull',parent=body,r=.07) {
+    const m=mesh(new RoundedBoxGeometry(w,h,d,2,Math.min(r,w/4,h/4,d/4)),key,x,y,z,parent)
+    m.userData.block={w,h,d,key,r};return m
+  }
   function cyl(x,y,z,r,l,key='metal',parent=body,axis='y') {
     const m=mesh(new THREE.CylinderGeometry(r,r,l,12),key,x,y,z,parent)
     if(axis==='x')m.rotation.z=Math.PI/2
@@ -50,7 +53,7 @@ export function createVehicle(id,{merge=true}={}) {
   function wheel(x,z,r=.52,y=r) {
     const g=new THREE.Group();g.position.set(x,y,z);body.add(g);wheels.push(g)
     g.name='wheel';
-    if(x){cyl(x/2,y,z,.085,Math.abs(x),'metal',body,'x').userData.jointTo=g;box(Math.sign(x)*.36,y+.2,z,.16,.46,.18,'dark')}
+    if(x){cyl((x+Math.sign(x)*.36)/2,y,z,.085,Math.abs(x)-.36,'metal',body,'x').userData.jointTo=g;box(Math.sign(x)*.36,y+.2,z,.16,.46,.18,'dark')}
     cyl(0,0,0,r,.42,'orange',g,'x');cyl(Math.sign(x)*.23,0,0,r*.64,.045,'dark',g,'x');cyl(Math.sign(x)*.26,0,0,r*.39,.07,'metal',g,'x')
     for(let k=0;k<12;k++) {const a=k*Math.PI/6;const t=box(0,Math.sin(a)*r,Math.cos(a)*r,.46,.1,.2,'orange',g,.025);t.rotation.x=-a}
     for(let k=0;k<5;k++){const a=k*Math.PI*2/5;const s=box(Math.sign(x)*.3,Math.sin(a)*r*.38,Math.cos(a)*r*.38,.025,r*.55,.06,'hull',g,.01);s.rotation.x=-a}
@@ -69,11 +72,11 @@ export function createVehicle(id,{merge=true}={}) {
     box(side*(span-.28),y+.14,z+length*.73,.35,.1,.48,'orange')
   }
   function cockpit(y=1,z=.5,w=.9,l=1.25) {
+    w=Math.max(w,.85);l=Math.max(l,1.15)
     box(0,y-.18,z,w+.18,.3,l+.18,'dark')
-    box(0,y+.08,z-.2,w*.65,.38,.3,'orange')
     const g=mesh(new THREE.SphereGeometry(1,14,8,0,Math.PI*2,0,Math.PI/2),'glass',0,y,z)
     canopies.push(g)
-    g.scale.set(w*.7,.82,l*.68)
+    g.scale.set(w*.7,.88,l*.74)
     for(const x of [-w*.52,w*.52])box(x,y+.02,z,.09,.13,l,'hull')
     box(0,y+.12,z+l*.42,w*.65,.1,.12,'metal')
     box(0,y+.02,z+l*.42,w*.5,.2,.1,'dark')
@@ -89,15 +92,34 @@ export function createVehicle(id,{merge=true}={}) {
     for(let i=0;i<5;i++){const ring=mesh(new THREE.TorusGeometry(.23*(1-i/6),.035,4,10),'dark',0,0,i*length/5,g);ring.rotation.z=i*.6}
   }
   function track(x,z) {
-    box(x,.46,z,.65,.72,1.8,'dark');for(const dz of [-.52,.52])cyl(x+Math.sign(x)*.34,.46,z+dz,.29,.06,'metal',body,'x')
-    for(let i=0;i<10;i++)for(const y of [.12,.81])box(x,y,z-.85+i*.19,.73,.13,.15,'orange')
-    for(const dz of [-.9,.9])for(const y of [.3,.48,.66])box(x,y,z+dz,.71,.13,.12,'orange')
+    const belt=new THREE.Group();body.add(belt)
+    const links=[],rollers=[],r=.38,half=.55,cy=.48,length=4*half+2*Math.PI*r
+    box(x,cy,z,.64,.66,half*2,'dark').userData.jointTo=belt
+    for(const dz of [-half,half]){
+      cyl(x,cy,z+dz,.33,.64,'dark',body,'x').userData.jointTo=belt
+      const roller=cyl(x+Math.sign(x)*.335,cy,z+dz,.27,.035,'metal',body,'x');roller.userData.jointTo=belt;rollers.push(roller)
+    }
+    cyl(x/2,cy,z,.09,Math.abs(x),'metal',body,'x');box(Math.sign(x)*.4,.65,z,.17,.35,.25,'dark')
+    for(let i=0;i<24;i++){const link=box(0,0,0,.72,.1,.15,'orange',belt,.015);link.userData.moving=true;links.push(link)}
+    const entry={belt,links,rollers,instance:null,update(time){
+      for(let i=0;i<links.length;i++){
+        let s=(i*length/links.length+time*.8)%length,y,zz,angle
+        if(s<2*half){zz=-half+s;y=r;angle=0}
+        else if((s-=2*half)<Math.PI*r){const a=s/r;zz=half+r*Math.sin(a);y=r*Math.cos(a);angle=a}
+        else if((s-=Math.PI*r)<2*half){zz=half-s;y=-r;angle=Math.PI}
+        else {s-=2*half;const a=s/r;zz=-half-r*Math.sin(a);y=-r*Math.cos(a);angle=Math.PI+a}
+        const link=links[i];link.position.set(x,cy+y,z+zz);link.rotation.x=angle;link.updateMatrix();entry.instance?.setMatrixAt(i,link.matrix)
+      }
+      if(entry.instance)entry.instance.instanceMatrix.needsUpdate=true
+      for(const roller of rollers)roller.rotation.x=-time*.8/.27
+    }}
+    tracks.push(entry);entry.update(0)
   }
   let seat
   if(['eagle','astro-fighter','drill-flyer','dropship'].includes(id)) {
     const large=id==='dropship',eagle=id==='eagle',scout=id==='drill-flyer'
     box(0,.65,0,large?1:scout?1.1:.88,.43,large?4.2:eagle?4.3:2.15)
-    const nose=mesh(new THREE.ConeGeometry(.6,.85,4),'hull',0,.65,large?2.3:eagle?2.15:1.3);nose.rotation.x=Math.PI/2;nose.rotation.z=Math.PI/4;nose.scale.x=.8
+    box(0,.67,large?2.3:eagle?2.15:1.3,.7,.18,.65).name='rounded-nose-fairing'
     seat=cockpit(.87,large?1.45:eagle?1.3:.64,large?1.15:scout?.95:.85,large?1.8:eagle?1.85:1.35)
     for(const side of [-1,1]) {
       if(large) {
@@ -124,10 +146,10 @@ export function createVehicle(id,{merge=true}={}) {
     for(const x of [-.38,.38])for(const z of [-.7,.7])cyl(x,.29,z,.07,.5,'metal')
     for(const x of [-.38,.38])box(x,.04,0,.15,.08,1.8,'dark')
   } else if(id==='drill-pod') {
-    box(0,.42,0,.62,.24,.72,'dark');wheel(0,1.05,.36);wheel(0,-1.05,.36)
+    box(0,.42,0,.62,.24,.72,'dark');wheel(0,1.3,.36);wheel(0,-1.3,.36)
     seat=cockpit(.65,0,.72,.9)
-    for(const [i,z] of [1.05,-1.05].entries())cyl(0,.36,z,.075,.88,'metal',body,'x').userData.jointTo=wheels[i]
-    for(const x of [-.44,.44]){box(x,.42,0,.1,.15,2.24,'dark');box(x,.99,-.52,.1,1.2,.12,'orange');box(x,1.54,-.08,.1,.1,1,'orange')}
+    for(const [i,z] of [1.3,-1.3].entries())cyl(0,.36,z,.075,.88,'metal',body,'x').userData.jointTo=wheels[i]
+    for(const x of [-.44,.44]){box(x,.42,0,.1,.15,2.7,'dark');box(x,.99,-.62,.1,1.2,.12,'orange');box(x,1.54,-.08,.1,.1,1.2,'orange')}
     box(0,1.54,.39,.98,.1,.12,'orange')
   } else if(id==='trike') {
     box(0,.85,0,.72,.4,1.7);seat=cockpit(1.05,.5,.8,1.1)
@@ -136,18 +158,20 @@ export function createVehicle(id,{merge=true}={}) {
     pod(0,1.02,-.57,.4)
     for(const x of [-.55,.55])cyl(x,.8,1.18,.07,.5,'blue',body,'z')
   } else if(id==='claw-tank') {
-    box(0,.8,0,1.6,.45,2.3);track(-1,.65);track(1,.65);box(0,.8,-1.25,.9,.3,.8,'dark');wheel(-1.2,-1.6,.65);wheel(1.2,-1.6,.65)
-    cyl(0,1.14,0,.48,.42,'dark');seat=cockpit(1.65,.05,1.25,1.3)
-    for(const x of [-.8,.8])pod(x,1,.25,1.2)
-    const arm=new THREE.Group();arm.position.set(-1.1,1.65,0);body.add(arm);arms.push(arm)
+    box(0,.8,0,1.6,.45,2.3);track(-1.25,.65);track(1.25,.65);box(0,.8,-1.25,.9,.3,.8,'dark');wheel(-1.2,-1.6,.65);wheel(1.2,-1.6,.65)
+    cyl(0,1.03,0,.48,.2,'dark');seat=cockpit(1.65,.05,1.25,1.3)
+    for(const x of [-1.15,1.15]){box(Math.sign(x)*.95,1,.15,.7,.1,1.4,'metal');pod(x,1.28,.15,1.2)}
+    const arm=new THREE.Group();arm.position.set(-1.7,1.82,-.45);body.add(arm);arms.push(arm)
     box(-.5,0,.2,1.1,.23,.35,'hull',arm);box(-1,.02,.5,.24,.25,.75,'metal',arm)
     box(-1,.02,.75,.75,.2,.18,'metal',arm)
     for(const side of [-1,1]){const finger=box(-1+side*.25,.02,1.08,.13,.18,.8,'dark',arm);finger.rotation.y=-side*.32}
-    cyl(-1.1,1.3,0,.13,.7,'metal').userData.jointTo=arm
-    cyl(.8,1.84,-.25,.12,.7,'dark');for(const z of [-.1,.22])cyl(.95,1.72,z,.12,.6,'blue',body,'z')
+    box(-1.23,1.03,-.45,1.15,.12,.2,'metal');cyl(-1.7,1.47,-.45,.13,.78,'metal').userData.jointTo=arm
+    cyl(1.2,1.78,-.25,.1,.6,'dark');box(1.25,1.75,.02,.45,.18,.4,'hull')
+    for(const x of [1.15,1.4])cyl(x,1.75,.45,.08,.6,'blue',body,'z')
   } else if(id==='drill-unit') {
     box(0,1.12,0,1.7,.65,4.25);for(const x of [-1.3,1.3])for(const z of [-1.7,0,1.7])wheel(x,z,.7)
-    const cab=box(0,1.5,.88,1.45,.58,1.6);cab.rotation.x=.25;seat=cockpit(1.75,.94,1.05,1.65)
+    for(const x of [-.6,.6]){const cab=box(x,1.5,.88,.25,.58,1.6);cab.rotation.x=.25}
+    box(0,1.38,1.62,1.45,.24,.25);seat=cockpit(1.75,.94,1.05,1.65)
     box(0,1.64,-.83,1.6,.5,1.2);for(const x of [-.67,.67])box(x,2.12,-1.05,.12,.75,.68,'dark')
     const boom=new THREE.Group();boom.position.set(0,3.05,-.38);body.add(boom);arms.push(boom)
     box(0,2.28,-.38,.23,1.54,.28,'dark').userData.jointTo=boom;box(0,3.05,-.8,.5,.28,1.15,'dark').userData.jointTo=boom
@@ -156,7 +180,7 @@ export function createVehicle(id,{merge=true}={}) {
   } else if(id==='defender') {
     box(0,.34,0,1.7,.25,1.7)
     for(const x of [-.9,.9]) {box(x,.15,0,.25,.2,2.3,'dark');const tip=box(x,.23,1.1,.26,.18,.55);tip.rotation.x=-.4}
-    box(0,.76,-.4,.85,.64,.6,'hull');box(0,1.15,-.55,.65,.5,.15,'dark');seat=new THREE.Vector3(0,.82,-.3)
+    box(0,.76,-.4,.85,.64,.6,'hull');seat=new THREE.Vector3(0,.48,-.55)
     box(0,.83,.16,.75,.78,.24,'dark');box(0,1.52,.08,.85,.65,.18,'hull')
     for(const x of [-.29,.29])for(const y of [1.35,1.73]){cyl(x,y,.55,.18,1.15,'orange',body,'z');cyl(x,y,1.16,.12,.28,'blue',body,'z');cyl(x,y,1.32,.17,.1,'dark',body,'z')}
     box(0,.4,-1.15,.65,.13,1.0,'dark');cyl(0,.76,-1.3,.24,.6,'hull')
@@ -173,25 +197,55 @@ export function createVehicle(id,{merge=true}={}) {
       box(0,.82,-.46,.8,.3,.5,'orange');cyl(0,1.02,-.84,.18,.5,'dark',body,'z');const mount=new THREE.Group();mount.rotation.y=Math.PI;body.add(mount);drill(0,1.02,1.02,.85,mount)
     }
   }
+  // Reserve a full-size seated astronaut's footwell through the solid hull blocks.
+  // Each slab is closed geometry; the cockpit is a real recess, not a hidden pilot.
+  // The widest vehicle is scaled to the rental bay, so reserve space in world units.
+  body.updateMatrixWorld(true)
+  const initialSize=new THREE.Box3().setFromObject(body).getSize(new THREE.Vector3())
+  const fitScale=Math.min(1,4.7/Math.max(initialSize.x,initialSize.z))
+  const well=new THREE.Box3(new THREE.Vector3(-.32/fitScale,seat.y,seat.z-.39/fitScale),new THREE.Vector3(.32/fitScale,seat.y+1.22/fitScale,seat.z+.43/fitScale))
+  for(const part of [...parts]){
+    const b=part.userData.block
+    if(!b||part.parent!==body||part.rotation.x||part.rotation.y||part.rotation.z)continue
+    const min=part.position.clone().sub(new THREE.Vector3(b.w,b.h,b.d).multiplyScalar(.5)),max=part.position.clone().add(new THREE.Vector3(b.w,b.h,b.d).multiplyScalar(.5))
+    if(!new THREE.Box3(min,max).intersectsBox(well))continue
+    const remaining={min:min.clone(),max:max.clone()},slabs=[]
+    for(const axis of ['x','z','y'])for(const side of ['min','max']){
+      const edge=well[side][axis]
+      if(side==='min'&&remaining.min[axis]<edge){const slab={min:remaining.min.clone(),max:remaining.max.clone()};slab.max[axis]=Math.min(edge,slab.max[axis]);slabs.push(slab);remaining.min[axis]=edge}
+      if(side==='max'&&remaining.max[axis]>edge){const slab={min:remaining.min.clone(),max:remaining.max.clone()};slab.min[axis]=Math.max(edge,slab.min[axis]);slabs.push(slab);remaining.max[axis]=edge}
+    }
+    body.remove(part);parts.splice(parts.indexOf(part),1);part.geometry.dispose()
+    for(const slab of slabs){const s=slab.max.clone().sub(slab.min),p=slab.min.clone().add(slab.max).multiplyScalar(.5);if(Math.min(s.x,s.y,s.z)<.002)continue;box(p.x,p.y,p.z,s.x,s.y,s.z,b.key,body,Math.min(b.r,.02)).name=`${part.name}-well`}
+  }
+  const wellWidth=well.max.x-well.min.x,wellLength=well.max.z-well.min.z
+  box(0,seat.y-.035,seat.z+.02/fitScale,wellWidth+.1,.07,wellLength+.12,'dark').name='pilot-floor'
+  box(0,seat.y+.24,well.min.z-.05,wellWidth,.48,.1,'orange').name='pilot-backrest'
   // Collapse all static hull pieces into one mesh per material; moving mechanisms remain separate.
   body.updateMatrixWorld(true)
   const batches=[];body.traverse(o=>{if(o.isGroup)batches.push(o)})
   for(const batch of merge?batches:[]) for(const mat of Object.values(mats)) {
-    const parts=batch.children.filter(o=>o.isMesh&&o.material===mat&&!thrusters.includes(o))
+    const parts=batch.children.filter(o=>o.isMesh&&o.material===mat&&!thrusters.includes(o)&&!o.userData.moving&&!tracks.some(t=>t.rollers.includes(o)))
     if(parts.length<2)continue
     const geometries=parts.map(o=>{const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrix);return g})
     const merged=new THREE.Mesh(mergeGeometries(geometries,false),mat);merged.castShadow=true;merged.receiveShadow=true
     for(const p of parts){batch.remove(p);p.geometry.dispose()}for(const g of geometries)g.dispose();batch.add(merged)
   }
+  if(merge)for(const track of tracks){
+    track.instance=new THREE.InstancedMesh(track.links[0].geometry.clone(),mats.orange,track.links.length);track.instance.castShadow=true;track.instance.receiveShadow=true;track.belt.add(track.instance)
+    for(const link of track.links){track.belt.remove(link);link.geometry.dispose()}
+    track.update(0)
+  }
   const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3())
   body.position.y=-bounds.min.y;seat.y-=bounds.min.y
   const scale=Math.min(1,4.7/Math.max(size.x,size.z));root.scale.setScalar(scale)
-  root.userData={spec,seat:seat.multiplyScalar(scale),wheels,rotors,arms,thrusters,canopies,parts:merge?null:parts,footprint:Math.max(size.x,size.z)*scale/2,
+  root.userData={spec,seat:seat.multiplyScalar(scale),wheels,rotors,arms,thrusters,canopies,tracks,parts:merge?null:parts,footprint:Math.max(size.x,size.z)*scale/2,
     animate(time,active,reduced=false){
       const t=reduced?0:time
       for(const wheel of wheels)wheel.rotation.x=active?-t*2:0
       for(const rotor of rotors)rotor.rotation.z=active?t*4:0
       for(const arm of arms)arm.rotation.y=active?Math.sin(t*.65)*.18:0
+      for(const track of tracks)track.update(active?t:0)
       for(const light of thrusters)light.scale.setScalar(active?1+Math.sin(t*5)*.07:1)
     },
     dispose(){root.traverse(o=>o.geometry?.dispose());for(const mat of Object.values(mats))mat.dispose()},

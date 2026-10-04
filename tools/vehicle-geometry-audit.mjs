@@ -45,7 +45,7 @@ export function auditVehicle(id,time=0) {
    return {name:m.name,tris,tree:tree([...tris]),mesh:m,closed}
  })
  const sets=parts.map((_,i)=>i),find=i=>sets[i]===i?i:(sets[i]=find(sets[i])),contacts=[],clearanceFailures=[]
- const mechanism=m=>{for(let p=m.parent;p;p=p.parent)if([...model.userData.wheels,...model.userData.arms].includes(p))return p;return null}
+ const mechanism=m=>{for(let p=m.parent;p;p=p.parent)if([...model.userData.wheels,...model.userData.arms,...model.userData.tracks.map(t=>t.belt)].includes(p))return p;return null}
  for(let i=0;i<parts.length;i++)for(let j=i+1;j<parts.length;j++){
    const a=parts[i],b=parts[j];if(boxDistance(a.tree.box,b.tree.box)>.025)continue
    if(contact(a.tree,b.tree,.025)||(b.closed&&inside(a.tris[0].a,b.tris))||(a.closed&&inside(b.tris[0].a,a.tris))){

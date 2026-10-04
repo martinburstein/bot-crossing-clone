@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 import {VEHICLES,createVehicle,chooseVehicle} from '../world/mars-vehicles.js'
 import {MAGI_CLUSTERS,tokenConstruction} from '../game/magi-world.js'
+import {crewRig} from '../agents/crew.js'
+import {createPilotPreview} from '../agents/pilot-preview.js'
 import './magi.css'
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n}
 const number=n=>n.toLocaleString('en-US')
@@ -86,6 +88,7 @@ export class MagiPanel {
     this.garageScene=new THREE.Scene();this.garageScene.add(new THREE.HemisphereLight(0xffefd3,0x465f73,3))
     const sun=new THREE.DirectionalLight(0xfff1de,4);sun.position.set(4,7,5);this.garageScene.add(sun)
     const rim=new THREE.DirectionalLight(0x9dd4e3,2);rim.position.set(-4,2,-4);this.garageScene.add(rim)
+    if(crewRig())this.pilot=createPilotPreview(this.garageScene,this.colony.settings,crewRig())
     this.garageCamera=new THREE.PerspectiveCamera(38,1,.1,80);this.garageCamera.position.set(4.5,3.4,5)
     this.controls=new OrbitControls(this.garageCamera,this.canvas);this.controls.target.set(0,1,0);this.controls.enableDamping=true;this.controls.minDistance=3;this.controls.maxDistance=16;this.controls.maxPolarAngle=Math.PI*.49
     this.resizeObserver=new ResizeObserver(()=>this.resizeGarage());this.resizeObserver.observe(this.canvas)
@@ -101,5 +104,5 @@ export class MagiPanel {
     for(const button of this.hangar.querySelectorAll('[data-vehicle]'))button.setAttribute('aria-pressed',String(button.dataset.vehicle===id))
   }
   resizeGarage() {if(!this.canvas||this.hangar.hidden)return;const w=this.canvas.clientWidth,h=this.canvas.clientHeight;if(!w||!h)return;this.renderer.setSize(w,h,false);this.garageCamera.aspect=w/h;this.garageCamera.updateProjectionMatrix()}
-  tick(time) {if(!this.hangar||this.hangar.hidden)return;this.controls.update();this.vehicle?.userData.animate(time,true,this.colony.settings.get('reducedMotion'));this.renderer.render(this.garageScene,this.garageCamera)}
+  tick(time) {if(!this.hangar||this.hangar.hidden)return;this.controls.update();const reduced=this.colony.settings.get('reducedMotion');this.vehicle?.userData.animate(time,true,reduced);if(this.vehicle)this.pilot?.update(reduced?0:time,this.vehicle.userData.seat);this.renderer.render(this.garageScene,this.garageCamera)}
 }

@@ -37,3 +37,15 @@ The compact three-bay hangar sits in the center near the original lander. Clicki
 Each cluster's missing sixth tile points away from the colony center. The first persona in that cluster to earn expansion fills that gap; later expansion preserves previous allocations.
 
 Screenshots: [fleet inspection sheet](vehicle-assemblies.jpg), [live standby colony](hangar-colony.jpg), and [returned rentals in the isolated simulation](hangar-returns-simulation.jpg).
+
+## Full-size pilots and tread repair
+
+The Eagle, Astro Fighter, Recon Dropship and transport scout now have shallow rounded nose fairings in place of the projecting cone. The Claw-Tank has wider track spacing, raised cargo supports, an outboard claw pivot, and separated instrument barrels clear of the canopy. Each track has 24 links that circulate around its two rollers; the production renderer instances those links without losing their individual animation.
+
+All eleven vehicles reserve a recessed footwell through their hull blocks, with a floor and rear seat pad. Wheel half-shafts stop outside the pilot space. The armored cab retains sloped side panels around its recess; the scout bike's wheelbase was lengthened to clear its occupied canopy. Pilot scale stays at the colony's normal scale. The hangar catalog now shows the actual astronaut rig, backpack, helmet, and seated drive animation in every vehicle.
+
+The browser inspection sheet CPU-skins the same rig and samples four drive-animation phases per vehicle. Every sampled body/equipment vertex clears the solid block and cylinder interiors, and the portion above the canopy rim fits within its ellipsoid. The saved [pilot fit results](pilot-fit-results.json) contain 44 samples with zero reported intrusions. This checks sampled vertices and the analytic canopy envelope, not continuous triangle-to-triangle collision against every decorative surface.
+
+The assembly audit now includes circulating track links in its mechanism checks. All 55 assembly samples remain connected with zero mechanism clearance failures. A separate regression compares instanced and unbatched tread transforms, checks travel along both belts and exact loop closure, and checks reduced-motion behavior. The full suite passes 101 tests; the production build succeeds.
+
+Updated views: [occupied fleet](vehicle-pilot-fit.jpg) and [Claw-Tank in the hangar](claw-tank-pilot.jpg).
