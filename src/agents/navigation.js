@@ -157,6 +157,10 @@ export class Navigation {
 
   // ── A* ──────────────────────────────────────────────────────────────────────────────
 
+  canAdvanceWaypoint(x,z,current,next,tolerance) {
+    return Math.hypot(current.x-x,current.z-z)<=tolerance&&this.lineOfSight(x,z,next.x,next.z)
+  }
+
   /**
    * A route from one world point to another, as world-space waypoints, or `null` if there
    * is no way through. The returned path excludes the start and ends exactly on the goal.

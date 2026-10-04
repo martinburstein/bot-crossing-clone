@@ -1,0 +1,39 @@
+# Mars vehicle assembly review
+
+The eleven procedural vehicles retain their original silhouettes, ivory/orange palette and colony scale. This pass repaired assembly connections and moving-part clearances.
+
+| Vehicle | Corrections |
+| --- | --- |
+| Eagle command shuttle | Moved detached tail fins onto the wings; fitted supported landing skids. |
+| Defence sled | Connected the seat pedestal and four launch tubes to a supported equipment rack. |
+| Recon Dropship | Added cargo-pod cross brackets and supported landing skids. |
+| Recon drilling rover | Added axles/suspension and a rear drill bearing; separated the six tires. |
+| Mining truck | Moved tires clear of the chassis; added axles and an elevated drill outrigger/pivot; moved the full drill sweep away from the tires. |
+| Trike | Added axles and a rear fork; shortened the rear chassis and cargo pod to clear the rotating rear tire. |
+| Astro Fighter | Connected the engine nacelles with spars; gave the instrument its own supported mast clear of the canopy; added landing skids. |
+| Claw-Tank | Added a claw pivot and finger crosspiece; moved the arm clear of the canopy; separated rear tires from tracks, hull and cargo pods with a supported rear extension. |
+| Armored Drilling Unit | Added six axles/suspension joints, separated tire treads and raised the drill boom clear of the cab. |
+| Transport scout | Added supported landing skids; verified pod, engine and tail connections. |
+| Scout bike | Shortened the belly/cockpit, added wheel axles, connected the roll cage, and moved the rotating tires clear of the canopy. |
+
+All parked models are grounded from their actual lowest geometry point, including tire treads and landing feet. Cockpit control bars have solid pedestals; an open canopy is not treated as a solid volume that could support floating interior equipment.
+
+## Numerical verification
+
+`node --test test/magi-geometry.test.mjs` tests all eleven vehicles at five motion phases, including both arm-sweep extrema. The audit operates on the individual transformed meshes before render batching:
+
+- Triangle surface contact plus solid containment builds a physical connection graph. All 55 samples form one connected assembly; no detached components remain.
+- Wheels and articulated mechanisms are checked against other mechanisms and static bodywork. Only specifically marked axle/pivot joints are permitted to meet their own mechanism. All 55 samples have zero clearance failures.
+- Contact tolerance is 0.025 scene units. Broad-phase bounding boxes accelerate the check; overlapping boxes alone do not establish contact.
+
+These are sampled visual-assembly checks, not continuous collision detection or watertight CAD certification. Fixed structural joins intentionally meet/penetrate slightly, as do concentric hubs and tire tread pieces. The test targets detached features and unintended moving-part/body intersections rather than prohibiting necessary assembly joints.
+
+`node tools/vehicle-geometry-audit.mjs` prints the parked-pose result for every vehicle; append a vehicle ID and time to inspect another pose. The browser inspection sheet at `/tools/visual-check/vehicles.html` provides front, rear, side and top views plus motion. The colony simulation at `/tools/visual-check/magi.html` checks rental and return behavior without protocol calls or browser preference saves.
+
+## Hangar and layout
+
+The compact three-bay hangar sits in the center near the original lander. Clicking its geometry opens the complete rental catalog. Bots board at the hangar, operate on its clear apron, then return and disembark. Three parked models occupy the bays; vehicle rentals never consume construction hexagons. The hangar walls and bays participate in navigation, and future construction avoids the building, apron and lander.
+
+Each cluster's missing sixth tile points away from the colony center. The first persona in that cluster to earn expansion fills that gap; later expansion preserves previous allocations.
+
+Screenshots: [fleet inspection sheet](vehicle-assemblies.jpg), [live standby colony](hangar-colony.jpg), and [returned rentals in the isolated simulation](hangar-returns-simulation.jpg).

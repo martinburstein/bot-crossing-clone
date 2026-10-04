@@ -731,9 +731,10 @@ export class Astronauts {
     // Retire waypoints already reached, and any the agent can already see past.
     while (agent.pathAt < path.length - 1) {
       const wp = path[agent.pathAt]
-      const dx = wp.x - agent.pos.x
-      const dz = wp.z - agent.pos.z
-      if (dx * dx + dz * dz > WAYPOINT_REACHED * WAYPOINT_REACHED) break
+      const next=path[agent.pathAt+1]
+      // Reaching the tolerance circle is not enough at a tight building corner:
+      // the next segment must also be visible from the astronaut's actual position.
+      if(!nav.canAdvanceWaypoint(agent.pos.x,agent.pos.z,wp,next,WAYPOINT_REACHED))break
       agent.pathAt++
     }
     if (agent.pathAt >= path.length) return out.copy(agent.site)
@@ -742,7 +743,7 @@ export class Astronauts {
   }
 
   _step(agent, dt, elapsed, anim) {
-    if(agent.mounted && agent.thread.running) {
+    if(agent.mounted && agent.magiSeat) {
       agent.pos.copy(agent.magiSeat);agent.yaw=agent.magiYaw;agent.targetYaw=agent.magiYaw
       agent.scale=1;agent.state='at-site';agent.vel.set(0,0,0);agent.groundSpeed=0;agent.hop=0
       return
@@ -968,6 +969,8 @@ export class Astronauts {
   /** A slow wander inside the plot, re-targeted every few seconds. */
   _magiRoutine(agent,dt) {
     const goal=agent.magiGoal
+    const routeGoal=`${goal.x.toFixed(2)},${goal.z.toFixed(2)}`
+    if(agent.magiRouteGoal!==routeGoal){agent.magiRouteGoal=routeGoal;agent.magiReplans=0;agent.magiStuck=0}
     const distance=Math.hypot(goal.x-agent.pos.x,goal.z-agent.pos.z)
     agent.magiSettled=distance<.65
     if(!agent.magiSettled) {
@@ -977,6 +980,10 @@ export class Astronauts {
       agent.site=site
       const direction=this._v.set(target.x-agent.pos.x,0,target.z-agent.pos.z)
       this._walk(agent,direction,distance,dt,.7)
+      // A long approach can exhaust A*'s search budget, leaving a direct fallback
+      // aimed through a hangar wall. Retry locally once the pilot reaches it.
+      agent.magiStuck=(agent.blocked||agent.groundSpeed<.03)?(agent.magiStuck||0)+dt:0
+      if(agent.magiStuck>1&&(agent.magiReplans||0)<3){agent.pathVersion=-1;agent.magiStuck=0;agent.magiReplans=(agent.magiReplans||0)+1}
     } else {
       agent.vel.set(0,0,0);this._faceToward(agent,agent.magiLook,dt);this._settle(agent,dt)
     }

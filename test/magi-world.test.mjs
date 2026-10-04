@@ -63,13 +63,22 @@ test('fleet covers eight sets and every model has finite geometry, a seat, bound
  const wheelCounts={'drill-unit':6,'cargo-rover':6,'drill-pod':2,trike:3,'mining-truck':4,'claw-tank':2}
  for(const v of VEHICLES){const m=createVehicle(v.id);assert.ok(m.userData.seat.toArray().every(Number.isFinite));assert.ok(m.userData.footprint<=2.36);if(wheelCounts[v.id])assert.equal(m.userData.wheels.length,wheelCounts[v.id]);m.userData.animate(2,true);m.traverse(o=>{if(o.geometry)assert.ok([...o.geometry.attributes.position.array].every(Number.isFinite))});m.userData.dispose()}
 })
-test('vehicle activity requires confirmed work, supports boarding/disembarking, and honors reduced motion',()=>{
- const scene=new THREE.Scene(),life=new MagiLife(scene,{get:()=>true}),thread=standbyMagiThreads()[0]
- const a={id:thread.id,thread,status:'idle',state:'at-site',home:new THREE.Vector3(11,0,0),pos:new THREE.Vector3(15,0,0)}
- const world={groundAt:()=>0};life.sync([a],world);life.update([a],world,1)
- const item=life.fleet.get(a.id);assert.equal(item.active,false)
- a.status='working';a.thread.running=true;a.pos.copy(item.dock);life.update([a],world,2);life.update([a],world,3)
- assert.equal(a.mounted,true);assert.equal(item.active,true);const parked=item.model.position.clone();life.update([a],world,10);assert.deepEqual(item.model.position,parked)
- a.thread.running=false;a.thread.assignmentState='unknown';a.status='idle';life.update([a],world,11);assert.equal(a.mounted,false);assert.equal(a.magiActivity,null);assert.equal(item.active,false)
+test('compact hangar rents only for confirmed work, returns vehicles, and reuses its three bays',()=>{
+ const scene=new THREE.Scene(),life=new MagiLife(scene,{get:()=>true}),threads=standbyMagiThreads()
+ const agents=threads.map(t=>({id:t.id,thread:t,status:'idle',state:'at-site',home:new THREE.Vector3(40,0,0),pos:new THREE.Vector3(40,0,0)}))
+ const world={groundAt:()=>.45};let time=0
+ const tick=(n=1)=>{for(let i=0;i<n;i++)life.update(agents,world,time+=.1)}
+ life.sync(agents,world);tick();assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
+ const a=agents[0];a.status='working';a.thread.running=true;tick()
+ let item=life.fleet.get(a.id);a.pos.copy(item.dock);tick(60)
+ assert.equal(a.mounted,true);assert.equal(item.active,true);assert.equal(item.phase,'working');assert.notDeepEqual(item.model.position,a.home)
+ const steady=item.model.position.clone();tick(20);assert.deepEqual(item.model.position,steady)
+ a.thread.running=false;a.thread.assignmentState='unknown';a.status='idle';tick()
+ assert.equal(item.active,false);assert.equal(item.phase,'returning');tick(60)
+ assert.equal(a.mounted,false);assert.equal(a.magiActivity,null);assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
+ for(const worker of agents.slice(1,5)){worker.thread.running=true;worker.status='working'}tick()
+ assert.equal(life.fleet.size,3);assert.equal(life.hangar.bays.filter(b=>b.rented).length,3)
+ const next=agents[1];const previous=life.fleet.get(next.id);life.choose(next.thread.shellId,'claw-tank');tick(2)
+ item=life.fleet.get(next.id);assert.equal(item.choice,'claw-tank');assert.notEqual(item.model,previous.model)
  life.dispose();assert.equal(scene.children.length,0)
 })

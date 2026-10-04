@@ -2,13 +2,20 @@
 export const MAGI_COLOR = '#e9a45b'
 export const TOKEN_POLICY = Object.freeze({small: 25_000, hex: 250_000})
 export const MAGI_CLUSTERS = [
-  {id:'melchior', name:'Melchior', q:-4, r:0},
-  {id:'balthasar', name:'Balthasar', q:4, r:-4},
-  {id:'casper', name:'Casper', q:0, r:4},
+  {id:'melchior', name:'Melchior', q:-4, r:0, opening:3},
+  {id:'balthasar', name:'Balthasar', q:4, r:-4, opening:1},
+  {id:'casper', name:'Casper', q:0, r:4, opening:5},
 ]
-const offsets = [[1,0],[1,-1],[0,-1],[-1,0],[-1,1]]
 const directions = [[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]]
 const key = c => `${c.q},${c.r}`
+export const HANGAR = Object.freeze({x:0,z:0,width:19,depth:11,deck:.45})
+export const clusterOpening = c => ({q:c.q+directions[c.opening][0],r:c.r+directions[c.opening][1]})
+export function infrastructureCell(c) {
+  const x=11.4*c.q,z=7.6*Math.sqrt(3)*(c.r+c.q/2)
+  // The reservation includes the departure apron as well as the building itself.
+  const dx=Math.max(0,Math.abs(x-HANGAR.x)-HANGAR.width/2),dz=Math.max(0,HANGAR.z-HANGAR.depth/2-z,z-HANGAR.z-HANGAR.depth/2-11)
+  return Math.hypot(dx,dz)<7.6 || Math.hypot(x+22.8,z)<15
+}
 export function tokenConstruction(shell) {
   const measured = Number.isSafeInteger(shell.tokenUsage?.total) && shell.tokenUsage.total >= 0
   const tokens = measured ? shell.tokenUsage.total : 0
@@ -29,7 +36,7 @@ export function allocateMagiCells(projects, previous=new Map()) {
   const sorted=[...projects].sort((a,b)=>a.shellId.localeCompare(b.shellId)), out=new Map(), occupied=new Set(MAGI_CLUSTERS.map(key))
   // Reserve every home first. Historical ROYGBIV layouts cannot change these roots.
   for(const p of sorted) {
-    const index=Number(p.shellId.slice(1))-1, cluster=MAGI_CLUSTERS[Math.floor(index/5)], offset=offsets[index%5]
+    const index=Number(p.shellId.slice(1))-1, cluster=MAGI_CLUSTERS[Math.floor(index/5)], offset=directions.filter((_,i)=>i!==cluster?.opening)[index%5]
     if(!cluster || !offset) throw Error('Invalid 15-3A identity')
     const home={q:cluster.q+offset[0],r:cluster.r+offset[1]}
     out.set(p.id,[home]); occupied.add(key(home))
@@ -37,15 +44,18 @@ export function allocateMagiCells(projects, previous=new Map()) {
   for(const p of sorted) {
     const cells=out.get(p.id), old=previous.get(p.id)
     if(old && key(old[0])===key(cells[0])) for(const c of old.slice(1,p.cells)) {
-      if(!occupied.has(key(c))) {cells.push(c);occupied.add(key(c))}
+      if(!occupied.has(key(c))&&!infrastructureCell(c)) {cells.push(c);occupied.add(key(c))}
     }
   }
   const rounds=Math.max(...sorted.map(p=>p.cells))
   for(let round=1;round<rounds;round++) for(const p of sorted) {
     const cells=out.get(p.id),home=cells[0]
     if(cells.length<p.cells) {
-      const frontier=source=>source.flatMap(c=>directions.map(([q,r])=>({q:c.q+q,r:c.r+r}))).filter(c=>!occupied.has(key(c)))
+      const frontier=source=>source.flatMap(c=>directions.map(([q,r])=>({q:c.q+q,r:c.r+r}))).filter(c=>!occupied.has(key(c))&&!infrastructureCell(c))
+      const cluster=MAGI_CLUSTERS[Math.floor((Number(p.shellId.slice(1))-1)/5)],opening=clusterOpening(cluster)
       let candidates=frontier(cells)
+      // The first earned tile closes the outward-facing gap in the crew's shared ring.
+      if(!occupied.has(key(opening))) candidates=[opening]
       // A surrounded persona may add a tile to its cluster's edge. Never erase homes.
       if(!candidates.length) candidates=frontier(sorted.filter(other=>Math.floor((Number(other.shellId.slice(1))-1)/5)===Math.floor((Number(p.shellId.slice(1))-1)/5)).flatMap(other=>out.get(other.id)))
       candidates.sort((a,b)=>{

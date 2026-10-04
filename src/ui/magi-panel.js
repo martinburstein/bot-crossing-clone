@@ -79,7 +79,7 @@ export class MagiPanel {
     for(const s of this.shells){const option=el('option',`${s.shellId.toUpperCase()} · ${s.shellName}`);option.value=s.shellId;this.workerSelect.append(option)}
     const equip=el('button','Choose this vehicle');equip.onclick=()=>{this.choose(this.workerSelect.value,this.vehicleId);equip.textContent='Vehicle selected ✓';this.signature=null;this.update(this.shells,this.flags)}
     assign.append(label,this.workerSelect,equip)
-    view.append(this.canvas,this.vehicleTitle,this.vehicleCue,this.vehicleSet,assign,el('small','Drag to inspect · scroll to zoom. Parked until the assigned persona is working.'))
+    view.append(this.canvas,this.vehicleTitle,this.vehicleCue,this.vehicleSet,assign,el('small','Drag to inspect · scroll to zoom. Three rental bays; vehicles return automatically after work.'))
     for(const spec of VEHICLES){const b=el('button',spec.name);b.dataset.vehicle=spec.id;b.onclick=()=>{this.showVehicle(spec.id);equip.textContent='Choose this vehicle'};catalog.append(b)}
     body.append(catalog,view);modal.append(header,body);this.root.append(modal)
     this.renderer=new THREE.WebGLRenderer({canvas:this.canvas,antialias:true,alpha:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.setClearColor(0x18242c,1);this.renderer.toneMapping=THREE.ACESFilmicToneMapping

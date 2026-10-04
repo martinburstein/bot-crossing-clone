@@ -477,6 +477,9 @@ export class Colony {
   }
 
   groundAt(x, z) {
+    if(this.astronauts?.magiLife?.hangar?.contains(x,z))return DECK_TOP
+    const ramp=this.astronauts?.magiLife?.hangar?.rampHeight(x,z)
+    if(ramp!=null)return Math.max(ramp,terrainHeight(x,z,this.planet))
     const cell = worldToHex(x, z)
     if (this.deckedCells?.has(`${cell.q},${cell.r}`)) return DECK_TOP
     return terrainHeight(x, z, this.planet)

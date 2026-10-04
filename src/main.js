@@ -476,7 +476,7 @@ engine.canvas.addEventListener('pointermove', (e) => {
   // Pointing at a quiet plot is what makes its name appear.
   const plot = plotUnder(e, p)
   colony.setHoveredPlot(plot)
-  engine.canvas.style.cursor = messageBoards.pick(engine.camera,p.x,p.y) || agent || plot ? 'pointer' : 'grab'
+  engine.canvas.style.cursor = colony.astronauts.magiLife.pickHangar(engine.camera,p.x,p.y) || messageBoards.pick(engine.camera,p.x,p.y) || agent || plot ? 'pointer' : 'grab'
 })
 
 /**
@@ -500,6 +500,7 @@ function plotUnder(e, p) {
 engine.canvas.addEventListener('pointerup', (e) => {
   if (e.button !== 0 || !rig.wasClick) return
   const p = ndc(e)
+  if(magiPanel&&colony.astronauts.magiLife.pickHangar(engine.camera,p.x,p.y)){magiPanel.openHangar();return}
   const board=messageBoards.pick(engine.camera,p.x,p.y)
   if(board){boardPanel.open(board);return}
   const agent = colony.pick(p.x, p.y, p.aspect)
