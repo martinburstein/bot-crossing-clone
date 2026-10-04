@@ -1,5 +1,7 @@
 # Bot Crossing 15-3A
 
+**Approved checkpoint:** [2026-10-03 restart and verification guide](docs/15-3A/CHECKPOINT.md), tag `checkpoint/15-3A-approved-2026-10-03`.
+
 Branch `15-3A` provides the visual world for the consolidated `../swarm-protocol` installation. Open the viewer root to see three separated crews of five home hexagons. All fifteen astronauts retain the existing body/helmet design and share the default ivory suit and amber station trim. Melchior, Balthasar and Casper remain identity labels, not suit colors.
 
 ## Run
@@ -74,7 +76,7 @@ Use `?legacy=1` for the pre-15-3A ordinary colony or `?legacy=1&swarm=1` for its
 
 ### Verified build, 2026-10-03
 
-- 100/100 Node tests passed, including 55 unbatched triangle-contact and moving-part clearance samples across all eleven vehicles and a hangar-corner routing regression.
+- 104/104 Node tests passed, including 55 moving-part clearance samples across all eleven vehicles, 660 cockpit surface checks, wheel direction/reversal, rover seating, and hangar-corner routing regressions.
 - Production Vite build passed; the existing large Three.js chunk warning is non-blocking.
 - Chrome visual check: clickable building opens the catalog; three simulated pilots reach the hangar and drive out; stopping work returns rentals to the three bays. Outward cluster gaps and clear home hexagons are visible in the live standby view.
 - Hangar assignment updated the selected persona's vehicle and was restored to its default after checking.
