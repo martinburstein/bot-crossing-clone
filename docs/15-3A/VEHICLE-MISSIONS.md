@@ -33,3 +33,13 @@ The browser fixture at `/tools/visual-check/magi.html` is labeled **SIMULATED DA
 Observed Windows result on October 3, 2026: 109 tests passed, zero failures; production build passed; Chrome/WebGL mission checks passed. These checks use simulated active workers and are not proof that the stopped live research project resumed.
 
 The off-shift presentation follow-up passed 19 focused tests, the production build and Chrome/WebGL checks. Simulated failed and unavailable assignments returned all fifteen personas to camp activities, parked every rental and displayed zero exclamation badges; the three-pilot active state still passed.
+
+## Pilot speech and telemetry
+
+Click a seated vehicle pilot to select that worker, including during departure from the hangar. A pixel-style speech bubble tracks the pilot's helmet with one line of at most three words, changing with the current mission phase. The bubble disappears when the pilot parks, leaves the selection or moves out of view.
+
+The right panel replaces the generic repository card with the actual assigned task, current activity and vehicle, mission, observed speed in scene units per second, altitude, destination distance, coordinates, measured tokens and the next construction thresholds. Idle crew show camp activity and their last task. No percentage is invented for task completion. F3 or the telemetry button expands receipt counts, route waypoints, feed availability, the underlying task record, worker binding, FPS, frame time, draw calls, triangle count and render-buffer size. Coordinates and rendering observations refresh four times per second; crew/vehicle geometry and shift rotation are unchanged.
+
+`node --test test/worker-inspector.test.mjs` checks all eleven mission labels, the three-word cap, phase changes, measured values and off-shift clearing. `tools/check-worker-inspector.cjs` exercises the actual application's mouse selection, live panel updates, F3, compact window layout and a disconnected feed. It intercepts every API request in its isolated browser, including colony saves, so its simulated workers never reach the host protocol. Set `BOT_CROSSING_TEST_URL` and `BOT_CROSSING_PLAYWRIGHT` as for the mission checks above. Captures stay in ignored `.cache/worker-inspector-check`.
+
+The pilot inspection follow-up passed 16 focused tests, the production build and the browser checks, including the 1152 × 480 desktop panel size. The browser sent zero API calls to the host service.

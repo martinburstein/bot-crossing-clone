@@ -5,6 +5,7 @@ import { STATUS_LABEL } from '../game/colony.js'
 import { FACE, FRAME_COLS, FRAME_ROWS } from '../agents/faces.js'
 import { PLOT_PALETTE, hashString } from '../world/plots.js'
 import {magiShiftLabel} from '../game/magi-world.js'
+import {WorkerInspector} from './worker-inspector.js'
 
 /**
  * The whole HUD, in plain DOM.
@@ -75,6 +76,9 @@ export class Hud {
     this._buildAvatar()
     this._wire()
     this.syncSettings()
+    this.workerInspector=new WorkerInspector(this.el,this.$('.thread-pop'),()=>{
+      const card=this.$('.thread-pop');if(card.offsetWidth)this._cardSize={w:card.offsetWidth,h:card.offsetHeight}
+    })
   }
 
   // ── construction ────────────────────────────────────────────────────────────────────
@@ -593,12 +597,16 @@ export class Hud {
     if (!agent || !thread) {
       card.classList.remove('on')
       this.selected = null
+      this.workerInspector.select(null,null)
+      this.el.classList.remove('worker-selected')
       return
     }
     this.selected = { agent, thread }
     card.classList.add('on')
+    this.workerInspector.select(agent,thread)
+    this.el.classList.toggle('worker-selected',thread.worldProfile==='15-3A')
 
-    this.$('.thread-pop .title').textContent = thread.title || 'Untitled thread'
+    this.$('.thread-pop .title').textContent = thread.worldProfile==='15-3A' ? `${thread.shellId.toUpperCase()} · ${thread.shellName}` : thread.title || 'Untitled thread'
     const status = thread.worldProfile === '15-3A' ? magiShiftLabel(thread) : thread.isShell ? thread.shellStatus : STATUS_LABEL[agent.status] || agent.status
     const meta = this.$('.thread-pop .meta')
     const bits = [
@@ -608,7 +616,8 @@ export class Hud {
     if (thread.worktree) bits.push(`<span class="tag">⑂ ${escapeHtml(thread.worktree)}</span>`)
     if (thread.gitBranch) bits.push(`<span class="tag">${escapeHtml(thread.gitBranch)}</span>`)
     if (thread.model) bits.push(`<span class="tag">${escapeHtml(shortModel(thread.model))}</span>`)
-    bits.push(`<span>${ago(thread.lastActivityAt)}</span>`)
+    if(thread.worldProfile==='15-3A')bits.push(`<span>${escapeHtml(thread.clusterId)} crew</span>`)
+    else bits.push(`<span>${ago(thread.lastActivityAt)}</span>`)
     meta.innerHTML = bits.join('')
 
     const pct = Math.round((this.actions.progressFor?.(thread.id) ?? 0) * 100)
@@ -636,6 +645,11 @@ export class Hud {
    */
   placeCard(screen) {
     const el = this.$('.thread-pop')
+    if(this.selected?.thread.worldProfile==='15-3A') {
+      el.style.transform='none';el.classList.remove('flip');el.classList.add('on');this._cardOn=true
+      this._cardX=this._cardY=null;this._cardFlip=false
+      return
+    }
     if (!screen || !this.selected) {
       if (this._cardOn) {
         this._cardOn = false
@@ -1017,6 +1031,7 @@ const TEMPLATE = `
         <div class="k"><span>Hide all UI</span><kbd>H</kbd> <kbd>${IS_MAC ? '⌘' : 'Ctrl'}\\</kbd></div>
         <div class="k"><span>Settings</span><kbd>S</kbd></div>
         <div class="k"><span>Screenshot</span><kbd>P</kbd></div>
+        <div class="k"><span>Worker telemetry (MAGI)</span><kbd>F3</kbd></div>
       </div>
       <div>
         <div class="k"><span>Next needing you</span><kbd>N</kbd></div>

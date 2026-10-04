@@ -500,10 +500,11 @@ function plotUnder(e, p) {
 engine.canvas.addEventListener('pointerup', (e) => {
   if (e.button !== 0 || !rig.wasClick) return
   const p = ndc(e)
+  const agent = colony.pick(p.x, p.y, p.aspect)
+  if(agent?.mounted){select(agent.id,{});return}
   if(magiPanel&&colony.astronauts.magiLife.pickHangar(engine.camera,p.x,p.y)){magiPanel.openHangar();return}
   const board=messageBoards.pick(engine.camera,p.x,p.y)
   if(board){boardPanel.open(board);return}
-  const agent = colony.pick(p.x, p.y, p.aspect)
   if (agent) {
     select(agent.id, {})
     return
@@ -541,6 +542,9 @@ window.addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return
 
   switch (e.key) {
+    case 'F3':
+      if(selectedId&&MAGI_VIEW){e.preventDefault();hud.workerInspector.toggleDebug()}
+      break
     case 'h':
     case 'H':
       hud.toggleUi()
@@ -830,7 +834,12 @@ engine.add({
       // A selected astronaut that walked off the roster should not keep a stale card open.
       const agent = colony.agentFor(selectedId)
       if (!agent) select(null, {})
-      else hud.placeCard(screenOf(agent))
+      else {
+        const screen=screenOf(agent),fleet=colony.astronauts.magiLife.fleet.get(agent.id)
+        const p=fleet?.model.position||agent.pos
+        hud.workerInspector.update(agent,fleet,{perf:engine.perf,viewport:engine.viewport,groundY:colony.groundAt(p.x,p.z),stale:!!magiPanel?.flags?.stale,standby:!!magiPanel?.flags?.standby},screen,elapsed)
+        hud.placeCard(screen)
+      }
     }
     hud.setFps(engine.perf, engine.viewport, `${colony.astronauts.visibleCount} crew · ${colony.particles.liveCount} bits`)
   },
