@@ -1,5 +1,12 @@
 // Display policy only. No task completion, clock time or inferred usage earns territory.
 export const MAGI_COLOR = '#e9a45b'
+// Crew presentation is a shift cycle. Task failures stay in the protocol;
+// off-duty personas rest at camp instead of becoming stalled/error characters.
+export function magiOnShift(thread) {
+  return thread.running===true && !thread.hasError && ['running','reviewing'].includes(thread.assignmentState)
+}
+export function magiCrewStatus(thread) { return magiOnShift(thread) ? 'working' : 'idle' }
+export function magiShiftLabel(thread) { return magiOnShift(thread) ? 'On shift' : 'Idle' }
 export const TOKEN_POLICY = Object.freeze({small: 25_000, hex: 250_000})
 export const MAGI_CLUSTERS = [
   {id:'melchior', name:'Melchior', q:-4, r:0, opening:3},

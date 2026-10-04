@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 import {VEHICLES,createVehicle} from '../world/mars-vehicles.js'
 import {vehicleJob,VEHICLE_JOBS} from '../game/vehicle-jobs.js'
-import {MAGI_CLUSTERS,tokenConstruction} from '../game/magi-world.js'
+import {MAGI_CLUSTERS,tokenConstruction,magiOnShift,magiShiftLabel} from '../game/magi-world.js'
 import {crewRig} from '../agents/crew.js'
 import {createPilotPreview} from '../agents/pilot-preview.js'
 import './magi.css'
@@ -27,8 +27,8 @@ export class MagiPanel {
   update(shells,{stale=false,standby=false}={}) {
     this.shells=shells
     this.flags={stale,standby}
-    const working=shells.filter(s=>s.running).length
-    this.status.textContent=stale?'Connection unavailable · activity paused':standby?'Standby · connect Swarm to begin':`${working} / 3 sessions active · ${15-working} personas resting`
+    const working=shells.filter(magiOnShift).length
+    this.status.textContent=stale?'Connection unavailable · crew off shift':standby?'Standby · connect Swarm to begin':`${working} / 3 sessions active · ${15-working} personas resting`
     this.status.dataset.state=stale?'stale':working?'live':'standby'
     const plans=shells.map(tokenConstruction),total=plans.reduce((n,p)=>n+p.tokens,0),measured=plans.filter(p=>p.measured).length
     this.total.textContent=`${plans.reduce((n,p)=>n+p.cells,0)} hexagons · ${measured?number(total)+' measured tokens':'usage not yet available'}`
@@ -40,13 +40,13 @@ export class MagiPanel {
     for(const cluster of MAGI_CLUSTERS) {
       const details=el('details');details.dataset.cluster=cluster.id;details.open=open.has(cluster.id)
       const crew=shells.filter(s=>s.clusterId===cluster.id),summary=el('summary')
-      const label=el('span',cluster.name),count=el('small',`${crew.filter(s=>s.running).length} active · 5 bots`)
+      const label=el('span',cluster.name),count=el('small',`${crew.filter(magiOnShift).length} active · 5 bots`)
       summary.append(label,count);details.append(summary)
       const fly=el('button','Go to crew','magi-link');fly.onclick=()=>this.focus(cluster.id);details.append(fly)
       for(const shell of crew) {
         const row=el('article',undefined,'magi-worker'),name=el('button',`${shell.shellId.toUpperCase()}  ${shell.shellName}`,'magi-worker-name')
         name.onclick=()=>this.select(shell.id)
-        const p=tokenConstruction(shell),status=el('span',stale?'Unknown':shell.shellStatus,'magi-worker-status')
+        const p=tokenConstruction(shell),status=el('span',magiShiftLabel(shell),'magi-worker-status')
         const progress=el('p',p.measured?`${number(p.tokens)} tokens · ${p.cells} hex · ${p.minor} additions / upgrades`:'Token usage unavailable','magi-worker-progress')
         row.append(name,status,progress)
         if(p.measured) {
@@ -58,7 +58,7 @@ export class MagiPanel {
           if(p.deferredHexagons)row.append(el('small',`${p.deferredHexagons} further earned hexagons held beyond the scene limit`))
         }
         const job=vehicleJob(shell,this.colony.astronauts.magiLife.choices[shell.shellId]||shell.vehicleId)
-        if(shell.running&&!stale)row.append(el('p',`Visual mission: ${job.label}`,'magi-worker-progress'))
+        if(magiOnShift(shell)&&!stale)row.append(el('p',`Visual mission: ${job.label}`,'magi-worker-progress'))
         const select=el('select');select.setAttribute('aria-label',`Vehicle preference for ${shell.shellName}`)
         for(const v of VEHICLES){const option=el('option',v.name);option.value=v.id;if(job.contextual&&v.id!==job.vehicle){option.disabled=true;option.title='This mission needs a different vehicle'}if(v.id==='defender'&&!job.meteorAlert){option.disabled=true;option.title='Available for an incoming meteor alert'}select.append(option)}
         select.value=job.vehicle

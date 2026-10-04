@@ -4,6 +4,7 @@ import { TIMES, systemTimeOfDay } from '../world/sky.js'
 import { STATUS_LABEL } from '../game/colony.js'
 import { FACE, FRAME_COLS, FRAME_ROWS } from '../agents/faces.js'
 import { PLOT_PALETTE, hashString } from '../world/plots.js'
+import {magiShiftLabel} from '../game/magi-world.js'
 
 /**
  * The whole HUD, in plain DOM.
@@ -553,7 +554,7 @@ export class Hud {
       b.type = 'button'
       b.className = `thread ${statusClass(t.status)}`
       b.setAttribute('aria-pressed', String(t.id === project.selectedId))
-      b.title = t.isShell ? t.shellStatus : STATUS_LABEL[t.status] || t.status
+      b.title = t.worldProfile === '15-3A' ? magiShiftLabel(t) : t.isShell ? t.shellStatus : STATUS_LABEL[t.status] || t.status
       b.innerHTML =
         '<i class="pip"></i>' +
         `<span class="t">${escapeHtml(t.title || 'Untitled thread')}</span>` +
@@ -598,7 +599,7 @@ export class Hud {
     card.classList.add('on')
 
     this.$('.thread-pop .title').textContent = thread.title || 'Untitled thread'
-    const status = thread.isShell ? thread.shellStatus : STATUS_LABEL[agent.status] || agent.status
+    const status = thread.worldProfile === '15-3A' ? magiShiftLabel(thread) : thread.isShell ? thread.shellStatus : STATUS_LABEL[agent.status] || agent.status
     const meta = this.$('.thread-pop .meta')
     const bits = [
       `<span class="tag"><i class="swatch" style="background:${hex(agent.trim.getHex())}"></i>${escapeHtml(status)}</span>`,

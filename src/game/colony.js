@@ -21,6 +21,7 @@ import { Particles } from '../agents/particles.js'
 import { Navigation } from '../agents/navigation.js'
 import { liveThreadsForColony } from './hidden-projects.js'
 import {constructionFor,allocateSwarmCells} from './swarm-construction.js'
+import {magiCrewStatus} from './magi-world.js'
 
 /**
  * The colony: everything that turns a list of agent threads into a place.
@@ -64,6 +65,7 @@ export const STATUS_LABEL = {
 
 /** Thread → behaviour. First match wins, exactly like the board's auto-sort. */
 export function statusFor(thread, now = Date.now()) {
+  if (thread.worldProfile === '15-3A') return magiCrewStatus(thread)
   if (thread.hasError) return 'blocked'
   if (thread.running) return 'working'
   if (thread.prState === 'MERGED') return 'celebrating'

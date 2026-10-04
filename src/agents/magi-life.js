@@ -8,7 +8,7 @@ import {createVehicleMission} from '../world/vehicle-mission.js'
 import {Navigation} from './navigation.js'
 
 export const IDLE_LABELS={tinker:'Tinkering',talk:'Chatting',board:'Reading the board',snack:'Snack break',drive:'Operating vehicle'}
-// Shared cluster clock creates real pairs. Working, failed and unknown agents never join.
+// Shared cluster clock pairs off-duty personas while the on-shift crew stays at work.
 export function idlePlan(workerId,seconds,idleIds) {
   const index=(Number(workerId.slice(1))-1)%5, epoch=Math.floor(seconds/64)
   const role=(index+epoch)%5
@@ -112,7 +112,7 @@ export class MagiLife {
     const dt=Math.max(0,Math.min(.25,elapsed-this.elapsed));this.elapsed=elapsed
     const reduced=this.settings.get('reducedMotion'),motionDt=reduced?0:dt;this.returnOrder ??= 3
     if(!this.hangar)return
-    const idleIds=new Set(agents.filter(a=>a.status==='idle'&&a.thread.assignmentState!=='unknown'&&a.state!=='leaving'&&!a.mounted).map(a=>a.thread.shellId))
+    const idleIds=new Set(agents.filter(a=>a.status==='idle'&&a.state!=='leaving'&&!a.mounted).map(a=>a.thread.shellId))
     for(const camp of this.camps.values())camp.group.position.y=world.groundAt(camp.group.position.x,camp.group.position.z)+.03
     // Only the confirmed live persona of each cluster gets a moving rental.
     const occupied=new Set(),active=agents.filter(agent=>{if(!confirmedVehicleWorker(agent)||occupied.has(agent.thread.clusterId)||occupied.size>=3)return false;occupied.add(agent.thread.clusterId);return true})
@@ -158,7 +158,7 @@ export class MagiLife {
     }
     for(const agent of agents) {
       if(agent.thread.worldProfile!=='15-3A'||this.fleet.has(agent.id))continue
-      if(agent.status==='idle'&&agent.thread.assignmentState!=='unknown') {
+      if(agent.status==='idle') {
         const plan=idlePlan(agent.thread.shellId,elapsed,idleIds),camp=this.camps.get(agent.thread.clusterId)
         if(!camp)continue
         const slot=plan.activity==='board'&&plan.role===3?2:plan.role%camp.targets[plan.activity].length

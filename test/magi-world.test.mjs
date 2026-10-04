@@ -4,10 +4,25 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import * as THREE from 'three'
-import {tokenConstruction,allocateMagiCells,standbyMagiThreads,MAGI_CLUSTERS} from '../src/game/magi-world.js'
+import {tokenConstruction,allocateMagiCells,standbyMagiThreads,MAGI_CLUSTERS,magiOnShift,magiShiftLabel,magiCrewStatus} from '../src/game/magi-world.js'
 import {usageFromEvents,readMagiTokens} from '../server/magi-tokens.mjs'
 import {VEHICLES,createVehicle} from '../src/world/mars-vehicles.js'
 import {idlePlan,MagiLife} from '../src/agents/magi-life.js'
+
+test('MAGI task outcomes present off-shift crew without rewriting task state',()=>{
+ const base=standbyMagiThreads()[0]
+ for(const assignmentState of ['failed','blocked','unknown','reserved','submitted','accepted','idle']) {
+  const thread={...base,assignmentState,hasError:assignmentState==='failed',unread:true,shellStatus:'Failed'}
+  const before=JSON.stringify(thread),status=magiCrewStatus(thread)
+  assert.equal(status,'idle');assert.equal(magiOnShift(thread),false);assert.equal(magiShiftLabel(thread),'Idle')
+  assert.equal(JSON.stringify(thread),before)
+ }
+ for(const assignmentState of ['running','reviewing']) {
+  const thread={...base,assignmentState,running:true}
+  assert.equal(magiCrewStatus(thread),'working');assert.equal(magiShiftLabel(thread),'On shift')
+  assert.equal(magiCrewStatus({...thread,hasError:true}),'idle')
+ }
+})
 
 test('token awards respect boundaries, ignore tasks, and bound rendering without losing earned counts',()=>{
  const plan=n=>tokenConstruction({tokenUsage:n===null?null:{total:n},milestones:Array(20).fill({level:'major'})})
@@ -75,7 +90,7 @@ test('compact hangar rents only for confirmed work, returns vehicles, and reuses
  const steady=item.model.position.clone();tick(20);assert.ok(item.model.position.distanceTo(steady)>1,'working vehicle must continue its mission')
  a.thread.running=false;a.thread.assignmentState='unknown';a.status='idle';tick()
  assert.equal(item.active,false);assert.equal(item.phase,'parked');tick(60)
- assert.equal(a.mounted,false);assert.equal(a.magiActivity,null);assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
+ assert.equal(a.mounted,false);assert.ok(['talk','tinker','board','snack'].includes(a.magiActivity));assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
  for(const worker of [agents[1],agents[5],agents[10],agents[2]]){worker.thread.running=true;worker.thread.assignmentState='running';worker.status='working'}tick()
  assert.equal(life.fleet.size,3);assert.equal(life.hangar.bays.filter(b=>b.rented).length,3)
  const next=agents[1];const previous=life.fleet.get(next.id);life.choose(next.thread.shellId,'claw-tank');tick(2)

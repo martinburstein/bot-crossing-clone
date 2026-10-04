@@ -1,4 +1,5 @@
 // Visual assignments only: never issue work, complete a task or award territory.
+import {magiOnShift} from './magi-world.js'
 export const VEHICLE_JOBS = Object.freeze({
   eagle: {id:'survey',label:'Mapping the camp approach',operation:'scan',speed:8},
   defender: {id:'intercept',label:'Intercepting an incoming meteor',operation:'intercept',speed:5},
@@ -14,8 +15,8 @@ export const VEHICLE_JOBS = Object.freeze({
 })
 
 export function confirmedVehicleWorker(agent) {
-  return agent?.thread.worldProfile==='15-3A' && agent.status==='working' && agent.thread.running===true &&
-    ['running','reviewing'].includes(agent.thread.assignmentState) && !['leaving','gone'].includes(agent.state)
+  return agent?.thread.worldProfile==='15-3A' && agent.status==='working' && magiOnShift(agent.thread) &&
+    !['leaving','gone'].includes(agent.state)
 }
 
 export function vehicleJob(thread, preferred) {
