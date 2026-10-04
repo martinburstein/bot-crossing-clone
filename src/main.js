@@ -725,7 +725,7 @@ async function poll() {
   } catch (err) {
     if (MAGI_VIEW) {
       // Preserve earned visuals during an outage, but invalidate all prior activity.
-      const unknown=(threads.length?threads:previousMagiProjection()).map(t=>({...t,running:false,hasError:false,assignmentState:'unknown',shellStatus:'Connection unavailable',tokenUsage:t.tokenUsage?{...t.tokenUsage,cached:true}:null}))
+      const unknown=(threads.length?threads:REPLAY_RUN?standbyMagiThreads():previousMagiProjection()).map(t=>({...t,running:false,hasError:false,assignmentState:'unknown',shellStatus:'Connection unavailable',tokenUsage:t.tokenUsage?{...t.tokenUsage,cached:true}:null}))
       applyThreads(unknown)
       colony.astronauts.setAlignmentLights(null)
       hud.setMagiAlignment(null)
