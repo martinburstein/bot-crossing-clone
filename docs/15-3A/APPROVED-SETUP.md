@@ -1,0 +1,13 @@
+# Approved reusable 15-3A setup — October 4, 2026
+
+Martin approved this setup after Deep Dive 2. Restore tag `checkpoint/15-3A-approved-2026-10-04` from this repository. It preserves the approved visual source at `30c73b118d3345d0a1b741553b2fc11de0284ed4` plus this reuse documentation. The older October 3 checkpoint is unchanged.
+
+The setup has fifteen stable personas across three clusters, with at most three confirmed active pilots. Workers operate suitable vehicles along their own group's outward rim; idle crews lounge at camp and shifts retain their approved behavior. Scenery poles and exclamation badges are removed. Click a mounted pilot for a one-line speech bubble of at most three words; F3 exposes useful task, vehicle, receipt and render telemetry. Swarm Atlas is square with its triangular overlapping arrangement. Codex stays left, Bot Crossing above, and equal square Atlas and Token Counter tiles below.
+
+The complete installation uses `martinburstein/swarm-protocol` on branch `15-3A` and the standalone private `martinburstein/Token-Counter` v1.0.0 release. The matching Swarm checkpoint tag is `checkpoint/15-3A-approved-2026-10-04`; its portable setup manifest is `docs/approved-15-3A-2026-10-04.json`. These are source checkpoints and restore documentation; no new automatic configuration loader is implied.
+
+For an explicitly requested startup, run `node swarm-start.mjs start --bot-crossing-root ../bot-crossing-clone` from the consolidated Swarm checkout. This opens/reuses the desktop and performs coordinator readiness; it does not authorize worker research. Keep the caller chat model unchanged. A fresh project requires a separate bounded plan. To rearrange an existing running desktop, use `node swarm-start.mjs layout` without model calls. Never reset archived runs merely to reopen the interface.
+
+Run-1 and Run-2 research worlds stay in the private Crypto-Research-Lab repository under `The Big Crypto Short/Run-1` and `Run-2`. Their private local archive-root registration is required to list them in Bot Crossing; the archived world is a checksum-verified read-only configuration, separate from this reusable visual source. Session handles, launcher capabilities, browser-local settings and PIDs are not portable setup state. Use the returned viewer URL after startup rather than assuming an old port.
+
+Approved source verification: 114 Bot Crossing tests, production build, browser vehicle missions, mounted-pilot speech/F3 interaction and Run-2 replay isolation passed. The isolated 175-cell fixture completed 180 simulated seconds at all three outward fronts without blocked routes. These source checks make no model turns and do not establish research completion.

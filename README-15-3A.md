@@ -1,8 +1,8 @@
 # Bot Crossing 15-3A
 
-**Approved checkpoint:** [2026-10-03 restart and verification guide](docs/15-3A/CHECKPOINT.md), tag `checkpoint/15-3A-approved-2026-10-03`.
+**Current approved setup:** [October 4 reusable 15-3A setup](docs/15-3A/APPROVED-SETUP.md), tag `checkpoint/15-3A-approved-2026-10-04`. The [October 3 checkpoint](docs/15-3A/CHECKPOINT.md) remains preserved.
 
-Branch `15-3A` provides the visual world for the consolidated `../swarm-protocol` installation. Open the viewer root to see three separated crews of five home hexagons. All fifteen astronauts retain the existing body/helmet design and share the default ivory suit and amber station trim. Melchior, Balthasar and Casper remain identity labels, not suit colors.
+The current approved viewer is on `codex/vehicle-missions`; the consolidated `../swarm-protocol` installation is on `15-3A`. Open the viewer root to see three separated crews of five home hexagons. All fifteen astronauts retain the existing body/helmet design and share the default ivory suit and amber station trim. Melchior, Balthasar and Casper remain identity labels, not suit colors.
 
 ## Run
 
@@ -60,9 +60,9 @@ The [reference gallery](references/mars-mission/index.html) contains eleven huma
 
 Click the **Mars Motor Pool building** near the lander, or **Explore the vehicle hangar**, to rotate and zoom all eleven vehicles and select a rental for a persona. The compact building has three visible bays and a retracted roof. It starts with three stock vehicles; returned vehicles replace the older parked stock. The full catalog is always available without placing 33 models in the world.
 
-Confirmed active personas walk to a free bay, board, and drive out onto the reserved apron. When work ends, they return, park and disembark before resuming idle activity. The next persona can use the parked vehicle or choose another catalog model. At most three rentals exist at once. A change of vehicle during work returns the old rental before checking out its replacement. Reduced motion suppresses wheel/tool motion and hovering bob, while keeping the departure/return journey. Construction hexagons contain no parked vehicles.
+Confirmed active personas deploy seated at their own starting group's outward rim, with a short local approach. Vehicles perform suitable jobs between that group's outer work stops and retarget as earned tiles grow. When work ends, rentals park immediately and the crew resumes camp activity. The next persona can use a parked vehicle or choose another catalog model. At most three rentals exist at once. Reduced motion freezes movement and mechanisms while preserving actual active status. Construction hexagons contain no parked vehicles.
 
-Idle crews rotate through paired conversation, tinkering with a hammer, reading their camp message board, and sipping a robot snack. Pairing excludes active and unavailable personas. Routes avoid camp furniture, vehicles, and earned buildings. Unknown or failed states do not masquerade as casual idle activity.
+Idle crews rotate through paired conversation, tinkering with a hammer, reading their camp message board, and sipping a robot snack. Pairing excludes active personas. Routes avoid camp furniture, vehicles, and earned buildings. Failed or unknown work returns the crew to camp without exclamation points or stalled poses; the actual assignment outcome and connection availability remain visible in telemetry.
 
 ## Verification
 
