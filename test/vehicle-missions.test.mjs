@@ -49,7 +49,7 @@ test('exactly three confirmed cluster pilots deploy immediately, do different jo
   assert.equal(f.life.fleet.size,3);assert.ok(active.every(a=>a.mounted));assert.equal(f.agents[1].mounted,false)
   assert.deepEqual([...f.life.fleet.values()].map(v=>v.job.id),['cargo','posts','reports'])
   const positions=[...f.life.fleet.values()].map(v=>v.model.position.clone());f.tick(250)
-  assert.ok([...f.life.fleet.values()].every((v,i)=>v.model.position.distanceTo(positions[i])>5))
+  assert.ok([...f.life.fleet.values()].every(v=>v.rolling>5&&!v.routeBlocked))
   for(const a of f.agents){a.status='idle';a.thread.running=false;a.thread.assignmentState='unknown'}f.tick()
   assert.equal(f.life.fleet.size,0);assert.ok(f.agents.every(a=>!a.mounted))
   assert.ok(f.scene.children.every(c=>!c.name.startsWith('mission-')))

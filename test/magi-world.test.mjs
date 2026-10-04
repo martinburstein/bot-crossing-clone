@@ -87,7 +87,7 @@ test('compact hangar rents only for confirmed work, returns vehicles, and reuses
  const a=agents[0];a.status='working';a.thread.running=true;a.thread.assignmentState='running';tick()
  let item=life.fleet.get(a.id);a.pos.copy(item.dock);tick(60)
  assert.equal(a.mounted,true);assert.equal(item.active,true);assert.equal(item.phase,'working');assert.notDeepEqual(item.model.position,a.home)
- const steady=item.model.position.clone();tick(20);assert.ok(item.model.position.distanceTo(steady)>1,'working vehicle must continue its mission')
+ const travelled=item.rolling;tick(200);assert.ok(item.rolling>travelled+1,'working vehicle resumes its route after operating at an outer work stop')
  a.thread.running=false;a.thread.assignmentState='unknown';a.status='idle';tick()
  assert.equal(item.active,false);assert.equal(item.phase,'parked');tick(60)
  assert.equal(a.mounted,false);assert.ok(['talk','tinker','board','snack'].includes(a.magiActivity));assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)

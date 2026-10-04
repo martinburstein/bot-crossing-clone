@@ -36,15 +36,8 @@ export class MagiLife {
     const allCells=this.world?.magiCells?.(),sites=clusterWorkFront(agent.thread.clusterId,this.world?.magiCells?.(agent.thread.clusterId),allCells)
     const stops=sites.map(s=>{const v=new THREE.Vector3(s.x,0,s.z);v.workNormal=s.normal;return v})
     if(!stops.length)return [bay.work.clone()]
-    if(job.operation==='report'||job.id==='remote-survey'||job.id==='air-scout') {
-      const index=MAGI_CLUSTERS.findIndex(c=>c.id===agent.thread.clusterId),next=this.camps.get(MAGI_CLUSTERS[(index+1)%3].id)
-      const nextId=MAGI_CLUSTERS[(index+1)%3].id,remote=clusterWorkFront(nextId,this.world?.magiCells?.(nextId),allCells)[0]
-      const transit=()=>{const p=bay.work.clone();p.transit=true;return p}
-      const destination=next&&remote?new THREE.Vector3(remote.x,0,remote.z):stops[1]||stops[0]
-      destination.workNormal=remote?.normal
-      // Break long inter-camp searches at the clear apron; transit is not a work stop.
-      return [stops[0],transit(),destination,transit(),stops[1]||stops[0]]
-    }
+    // Couriers and scouts make rounds between their own group's outer outposts.
+    if(job.operation==='report'||job.id==='remote-survey'||job.id==='air-scout')return [stops[0],stops[2]||stops[0],stops[1]||stops[0]]
     return stops
   }
   moveMission(item,dt) {
@@ -103,6 +96,11 @@ export class MagiLife {
       const movedFront=stops.length!==item.stops.length||stops.some((p,i)=>p.distanceToSquared(item.stops[i])>.01)
       if(movedFront){
         item.stops=stops;item.stopIndex=0;item.path=null;item.dwell=0
+        if(item.phase==='outbound'){
+          const front=stops[0],normal=front.workNormal
+          item.departureEnd=front.clone();item.departureStart=front.clone().add(new THREE.Vector3((normal?.x||0)*5,0,(normal?.z||1)*5))
+          item.model.position.lerpVectors(item.departureStart,item.departureEnd,item.travel)
+        }
       }
       // A newly earned tile can place buildings over the previous work front.
       // Relocate a covered rental to free ground before routing; never drive out through a wall.
@@ -149,6 +147,9 @@ export class MagiLife {
       const job=this.job(agent),mission=createVehicleMission(job,agent.thread.shellId)
       const item={choice,job,mission,bay,model:bay.model,home:bay.work.clone(),seat:new THREE.Vector3(),dock:bay.dock.clone(),active:true,travel:0,rolling:0,phase:'outbound',stopIndex:0,visitedStops:[],dwell:0,operationTime:0}
       item.stops=this.missionStops(job,agent,bay);this.scene.add(mission.group)
+      const front=item.stops[0],normal=front.workNormal
+      item.departureEnd=front.clone();item.departureStart=front.clone().add(new THREE.Vector3((normal?.x||0)*5,0,(normal?.z||1)*5))
+      item.model.position.copy(item.departureStart)
       // A status change deploys the seated pilot immediately; activity is visible
       // without waiting for a long walk from the far side of the colony.
       agent.mounted=true;agent.pathVersion=-1
@@ -159,8 +160,8 @@ export class MagiLife {
       let distance=0
       if(item.phase==='outbound'){
         const before=item.travel;item.travel=Math.min(1,item.travel+motionDt/5)
-        p.lerpVectors(item.bay.position,item.bay.work,item.travel)
-        distance=item.bay.position.distanceTo(item.bay.work)*(item.travel-before)
+        p.lerpVectors(item.departureStart,item.departureEnd,item.travel)
+        distance=item.departureStart.distanceTo(item.departureEnd)*(item.travel-before)
         if(item.travel===1)item.phase='working'
       }else distance=this.moveMission(item,motionDt)
       // Bay threshold is a short ramp; the remainder rests on the sampled terrain.
