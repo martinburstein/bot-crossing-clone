@@ -26,7 +26,7 @@ export class MagiLife {
   choice(agent) {return chooseVehicle(agent.thread.shellId,this.choices[agent.thread.shellId]||agent.thread.vehicleId)}
   parkModel(bay,id) {
     if(bay.model){this.scene.remove(bay.model);bay.model.userData.dispose()}
-    bay.model=createVehicle(id);bay.model.position.copy(bay.position);this.scene.add(bay.model)
+    bay.model=createVehicle(id);bay.model.rotation.y=bay.model.userData.seatYaw;bay.model.position.copy(bay.position);this.scene.add(bay.model)
   }
   sync(agents,world) {
     this.agents=agents;this.world=world
@@ -50,7 +50,7 @@ export class MagiLife {
   pickHangar(camera,x,y){return !!this.hangar?.pick(camera,x,y)}
   release(id,item,agent,world) {
     if(agent){agent.mounted=false;agent.magiSeat=null;agent.pos.copy(item.bay.dock);agent.pos.y=world.groundAt(agent.pos.x,agent.pos.z);agent.groundY=agent.pos.y;agent.groundAt=null;agent.state='at-site';agent.pathVersion=-1;agent.magiActivity=null}
-    item.model.position.copy(item.bay.position);item.model.rotation.y=0;item.model.userData.animate(0,false)
+    item.model.position.copy(item.bay.position);item.model.rotation.y=item.model.userData.seatYaw;item.model.userData.animate(0,false)
     item.bay.model=item.model;item.bay.parkedAt=++this.returnOrder;item.bay.rented=false;this.fleet.delete(id)
     try {if(this.persist)localStorage.setItem('botcrossing.15-3A.parked.v2',JSON.stringify(this.hangar.bays.map(b=>b.model?.userData.spec.id||b.lastChoice||'eagle')))}catch{/* Optional history. */}
   }
@@ -66,7 +66,7 @@ export class MagiLife {
       const choice=this.choice(agent),bay=available.find(b=>b.model?.userData.spec.id===choice)||available[0]
       if(!bay)continue
       if(bay.model?.userData.spec.id!==choice)this.parkModel(bay,choice)
-      const item={choice,bay,model:bay.model,home:bay.work.clone(),seat:new THREE.Vector3(),dock:bay.dock.clone(),active:false,travel:0,phase:'boarding'}
+      const item={choice,bay,model:bay.model,home:bay.work.clone(),seat:new THREE.Vector3(),dock:bay.dock.clone(),active:false,travel:0,rolling:0,phase:'boarding'}
       bay.rented=true;bay.lastChoice=choice;bay.model=null;this.fleet.set(agent.id,item)
     }
     for(const [id,item] of this.fleet) {
@@ -80,10 +80,11 @@ export class MagiLife {
       const ground=world.groundAt(p.x,p.z);p.y=ground
       const air=item.model.userData.spec.kind==='air',inUse=agent?.mounted&&item.phase!=='boarding'
       if(air&&inUse)p.y+=.6*Math.min(1,item.travel*5)+(reduced?0:Math.sin(elapsed*1.4)*.025*Math.min(1,item.travel*5))
-      item.model.rotation.y=0;item.model.updateMatrixWorld(true)
-      item.seat.copy(item.model.userData.seat).add(p);item.active=!!(working&&agent?.mounted&&item.phase!=='returning')
-      item.model.userData.animate(elapsed,inUse&&!reduced,reduced)
-      if(agent){agent.magiActivity=item.phase==='returning'?'return':'drive';agent.magiGoal.copy(item.dock);agent.magiLook.copy(p);agent.magiSeat=item.seat;agent.magiYaw=0}
+      item.model.rotation.y=item.model.userData.seatYaw;item.model.updateMatrixWorld(true)
+      item.seat.copy(item.model.userData.seat).applyAxisAngle(new THREE.Vector3(0,1,0),item.model.rotation.y).add(p);item.active=!!(working&&agent?.mounted&&item.phase!=='returning')
+      if(inUse&&!reduced)item.rolling+=dt*(item.phase==='returning'?-1:1)
+      item.model.userData.animate(elapsed,inUse&&!reduced,reduced,item.rolling)
+      if(agent){agent.magiActivity=item.phase==='returning'?'return':'drive';agent.magiGoal.copy(item.dock);agent.magiLook.copy(p);agent.magiSeat=item.seat;agent.magiYaw=item.model.rotation.y+item.model.userData.seatYaw}
     }
     for(const agent of agents) {
       if(agent.thread.worldProfile!=='15-3A'||this.fleet.has(agent.id))continue

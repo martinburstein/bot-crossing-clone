@@ -10,7 +10,7 @@ document.getElementById('motion').onclick=e=>{motion=!motion;e.target.textConten
 function checkFit(model,pilot){
  const results=[]
  for(const time of [0,.75,1.5,2.25]){
-  pilot.update(time,model.userData.seat);model.userData.animate(time,true);model.updateMatrixWorld(true)
+  pilot.update(time,model.userData.seat,model.userData.seatYaw);model.userData.animate(time,true);model.updateMatrixWorld(true)
   const points=pilot.points(),hits=[]
   for(const part of model.userData.parts){
    const inv=part.matrixWorld.clone().invert(),b=part.userData.block,p=part.geometry.parameters
@@ -26,5 +26,5 @@ function checkFit(model,pilot){
  }
  return results
 }
-function render(time){for(const {model,canvas,pilot,card} of models){pilot.group.visible=true;if(!card.dataset.fit){card.dataset.fit=JSON.stringify(checkFit(model,pilot));const bounds=new THREE.Box3().setFromPoints(pilot.points().map(p=>p.sub(model.userData.seat)));card.dataset.bounds=JSON.stringify({min:bounds.min.toArray(),max:bounds.max.toArray(),seat:model.userData.seat.toArray()});}pilot.update(motion?time/1000:0,model.userData.seat);scene.add(model);model.userData.animate(time/1000,motion);const box=new THREE.Box3().setFromObject(model),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());camera.position.copy(center).add(new THREE.Vector3(...views[view]).normalize().multiplyScalar(Math.max(size.x,size.y,size.z)*2));camera.lookAt(center);renderer.render(scene,camera);canvas.getContext('2d').drawImage(renderer.domElement,0,0);scene.remove(model);pilot.group.visible=false}setTimeout(()=>requestAnimationFrame(render),200)}render(0)
+function render(time){for(const {model,canvas,pilot,card} of models){pilot.group.visible=true;if(!card.dataset.fit){card.dataset.fit=JSON.stringify(checkFit(model,pilot));const bounds=new THREE.Box3().setFromPoints(pilot.points().map(p=>p.sub(model.userData.seat)));card.dataset.bounds=JSON.stringify({min:bounds.min.toArray(),max:bounds.max.toArray(),seat:model.userData.seat.toArray()});}pilot.update(motion?time/1000:0,model.userData.seat,model.userData.seatYaw);scene.add(model);model.userData.animate(time/1000,motion);const box=new THREE.Box3().setFromObject(model),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());camera.position.copy(center).add(new THREE.Vector3(...views[view]).normalize().multiplyScalar(Math.max(size.x,size.y,size.z)*2));camera.lookAt(center);renderer.render(scene,camera);canvas.getContext('2d').drawImage(renderer.domElement,0,0);scene.remove(model);pilot.group.visible=false}setTimeout(()=>requestAnimationFrame(render),200)}render(0)
 </script></body></html>

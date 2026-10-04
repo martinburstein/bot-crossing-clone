@@ -99,10 +99,10 @@ export class MagiPanel {
     if(this.vehicle){this.garageScene.remove(this.vehicle);this.vehicle.userData.dispose()}
     this.vehicleId=id;this.vehicle=createVehicle(id);this.garageScene.add(this.vehicle)
     const bounds=new THREE.Box3().setFromObject(this.vehicle),size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3())
-    const distance=Math.max(size.x,size.z,size.y)*1.6;this.controls.target.copy(center);this.garageCamera.position.copy(center).add(new THREE.Vector3(.62,.46,.72).normalize().multiplyScalar(distance));this.controls.update()
+    const distance=Math.max(size.x,size.z,size.y)*1.6;this.controls.target.copy(center);this.garageCamera.position.copy(center).add(new THREE.Vector3(.62,.46,.72).applyAxisAngle(new THREE.Vector3(0,1,0),this.vehicle.userData.seatYaw).normalize().multiplyScalar(distance));this.controls.update()
     const spec=this.vehicle.userData.spec;this.vehicleTitle.textContent=spec.name;this.vehicleCue.textContent=spec.cue;this.vehicleSet.textContent=`Set ${spec.set} · ${spec.role} · ${spec.kind==='air'?'Flight-capable':'Surface vehicle'}`
     for(const button of this.hangar.querySelectorAll('[data-vehicle]'))button.setAttribute('aria-pressed',String(button.dataset.vehicle===id))
   }
   resizeGarage() {if(!this.canvas||this.hangar.hidden)return;const w=this.canvas.clientWidth,h=this.canvas.clientHeight;if(!w||!h)return;this.renderer.setSize(w,h,false);this.garageCamera.aspect=w/h;this.garageCamera.updateProjectionMatrix()}
-  tick(time) {if(!this.hangar||this.hangar.hidden)return;this.controls.update();const reduced=this.colony.settings.get('reducedMotion');this.vehicle?.userData.animate(time,true,reduced);if(this.vehicle)this.pilot?.update(reduced?0:time,this.vehicle.userData.seat);this.renderer.render(this.garageScene,this.garageCamera)}
+  tick(time) {if(!this.hangar||this.hangar.hidden)return;this.controls.update();const reduced=this.colony.settings.get('reducedMotion');this.vehicle?.userData.animate(time,true,reduced);if(this.vehicle)this.pilot?.update(reduced?0:time,this.vehicle.userData.seat,this.vehicle.userData.seatYaw);this.renderer.render(this.garageScene,this.garageCamera)}
 }

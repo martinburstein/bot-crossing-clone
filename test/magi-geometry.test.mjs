@@ -62,6 +62,21 @@ test('cockpit interior rays see one surface instead of coincident colored faces'
   model.userData.dispose()
  }
 })
+
+test('wheel contact surfaces move opposite the pilot-facing direction and reverse together',()=>{
+ for(const {id} of VEHICLES){
+  const model=createVehicle(id)
+  const forward=new THREE.Vector3(0,0,1).applyAxisAngle(new THREE.Vector3(0,1,0),model.userData.seatYaw)
+  for(const sign of [1,-1]){
+   model.userData.animate(.01,true,false,sign*.01)
+   for(const wheel of model.userData.wheels){
+    const contact=new THREE.Vector3(0,-1,0).applyQuaternion(wheel.quaternion)
+    assert.ok(contact.dot(forward)*sign<0,`${id}: tire contact moves against travel`)
+   }
+  }
+  model.userData.dispose()
+ }
+})
 test('each outward opening is the first shared expansion and growth avoids the hangar and lander',()=>{
  const projects=standbyMagiThreads().map(t=>({...t,cells:1})),base=allocateMagiCells(projects)
  for(let c=0;c<3;c++) {

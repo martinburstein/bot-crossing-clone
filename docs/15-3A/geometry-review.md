@@ -55,3 +55,11 @@ Updated views: [occupied fleet](vehicle-pilot-fit.jpg) and [Claw-Tank in the han
 The recessed hull blocks originally exposed coincident interior faces, including differently colored hull/base walls and the seat pad. Those surfaces caused depth fighting. The structural cuts now sit 0.04 units behind a single cabin lining; the floor and backrest have their own separated visible surfaces. The vehicle exteriors, pilot scale, and seating positions are unchanged.
 
 A regression casts 660 rays across the eleven interiors and checks that their first visible opaque surfaces do not coincide with another mesh. The original geometry failed this check. All 44 browser pilot-fit samples still report no intrusion, all 55 moving-assembly samples pass, and the full suite now passes 102 tests. The production build succeeds. Close-up orbit inspection confirmed clean surfaces; [updated hangar view](cockpit-interiors.jpg).
+
+## Driving direction
+
+The drilling rover's pilot, controls, seat back, and footwell now face its drill end. Its catalog camera opens from that end, and rentals park with the drill toward the hangar exit. The seat position and pilot heading follow the vehicle's rotation in the colony as well as in the preview.
+
+The mining truck, trike, Claw-Tank rear wheels, armored drilling unit, and scout bike now roll toward their fronts. The drilling rover retains the opposite local wheel direction because its front is the drill end. Track rollers match the circulating links. Returning rentals reverse the accumulated wheel/track phase smoothly while backing into their bays.
+
+Regression checks verify tire contact movement against the vehicle's forward direction, its reversal, and the rover's mounted seat transform and outbound/return behavior. All 104 tests pass, the build succeeds, and all 44 browser pilot-fit samples remain clear. [Rover facing the drill](rover-driving-direction.jpg).

@@ -82,3 +82,23 @@ test('compact hangar rents only for confirmed work, returns vehicles, and reuses
  item=life.fleet.get(next.id);assert.equal(item.choice,'claw-tank');assert.notEqual(item.model,previous.model)
  life.dispose();assert.equal(scene.children.length,0)
 })
+
+test('drilling rover faces the exit with its pilot seated correctly and reverses on return',()=>{
+ const scene=new THREE.Scene(),life=new MagiLife(scene,{transient:true,get:()=>false}),thread=standbyMagiThreads()[0]
+ const agent={id:thread.id,thread,status:'working',state:'at-site',home:new THREE.Vector3(40,0,0),pos:new THREE.Vector3(40,0,0)}
+ thread.running=true;const world={groundAt:()=>.45},agents=[agent];let time=0
+ const tick=()=>life.update(agents,world,time+=.1)
+ life.choose(thread.shellId,'cargo-rover');life.sync(agents,world);tick()
+ const item=life.fleet.get(agent.id);agent.pos.copy(item.dock);tick()
+ const data=item.model.userData,yAxis=new THREE.Vector3(0,1,0)
+ assert.ok(Math.abs(data.seatYaw-Math.PI)<1e-9)
+ assert.ok(new THREE.Vector3(0,0,-1).applyQuaternion(item.model.quaternion).z>.99,'drill end points out of the bay')
+ assert.ok(new THREE.Vector3(0,0,1).applyAxisAngle(yAxis,agent.magiYaw).z>.99,'pilot faces drill end')
+ const expected=data.seat.clone().applyQuaternion(item.model.quaternion).add(item.model.position)
+ assert.ok(agent.magiSeat.distanceTo(expected)<1e-9)
+ let angle=data.wheels[0].rotation.x;tick()
+ assert.ok(data.wheels[0].rotation.x<angle,'outbound wheels turn toward the drill')
+ angle=data.wheels[0].rotation.x;agent.status='idle';thread.running=false;tick()
+ assert.equal(item.phase,'returning');assert.ok(data.wheels[0].rotation.x>angle,'return reverses the same wheel phase')
+ life.dispose()
+})

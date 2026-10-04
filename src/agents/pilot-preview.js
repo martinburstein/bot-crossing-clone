@@ -9,7 +9,7 @@ export function createPilotPreview(scene,settings,rig) {
   crew.setRoster([{id:thread.id,thread,status:'idle',site:seat,home:seat,anchor:seat,known:true}],{groundAt:()=>0,shipDoor:()=>seat})
   const agent=crew.agents[0];agent.mounted=true;agent.magiSeat=seat;agent.magiYaw=0
   return {group:crew.group,crew,agent,seat,
-    update(time,position){seat.copy(position);crew.update(.016,time);agent.clipTime=time;crew._animate(agent,0,1);crew._writeMatrices(time,1)},
+    update(time,position,yaw=0){seat.copy(position);agent.magiYaw=yaw;crew.update(.016,time);agent.clipTime=time;crew._animate(agent,0,1);crew._writeMatrices(time,1)},
     points(){
       const points=[],matrix=new THREE.Matrix4(),m0=new THREE.Matrix4(),m1=new THREE.Matrix4(),p=new THREE.Vector3(),q=new THREE.Vector3(),v=new THREE.Vector3()
       const frame=agent.frame,f0=Math.floor(frame),f1=Math.min(rig.frameCount-1,f0+1),alpha=frame-f0,data=rig.boneTexture.image.data,stride=rig.boneCount*16

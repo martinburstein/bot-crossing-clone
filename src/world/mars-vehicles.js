@@ -7,7 +7,7 @@ export const VEHICLES = Object.freeze([
   {id:'eagle',name:'Eagle command shuttle',set:7690,kind:'air',role:'Survey',cue:'Long amber canopy, swept white wings, twin orange engines'},
   {id:'defender',name:'Mothership-assault defence sled',set:7691,kind:'ground',role:'Support',cue:'Twin runners, open control seats, four orange launch tubes'},
   {id:'dropship',name:'MX-71 Recon Dropship',set:7692,kind:'air',role:'Transport',cue:'Sloping front wings, long spine, three rear engines and amber cargo pods'},
-  {id:'cargo-rover',name:'Recon drilling rover',set:7692,kind:'ground',role:'Mining',cue:'Six orange wheels, curved amber cab, rear drill and roll bar'},
+  {id:'cargo-rover',name:'Recon drilling rover',set:7692,kind:'ground',role:'Mining',cue:'Six orange wheels, curved amber cab, drill and roll bar'},
   {id:'mining-truck',name:'Alien Strike mining truck',set:7693,kind:'ground',role:'Mining',cue:'Four orange wheels, curved amber cab, articulated vertical drill'},
   {id:'trike',name:'MT-31 Trike',set:7694,kind:'ground',role:'Scout',cue:'Two huge front wheels, single trailing wheel, narrow white fuselage'},
   {id:'astro-fighter',name:'MX-11 Astro Fighter',set:7695,kind:'air',role:'Scout',cue:'Small swept wings, bubble canopy, single over-cockpit instrument'},
@@ -33,6 +33,7 @@ function material(key) {
 export function createVehicle(id,{merge=true}={}) {
   const spec=VEHICLE_BY_ID.get(id)
   if(!spec) throw Error(`Unknown Mars vehicle: ${id}`)
+  const forwardSign=id==='cargo-rover'?-1:1,seatYaw=forwardSign<0?Math.PI:0
   const root=new THREE.Group();root.name=`mars-${id}`
   const body=new THREE.Group();root.add(body)
   const mats=Object.fromEntries(Object.keys(colors).map(k=>[k,material(k)]))
@@ -78,9 +79,9 @@ export function createVehicle(id,{merge=true}={}) {
     canopies.push(g)
     g.scale.set(w*.7,.88,l*.74)
     for(const x of [-w*.52,w*.52])box(x,y+.02,z,.09,.13,l,'hull')
-    box(0,y+.12,z+l*.42,w*.65,.1,.12,'metal')
-    box(0,y+.02,z+l*.42,w*.5,.2,.1,'dark')
-    return new THREE.Vector3(0,y-.5,z-.15)
+    box(0,y+.12,z+forwardSign*l*.42,w*.65,.1,.12,'metal')
+    box(0,y+.02,z+forwardSign*l*.42,w*.5,.2,.1,'dark')
+    return new THREE.Vector3(0,y-.5,z-forwardSign*.15)
   }
   function pod(x,y,z,l=1.15) {
     cyl(x,y,z,.27,l,'glass',body,'z');cyl(x,y,z-l/2,.29,.13,'orange',body,'z');cyl(x,y,z+l/2,.29,.13,'orange',body,'z')
@@ -103,7 +104,7 @@ export function createVehicle(id,{merge=true}={}) {
     for(let i=0;i<24;i++){const link=box(0,0,0,.72,.1,.15,'orange',belt,.015);link.userData.moving=true;links.push(link)}
     const entry={belt,links,rollers,instance:null,update(time){
       for(let i=0;i<links.length;i++){
-        let s=(i*length/links.length+time*.8)%length,y,zz,angle
+        let s=THREE.MathUtils.euclideanModulo(i*length/links.length+time*.8,length),y,zz,angle
         if(s<2*half){zz=-half+s;y=r;angle=0}
         else if((s-=2*half)<Math.PI*r){const a=s/r;zz=half+r*Math.sin(a);y=r*Math.cos(a);angle=a}
         else if((s-=Math.PI*r)<2*half){zz=half-s;y=-r;angle=Math.PI}
@@ -111,7 +112,7 @@ export function createVehicle(id,{merge=true}={}) {
         const link=links[i];link.position.set(x,cy+y,z+zz);link.rotation.x=angle;link.updateMatrix();entry.instance?.setMatrixAt(i,link.matrix)
       }
       if(entry.instance)entry.instance.instanceMatrix.needsUpdate=true
-      for(const roller of rollers)roller.rotation.x=-time*.8/.27
+      for(const roller of rollers)roller.rotation.x=time*.8/.27
     }}
     tracks.push(entry);entry.update(0)
   }
@@ -203,7 +204,7 @@ export function createVehicle(id,{merge=true}={}) {
   body.updateMatrixWorld(true)
   const initialSize=new THREE.Box3().setFromObject(body).getSize(new THREE.Vector3())
   const fitScale=Math.min(1,4.7/Math.max(initialSize.x,initialSize.z))
-  const well=new THREE.Box3(new THREE.Vector3(-.32/fitScale,seat.y,seat.z-.39/fitScale),new THREE.Vector3(.32/fitScale,seat.y+1.22/fitScale,seat.z+.43/fitScale))
+  const well=new THREE.Box3(new THREE.Vector3(-.32/fitScale,seat.y,seat.z-(forwardSign>0?.39:.43)/fitScale),new THREE.Vector3(.32/fitScale,seat.y+1.22/fitScale,seat.z+(forwardSign>0?.43:.39)/fitScale))
   // Recess the structural cut behind a single cabin lining. Cutting overlapping
   // hull blocks on the visible wall plane gave them coincident, flickering faces.
   const cut=well.clone().expandByVector(new THREE.Vector3(.04,.04,.04))
@@ -222,10 +223,11 @@ export function createVehicle(id,{merge=true}={}) {
     for(const slab of slabs){const s=slab.max.clone().sub(slab.min),p=slab.min.clone().add(slab.max).multiplyScalar(.5);if(Math.min(s.x,s.y,s.z)<.002)continue;box(p.x,p.y,p.z,s.x,s.y,s.z,b.key,body,Math.min(b.r,.02)).name=`${part.name}-well`}
   }
   const wellWidth=well.max.x-well.min.x,wellLength=well.max.z-well.min.z
-  box(0,seat.y-.035,seat.z+.02/fitScale,wellWidth+.1,.07,wellLength+.12,'dark').name='pilot-floor'
-  for(const x of [well.min.x-.03,well.max.x+.03])box(x,seat.y+.215,seat.z+.02/fitScale,.06,.53,wellLength+.12,'dark',body,.01).name='pilot-side-lining'
-  box(0,seat.y+.215,well.max.z+.03,wellWidth,.53,.06,'dark',body,.01).name='pilot-front-lining'
-  box(0,seat.y+.215,well.min.z-.05,wellWidth,.53,.1,'orange',body,.01).name='pilot-backrest'
+  const wellCenterZ=(well.min.z+well.max.z)/2,frontZ=forwardSign>0?well.max.z:well.min.z,backZ=forwardSign>0?well.min.z:well.max.z
+  box(0,seat.y-.035,wellCenterZ,wellWidth+.1,.07,wellLength+.12,'dark').name='pilot-floor'
+  for(const x of [well.min.x-.03,well.max.x+.03])box(x,seat.y+.215,wellCenterZ,.06,.53,wellLength+.12,'dark',body,.01).name='pilot-side-lining'
+  box(0,seat.y+.215,frontZ+forwardSign*.03,wellWidth,.53,.06,'dark',body,.01).name='pilot-front-lining'
+  box(0,seat.y+.215,backZ-forwardSign*.05,wellWidth,.53,.1,'orange',body,.01).name='pilot-backrest'
   // Collapse all static hull pieces into one mesh per material; moving mechanisms remain separate.
   body.updateMatrixWorld(true)
   const batches=[];body.traverse(o=>{if(o.isGroup)batches.push(o)})
@@ -244,13 +246,14 @@ export function createVehicle(id,{merge=true}={}) {
   const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3())
   body.position.y=-bounds.min.y;seat.y-=bounds.min.y
   const scale=Math.min(1,4.7/Math.max(size.x,size.z));root.scale.setScalar(scale)
-  root.userData={spec,seat:seat.multiplyScalar(scale),wheels,rotors,arms,thrusters,canopies,tracks,parts:merge?null:parts,footprint:Math.max(size.x,size.z)*scale/2,
-    animate(time,active,reduced=false){
+  root.userData={spec,seat:seat.multiplyScalar(scale),seatYaw,forwardSign,wheels,rotors,arms,thrusters,canopies,tracks,parts:merge?null:parts,footprint:Math.max(size.x,size.z)*scale/2,
+    animate(time,active,reduced=false,driveTime=time){
       const t=reduced?0:time
-      for(const wheel of wheels)wheel.rotation.x=active?-t*2:0
+      const rolling=reduced?0:driveTime
+      for(const wheel of wheels)wheel.rotation.x=active?rolling*forwardSign*2:0
       for(const rotor of rotors)rotor.rotation.z=active?t*4:0
       for(const arm of arms)arm.rotation.y=active?Math.sin(t*.65)*.18:0
-      for(const track of tracks)track.update(active?t:0)
+      for(const track of tracks)track.update(active?rolling:0)
       for(const light of thrusters)light.scale.setScalar(active?1+Math.sin(t*5)*.07:1)
     },
     dispose(){root.traverse(o=>o.geometry?.dispose());for(const mat of Object.values(mats))mat.dispose()},
