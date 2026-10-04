@@ -15,6 +15,7 @@ import { crewRig, loadCrew } from './agents/crew.js'
 import { TIMES } from './world/sky.js'
 import {
   fetchThreads,
+  REPLAY_RUN,
   fetchState,
   saveState,
   openThread,
@@ -49,6 +50,7 @@ app.insertAdjacentHTML(
 )
 
 const settings = new Settings()
+settings.transient=Boolean(REPLAY_RUN)
 if (!hasStoredSettings()) {settings.applyPreset(DEFAULT_PRESET);if(MAGI_VIEW){settings.set('planet','mars');settings.set('timeOfDay',.46)}}
 if(MAGI_VIEW)document.body.classList.add('magi-world')
 
@@ -708,13 +710,13 @@ async function poll() {
   polling = true
   try {
     const res = await fetchThreads(MAGI_VIEW)
-    if(MAGI_VIEW&&res.mode==='magi')try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
+    if(MAGI_VIEW&&res.mode==='magi'&&!REPLAY_RUN)try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
     applyThreads(res.threads || [])
     const shells = (res.threads || []).filter(t=>t.isShell)
     colony.astronauts.setAlignmentLights(null)
     hud.setMagiAlignment(null)
     swarm.update(MAGI_VIEW?[]:shells)
-    magiPanel?.update(shells,{standby:res.mode==='standby'})
+    magiPanel?.update(shells,{standby:res.mode==='standby',replay:res.replay})
     messageBoards.sync(MAGI_VIEW?[]:shells,colony.plotOrder)
     boardPanel.update(res.messageBoards,MAGI_VIEW?[]:shells)
     if (shells.length) mission.el.hidden = true
@@ -743,6 +745,7 @@ async function poll() {
 }
 
 function queueSave() {
+  if(REPLAY_RUN)return
   clearTimeout(pendingSave)
   pendingSave = setTimeout(async () => {
     try {
@@ -770,7 +773,7 @@ async function boot() {
         colony.restoreLayout(state.plots)
         // And the settings, but only for a browser that has none of its own — an explicit
         // choice made here always outranks the file.
-        if (!hasStoredSettings() && state.settings) settings.applyAll(state.settings)
+        if ((REPLAY_RUN||!hasStoredSettings()) && state.settings) settings.applyAll(state.settings)
       })
       .catch(() => {
         /* first run, or the file is gone — an empty colony state is a valid one */

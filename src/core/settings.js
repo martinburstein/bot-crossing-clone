@@ -229,6 +229,7 @@ export class Settings {
 
   _scheduleSave() {
     clearTimeout(this._saveTimer)
+    if(this.transient)return
     this._saveTimer = setTimeout(() => {
       try {
         localStorage.setItem(STORE_KEY, JSON.stringify(this.values))

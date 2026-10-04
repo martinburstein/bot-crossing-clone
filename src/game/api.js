@@ -14,7 +14,9 @@ const post = (url, payload) =>
     body: JSON.stringify(payload),
   })
 
-export const fetchThreads = (magi=false) => req(magi?'/api/magi/world':'/api/threads')
+export const REPLAY_RUN=typeof location!=='undefined'?new URLSearchParams(location.search).get('run'):null
+const archive=()=>req(`/api/magi/archive/${encodeURIComponent(REPLAY_RUN)}`)
+export const fetchThreads = (magi=false) => REPLAY_RUN?archive().then(a=>a.world):req(magi?'/api/magi/world':'/api/threads')
 const STATE_URL=typeof location!=='undefined'&&new URLSearchParams(location.search).get('legacy')!=='1'?'/api/magi/colony':'/api/state'
 
 /**
@@ -36,7 +38,7 @@ function adoptBase(state, updatedAt) {
 }
 
 export const fetchState = async () => {
-  const state = await req(STATE_URL)
+  const state = REPLAY_RUN?(await archive()).colony:await req(STATE_URL)
   adoptBase(state)
   return state
 }
@@ -57,6 +59,7 @@ const SAVE_TRIES = 3
  * happened mid-flight, and only a real merge hands back something new.
  */
 export async function saveState(state) {
+  if(REPLAY_RUN)return state
   let local = state
   for (let attempt = 0; attempt < SAVE_TRIES; attempt++) {
     const res = await fetch(STATE_URL, {

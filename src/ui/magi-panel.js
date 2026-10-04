@@ -19,17 +19,21 @@ export class MagiPanel {
     const rule=el('div',undefined,'magi-rules');rule.append(el('span','25k tokens → small addition'),el('span','250k tokens → new hexagon'))
     this.total=el('p','','magi-total')
     const garage=el('button','Explore the vehicle hangar','magi-hangar-button');garage.onclick=()=>this.openHangar()
+    const runs=el('select');runs.setAttribute('aria-label','Saved runs');runs.append(new Option('Live world',''))
+    fetch('/api/magi/archives').then(r=>r.json()).then(data=>{for(const run of data.runs||[])runs.append(new Option(run.label,run.id));runs.value=new URLSearchParams(location.search).get('run')||''}).catch(()=>{})
+    runs.onchange=()=>{const url=new URL(location.href);if(runs.value)url.searchParams.set('run',runs.value);else url.searchParams.delete('run');location.assign(url)}
     this.groups=el('div',undefined,'magi-groups')
     const caption=el('p','Three crews. Five personas each. One shared suit colour.','magi-caption')
-    this.el.append(eyebrow,header,this.status,rule,this.total,garage,this.groups,caption);root.append(this.el)
+    this.el.append(eyebrow,header,this.status,rule,this.total,garage,runs,this.groups,caption);root.append(this.el)
     this.root=root
   }
-  update(shells,{stale=false,standby=false}={}) {
+  update(shells,{stale=false,standby=false,replay=null}={}) {
     this.shells=shells
-    this.flags={stale,standby}
+    this.flags={stale,standby,replay}
     const working=shells.filter(magiOnShift).length
     this.status.textContent=stale?'Connection unavailable · crew off shift':standby?'Standby · connect Swarm to begin':`${working} / 3 sessions active · ${15-working} personas resting`
     this.status.dataset.state=stale?'stale':working?'live':'standby'
+    if(replay)this.status.textContent=`${replay} replay · no live workers`
     const plans=shells.map(tokenConstruction),total=plans.reduce((n,p)=>n+p.tokens,0),measured=plans.filter(p=>p.measured).length
     this.total.textContent=`${plans.reduce((n,p)=>n+p.cells,0)} hexagons · ${measured?number(total)+' measured tokens':'usage not yet available'}`
     const signature=JSON.stringify(shells.map(s=>[s.shellId,s.shellName,s.shellStatus,s.tokenUsage,s.vehicleId,s.assignmentState,s.taskTitle,s.assignmentRole]))+stale

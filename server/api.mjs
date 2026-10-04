@@ -7,6 +7,7 @@ import { loadSwarm, projectShells, scrollFor, SWARM_ROOT } from './swarm.mjs'
 import { magiHealth, magiSourceUrl, projectMagiState, readMagiState } from './magi.mjs'
 import {readMagiTokens} from './magi-tokens.mjs'
 import {standbyMagiThreads} from '../src/game/magi-world.js'
+import {archiveRoot,readArchive,listArchives} from './run-archives.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
 import {
   defaultHarness,
@@ -367,6 +368,14 @@ export async function apiMiddleware(req, res, next) {
   }
 
   try {
+    if(url.pathname==='/api/magi/archives'&&req.method==='GET') {
+      try {return send(res,200,{runs:await listArchives(await archiveRoot(DATA_DIR))})}
+      catch {return send(res,200,{runs:[]})}
+    }
+    if(url.pathname.startsWith('/api/magi/archive/')&&req.method==='GET') {
+      try {return send(res,200,await readArchive(await archiveRoot(DATA_DIR),url.pathname.slice('/api/magi/archive/'.length)))}
+      catch {return send(res,404,{error:'Saved run unavailable or checksum invalid'})}
+    }
     const magiMode = Boolean(magiSourceUrl())
     if (magiMode && ['/api/open', '/api/new-session', '/api/reveal', '/api/swarm/health', '/api/swarm/scroll', '/api/harnesses'].includes(url.pathname)) {
       return send(res, 404, { error: 'This read-only MAGI cover does not expose legacy harness or Swarm controls' })
