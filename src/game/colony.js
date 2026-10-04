@@ -613,6 +613,7 @@ export class Colony {
     const ship = shipPosition()
     obstacles.push({ x: ship.x, z: ship.z, r: 3.4 + AGENT_RADIUS })
     this.nav.rebuild(obstacles)
+    this.astronauts.magiLife.setNavigationObstacles(obstacles,this.nav.half)
   }
 
   /** The plot under a world point. On a hex lattice the nearest cell centre is the cell. */

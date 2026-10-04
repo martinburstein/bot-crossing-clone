@@ -64,29 +64,29 @@ test('fleet covers eight sets and every model has finite geometry, a seat, bound
  for(const v of VEHICLES){const m=createVehicle(v.id);assert.ok(m.userData.seat.toArray().every(Number.isFinite));assert.ok(m.userData.footprint<=2.36);if(wheelCounts[v.id])assert.equal(m.userData.wheels.length,wheelCounts[v.id]);m.userData.animate(2,true);m.traverse(o=>{if(o.geometry)assert.ok([...o.geometry.attributes.position.array].every(Number.isFinite))});m.userData.dispose()}
 })
 test('compact hangar rents only for confirmed work, returns vehicles, and reuses its three bays',()=>{
- const scene=new THREE.Scene(),life=new MagiLife(scene,{get:()=>true}),threads=standbyMagiThreads()
+ const scene=new THREE.Scene(),life=new MagiLife(scene,{transient:true,get:()=>false}),threads=standbyMagiThreads()
  const agents=threads.map(t=>({id:t.id,thread:t,status:'idle',state:'at-site',home:new THREE.Vector3(40,0,0),pos:new THREE.Vector3(40,0,0)}))
  const world={groundAt:()=>.45};let time=0
  const tick=(n=1)=>{for(let i=0;i<n;i++)life.update(agents,world,time+=.1)}
  life.sync(agents,world);tick();assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
- const a=agents[0];a.status='working';a.thread.running=true;tick()
+ const a=agents[0];a.status='working';a.thread.running=true;a.thread.assignmentState='running';tick()
  let item=life.fleet.get(a.id);a.pos.copy(item.dock);tick(60)
  assert.equal(a.mounted,true);assert.equal(item.active,true);assert.equal(item.phase,'working');assert.notDeepEqual(item.model.position,a.home)
- const steady=item.model.position.clone();tick(20);assert.deepEqual(item.model.position,steady)
+ const steady=item.model.position.clone();tick(20);assert.ok(item.model.position.distanceTo(steady)>1,'working vehicle must continue its mission')
  a.thread.running=false;a.thread.assignmentState='unknown';a.status='idle';tick()
- assert.equal(item.active,false);assert.equal(item.phase,'returning');tick(60)
+ assert.equal(item.active,false);assert.equal(item.phase,'parked');tick(60)
  assert.equal(a.mounted,false);assert.equal(a.magiActivity,null);assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
- for(const worker of agents.slice(1,5)){worker.thread.running=true;worker.status='working'}tick()
+ for(const worker of [agents[1],agents[5],agents[10],agents[2]]){worker.thread.running=true;worker.thread.assignmentState='running';worker.status='working'}tick()
  assert.equal(life.fleet.size,3);assert.equal(life.hangar.bays.filter(b=>b.rented).length,3)
  const next=agents[1];const previous=life.fleet.get(next.id);life.choose(next.thread.shellId,'claw-tank');tick(2)
  item=life.fleet.get(next.id);assert.equal(item.choice,'claw-tank');assert.notEqual(item.model,previous.model)
  life.dispose();assert.equal(scene.children.length,0)
 })
 
-test('drilling rover faces the exit with its pilot seated correctly and reverses on return',()=>{
+test('drilling rover retains its approved heading and seat fit, then parks immediately when work stops',()=>{
  const scene=new THREE.Scene(),life=new MagiLife(scene,{transient:true,get:()=>false}),thread=standbyMagiThreads()[0]
  const agent={id:thread.id,thread,status:'working',state:'at-site',home:new THREE.Vector3(40,0,0),pos:new THREE.Vector3(40,0,0)}
- thread.running=true;const world={groundAt:()=>.45},agents=[agent];let time=0
+ thread.running=true;thread.assignmentState='running';const world={groundAt:()=>.45},agents=[agent];let time=0
  const tick=()=>life.update(agents,world,time+=.1)
  life.choose(thread.shellId,'cargo-rover');life.sync(agents,world);tick()
  const item=life.fleet.get(agent.id);agent.pos.copy(item.dock);tick()
@@ -99,6 +99,6 @@ test('drilling rover faces the exit with its pilot seated correctly and reverses
  let angle=data.wheels[0].rotation.x;tick()
  assert.ok(data.wheels[0].rotation.x<angle,'outbound wheels turn toward the drill')
  angle=data.wheels[0].rotation.x;agent.status='idle';thread.running=false;tick()
- assert.equal(item.phase,'returning');assert.ok(data.wheels[0].rotation.x>angle,'return reverses the same wheel phase')
+ assert.equal(item.phase,'parked');assert.equal(life.fleet.size,0);assert.equal(data.wheels[0].rotation.x,0,'inactive vehicle mechanisms stop')
  life.dispose()
 })

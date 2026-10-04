@@ -1,0 +1,33 @@
+# Vehicle missions
+
+The approved fleet and astronaut geometry stay unchanged. The colony now gives confirmed active workers visible Mars jobs instead of parking every rental just outside the hangar. This is a visual metaphor for coding work, not physical operations or additional Swarm tasks.
+
+| Vehicle | Visible function |
+| --- | --- |
+| Eagle command shuttle | Survey the camp approach with a scanning marker |
+| Defense sled | Intercept a large incoming meteor during a meteor alert |
+| Recon Dropship | Carry supplies from the motor pool to camp and back |
+| Recon drilling rover | Drill for mineral samples |
+| Mining truck | Dig foundation post holes with soil and post markers |
+| Trike | Check a wider camp perimeter |
+| Astro Fighter | Scout the route between camps |
+| Claw-Tank | Pick up and move construction materials |
+| Armored Drilling Unit | Excavate a foundation trench |
+| Transport scout | Survey another camp's remote work site |
+| Scout bike | Carry reports between two camps and the motor pool |
+
+Only a confirmed running/reviewing persona deploys a vehicle, with at most one per cluster and three total. Pilots deploy seated immediately. Rentals use terrain heights and a vehicle-width navigation grid; failed routes never fall back to crossing buildings. Active vehicles have a cyan marker. Drills and claws operate at work stops while wheels retain their stopped position. Cargo/reporting and survey missions repeat their routes while the worker remains active.
+
+Known task titles choose the suitable mission. Reviews use camp reporting. For general coding work without a clear vehicle function, the three cluster defaults are supplies, post foundations and camp reporting; a compatible saved vehicle preference can choose another visual job. A preference cannot override an explicit mission requirement or manufacture a meteor alert. The defense effect is an explicitly visual incoming-meteor event associated with an active interception title, not a weather sensor or evidence of a real hazard.
+
+When work stops, fails, becomes unknown or leaves the roster, the rental parks immediately and its mission effects disappear. Idle known workers retain their existing camp routines: talking, tinkering, board reading and snack breaks. Unknown/failed workers do not gain fabricated activity. Reduced motion freezes vehicle movement while keeping its active marker and status.
+
+The viewer remains read-only. Mission props and trip history are transient; they do not earn hexagons, produce task receipts, change lease limits or start models. The live research project was left stopped throughout this change. The approved checkpoint tag remains intact; these changes live on `codex/vehicle-missions` and await user acceptance.
+
+## Verification
+
+Run `npm test` and `npm run build`. The updated tests exercise job selection, meteor gating, three independent cluster pilots, immediate disconnect parking, drilling versus wheel motion, vehicle-width obstacle avoidance, reduced motion and the approved rover orientation/seat fit. Existing geometry and asset tests continue to verify the canonical fleet.
+
+The browser fixture at `/tools/visual-check/magi.html` is labeled **SIMULATED DATA** and never calls the protocol or saves a colony. `tools/check-vehicle-missions.cjs` checks three mounted pilots/twelve idle workers, motion, cargo/report visits to camp stops, an actual visible meteor/beam and immediate disconnect parking. Set `BOT_CROSSING_TEST_URL` to an existing loopback Vite server and `BOT_CROSSING_PLAYWRIGHT` to an installed `@playwright/test` module when it is not available in this checkout. Generated captures and logs stay under ignored `.cache/vehicle-missions-check`.
+
+Observed Windows result on October 3, 2026: 109 tests passed, zero failures; production build passed; Chrome/WebGL mission checks passed. These checks use simulated active workers and are not proof that the stopped live research project resumed.

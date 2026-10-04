@@ -46,7 +46,7 @@ export function createHangar() {
    rampHeight(x,z){const localZ=z-HANGAR.z;return Math.abs(x-HANGAR.x)<=9.5&&localZ>5.5&&localZ<7.5?.45-(localZ-5.5)*.2:null},
    pick(camera,x,y){raycaster.setFromCamera(new THREE.Vector2(x,y),camera);return raycaster.intersectObject(group,true).length>0},
    clearings:[{x:HANGAR.x,z:HANGAR.z,r:13},{x:HANGAR.x,z:HANGAR.z+10,r:12}],
-   obstacles:[...[-9,-3,3,9].flatMap(x=>[-5,4.6].map(z=>({x:x+HANGAR.x,z:z+HANGAR.z,r:.5}))),...Array.from({length:19},(_,i)=>({x:i-9+HANGAR.x,z:-5.2+HANGAR.z,r:.65})),...[-9.2,9.2].flatMap(x=>Array.from({length:11},(_,i)=>({x:x+HANGAR.x,z:i-5+HANGAR.z,r:.5}))),...bays.flatMap(b=>[{x:b.position.x,z:b.position.z,r:2.65},{x:b.work.x,z:b.work.z,r:2.65}])],
+   obstacles:[...[-9,-3,3,9].flatMap(x=>[-5,4.6].map(z=>({x:x+HANGAR.x,z:z+HANGAR.z,r:.5}))),...Array.from({length:19},(_,i)=>({x:i-9+HANGAR.x,z:-5.2+HANGAR.z,r:.65})),...[-9.2,9.2].flatMap(x=>Array.from({length:11},(_,i)=>({x:x+HANGAR.x,z:i-5+HANGAR.z,r:.5}))),...bays.flatMap(b=>[{x:b.position.x,z:b.position.z,r:2.65,parking:true},{x:b.work.x,z:b.work.z,r:2.65,parking:true}])],
    dispose(){group.traverse(o=>{o.geometry?.dispose();if(o.material?.map){o.material.map.dispose();o.material.dispose()}});Object.values(mats).forEach(m=>m.dispose())},
  }
 }

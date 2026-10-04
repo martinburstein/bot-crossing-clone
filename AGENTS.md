@@ -1,5 +1,7 @@
 # Bot Crossing: visual layer
 
+The current 15/3A installation observes `../swarm-protocol` through its configured read-only MAGI endpoint. The legacy Swarm references below remain historical compatibility guidance. Vehicle missions are presentation only: deploy at most one confirmed pilot per cluster, never create work or treat scene effects as execution evidence. Preserve the approved fleet/astronaut geometry and checkpoint tag. Read `docs/15-3A/VEHICLE-MISSIONS.md` for the current mission behavior and checks.
+
 Swarm tactics and authoritative state live in ../Swarm, outside this clone.
 For “activate the swarm”, read ../Swarm/AGENTS.md, ../Swarm/README.md and ../Swarm/MANAGEMENT.md. Run the canonical CLI from that directory. Do not recreate a local protocol or write a second roster/run store in this clone.
 

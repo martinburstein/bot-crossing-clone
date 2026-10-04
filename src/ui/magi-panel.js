@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
-import {VEHICLES,createVehicle,chooseVehicle} from '../world/mars-vehicles.js'
+import {VEHICLES,createVehicle} from '../world/mars-vehicles.js'
+import {vehicleJob,VEHICLE_JOBS} from '../game/vehicle-jobs.js'
 import {MAGI_CLUSTERS,tokenConstruction} from '../game/magi-world.js'
 import {crewRig} from '../agents/crew.js'
 import {createPilotPreview} from '../agents/pilot-preview.js'
@@ -31,7 +32,7 @@ export class MagiPanel {
     this.status.dataset.state=stale?'stale':working?'live':'standby'
     const plans=shells.map(tokenConstruction),total=plans.reduce((n,p)=>n+p.tokens,0),measured=plans.filter(p=>p.measured).length
     this.total.textContent=`${plans.reduce((n,p)=>n+p.cells,0)} hexagons · ${measured?number(total)+' measured tokens':'usage not yet available'}`
-    const signature=JSON.stringify(shells.map(s=>[s.shellId,s.shellName,s.shellStatus,s.tokenUsage,s.vehicleId,s.assignmentState]))+stale
+    const signature=JSON.stringify(shells.map(s=>[s.shellId,s.shellName,s.shellStatus,s.tokenUsage,s.vehicleId,s.assignmentState,s.taskTitle,s.assignmentRole]))+stale
     if(signature===this.signature)return
     this.signature=signature
     const open=new Set([...this.groups.querySelectorAll('details[open]')].map(g=>g.dataset.cluster))
@@ -56,9 +57,11 @@ export class MagiPanel {
           if(shell.tokenUsage.pendingTurns)row.append(el('small',`${shell.tokenUsage.pendingTurns} turn(s) await usage receipts`))
           if(p.deferredHexagons)row.append(el('small',`${p.deferredHexagons} further earned hexagons held beyond the scene limit`))
         }
-        const select=el('select');select.setAttribute('aria-label',`Vehicle for ${shell.shellName}`)
-        for(const v of VEHICLES){const option=el('option',v.name);option.value=v.id;select.append(option)}
-        select.value=chooseVehicle(shell.shellId,this.colony.astronauts.magiLife.choices[shell.shellId]||shell.vehicleId)
+        const job=vehicleJob(shell,this.colony.astronauts.magiLife.choices[shell.shellId]||shell.vehicleId)
+        if(shell.running&&!stale)row.append(el('p',`Visual mission: ${job.label}`,'magi-worker-progress'))
+        const select=el('select');select.setAttribute('aria-label',`Vehicle preference for ${shell.shellName}`)
+        for(const v of VEHICLES){const option=el('option',v.name);option.value=v.id;if(job.contextual&&v.id!==job.vehicle){option.disabled=true;option.title='This mission needs a different vehicle'}if(v.id==='defender'&&!job.meteorAlert){option.disabled=true;option.title='Available for an incoming meteor alert'}select.append(option)}
+        select.value=job.vehicle
         select.onchange=()=>this.choose(shell.shellId,select.value)
         row.append(select);details.append(row)
       }
@@ -79,10 +82,10 @@ export class MagiPanel {
     this.vehicleTitle=el('h3');this.vehicleCue=el('p');this.vehicleSet=el('p',undefined,'magi-caption')
     const assign=el('div',undefined,'vehicle-assign'),label=el('label','Assign to ');this.workerSelect=el('select');this.workerSelect.setAttribute('aria-label','Bot receiving vehicle')
     for(const s of this.shells){const option=el('option',`${s.shellId.toUpperCase()} · ${s.shellName}`);option.value=s.shellId;this.workerSelect.append(option)}
-    const equip=el('button','Choose this vehicle');equip.onclick=()=>{this.choose(this.workerSelect.value,this.vehicleId);equip.textContent='Vehicle selected ✓';this.signature=null;this.update(this.shells,this.flags)}
+    const equip=el('button','Save vehicle preference');equip.onclick=()=>{this.choose(this.workerSelect.value,this.vehicleId);equip.textContent='Preference saved ✓';this.signature=null;this.update(this.shells,this.flags)}
     assign.append(label,this.workerSelect,equip)
-    view.append(this.canvas,this.vehicleTitle,this.vehicleCue,this.vehicleSet,assign,el('small','Drag to inspect · scroll to zoom. Three rental bays; vehicles return automatically after work.'))
-    for(const spec of VEHICLES){const b=el('button',spec.name);b.dataset.vehicle=spec.id;b.onclick=()=>{this.showVehicle(spec.id);equip.textContent='Choose this vehicle'};catalog.append(b)}
+    view.append(this.canvas,this.vehicleTitle,this.vehicleCue,this.vehicleSet,assign,el('small','Drag to inspect · scroll to zoom. Three active missions at most. Vehicles park as soon as work stops; defense requires a meteor alert.'))
+    for(const spec of VEHICLES){const b=el('button',spec.name);b.dataset.vehicle=spec.id;b.onclick=()=>{this.showVehicle(spec.id);equip.textContent='Save vehicle preference'};catalog.append(b)}
     body.append(catalog,view);modal.append(header,body);this.root.append(modal)
     this.renderer=new THREE.WebGLRenderer({canvas:this.canvas,antialias:true,alpha:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.setClearColor(0x18242c,1);this.renderer.toneMapping=THREE.ACESFilmicToneMapping
     this.garageScene=new THREE.Scene();this.garageScene.add(new THREE.HemisphereLight(0xffefd3,0x465f73,3))
@@ -100,7 +103,7 @@ export class MagiPanel {
     this.vehicleId=id;this.vehicle=createVehicle(id);this.garageScene.add(this.vehicle)
     const bounds=new THREE.Box3().setFromObject(this.vehicle),size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3())
     const distance=Math.max(size.x,size.z,size.y)*1.6;this.controls.target.copy(center);this.garageCamera.position.copy(center).add(new THREE.Vector3(.62,.46,.72).applyAxisAngle(new THREE.Vector3(0,1,0),this.vehicle.userData.seatYaw).normalize().multiplyScalar(distance));this.controls.update()
-    const spec=this.vehicle.userData.spec;this.vehicleTitle.textContent=spec.name;this.vehicleCue.textContent=spec.cue;this.vehicleSet.textContent=`Set ${spec.set} · ${spec.role} · ${spec.kind==='air'?'Flight-capable':'Surface vehicle'}`
+    const spec=this.vehicle.userData.spec;this.vehicleTitle.textContent=spec.name;this.vehicleCue.textContent=spec.cue;this.vehicleSet.textContent=`Set ${spec.set} · ${VEHICLE_JOBS[id].label} · ${spec.kind==='air'?'Flight-capable':'Surface vehicle'}`
     for(const button of this.hangar.querySelectorAll('[data-vehicle]'))button.setAttribute('aria-pressed',String(button.dataset.vehicle===id))
   }
   resizeGarage() {if(!this.canvas||this.hangar.hidden)return;const w=this.canvas.clientWidth,h=this.canvas.clientHeight;if(!w||!h)return;this.renderer.setSize(w,h,false);this.garageCamera.aspect=w/h;this.garageCamera.updateProjectionMatrix()}

@@ -247,12 +247,12 @@ export function createVehicle(id,{merge=true}={}) {
   body.position.y=-bounds.min.y;seat.y-=bounds.min.y
   const scale=Math.min(1,4.7/Math.max(size.x,size.z));root.scale.setScalar(scale)
   root.userData={spec,seat:seat.multiplyScalar(scale),seatYaw,forwardSign,wheels,rotors,arms,thrusters,canopies,tracks,parts:merge?null:parts,footprint:Math.max(size.x,size.z)*scale/2,
-    animate(time,active,reduced=false,driveTime=time){
+    animate(time,active,reduced=false,driveTime=time,operation={working:active}){
       const t=reduced?0:time
       const rolling=reduced?0:driveTime
       for(const wheel of wheels)wheel.rotation.x=active?rolling*forwardSign*2:0
-      for(const rotor of rotors)rotor.rotation.z=active?t*4:0
-      for(const arm of arms)arm.rotation.y=active?Math.sin(t*.65)*.18:0
+      for(const rotor of rotors)rotor.rotation.z=active&&operation.working?t*4:0
+      for(const arm of arms)arm.rotation.y=active&&operation.working?Math.sin(t*.65)*.18:0
       for(const track of tracks)track.update(active?rolling:0)
       for(const light of thrusters)light.scale.setScalar(active?1+Math.sin(t*5)*.07:1)
     },

@@ -1,5 +1,7 @@
 # Bot Crossing — your agent threads, as a colony
 
+The current 15/3A view has fifteen personas in three camps and a mission fleet that makes active workers visible through their vehicles. Vehicles drill, haul, scout or carry camp reports according to their jobs; idle crews retain their camp routines. See [vehicle missions and verification](docs/15-3A/VEHICLE-MISSIONS.md).
+
 This fork adds an expandable ROYGBIV base of seven persistent Swarm stations, observed Codex/Python worker status,
 and a read-only adapter to a separate Swarm protocol installation. See the
 [fork change summary](FORK-CHANGES.md) for differences from the original, and
