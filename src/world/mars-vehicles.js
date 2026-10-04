@@ -204,14 +204,17 @@ export function createVehicle(id,{merge=true}={}) {
   const initialSize=new THREE.Box3().setFromObject(body).getSize(new THREE.Vector3())
   const fitScale=Math.min(1,4.7/Math.max(initialSize.x,initialSize.z))
   const well=new THREE.Box3(new THREE.Vector3(-.32/fitScale,seat.y,seat.z-.39/fitScale),new THREE.Vector3(.32/fitScale,seat.y+1.22/fitScale,seat.z+.43/fitScale))
+  // Recess the structural cut behind a single cabin lining. Cutting overlapping
+  // hull blocks on the visible wall plane gave them coincident, flickering faces.
+  const cut=well.clone().expandByVector(new THREE.Vector3(.04,.04,.04))
   for(const part of [...parts]){
     const b=part.userData.block
     if(!b||part.parent!==body||part.rotation.x||part.rotation.y||part.rotation.z)continue
     const min=part.position.clone().sub(new THREE.Vector3(b.w,b.h,b.d).multiplyScalar(.5)),max=part.position.clone().add(new THREE.Vector3(b.w,b.h,b.d).multiplyScalar(.5))
-    if(!new THREE.Box3(min,max).intersectsBox(well))continue
+    if(!new THREE.Box3(min,max).intersectsBox(cut))continue
     const remaining={min:min.clone(),max:max.clone()},slabs=[]
     for(const axis of ['x','z','y'])for(const side of ['min','max']){
-      const edge=well[side][axis]
+      const edge=cut[side][axis]
       if(side==='min'&&remaining.min[axis]<edge){const slab={min:remaining.min.clone(),max:remaining.max.clone()};slab.max[axis]=Math.min(edge,slab.max[axis]);slabs.push(slab);remaining.min[axis]=edge}
       if(side==='max'&&remaining.max[axis]>edge){const slab={min:remaining.min.clone(),max:remaining.max.clone()};slab.min[axis]=Math.max(edge,slab.min[axis]);slabs.push(slab);remaining.max[axis]=edge}
     }
@@ -220,7 +223,9 @@ export function createVehicle(id,{merge=true}={}) {
   }
   const wellWidth=well.max.x-well.min.x,wellLength=well.max.z-well.min.z
   box(0,seat.y-.035,seat.z+.02/fitScale,wellWidth+.1,.07,wellLength+.12,'dark').name='pilot-floor'
-  box(0,seat.y+.24,well.min.z-.05,wellWidth,.48,.1,'orange').name='pilot-backrest'
+  for(const x of [well.min.x-.03,well.max.x+.03])box(x,seat.y+.215,seat.z+.02/fitScale,.06,.53,wellLength+.12,'dark',body,.01).name='pilot-side-lining'
+  box(0,seat.y+.215,well.max.z+.03,wellWidth,.53,.06,'dark',body,.01).name='pilot-front-lining'
+  box(0,seat.y+.215,well.min.z-.05,wellWidth,.53,.1,'orange',body,.01).name='pilot-backrest'
   // Collapse all static hull pieces into one mesh per material; moving mechanisms remain separate.
   body.updateMatrixWorld(true)
   const batches=[];body.traverse(o=>{if(o.isGroup)batches.push(o)})

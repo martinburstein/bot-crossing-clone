@@ -46,6 +46,22 @@ test('claw tank links circulate around both tracks and batching preserves their 
  for(let s=0;s<2;s++)for(let i=0;i<24;i++)assert.ok(plain.userData.tracks[s].links[i].position.distanceTo(start[s][i])<1e-9)
  plain.userData.dispose();batched.userData.dispose()
 })
+
+test('cockpit interior rays see one surface instead of coincident colored faces',()=>{
+ for(const {id} of VEHICLES){
+  const model=createVehicle(id,{merge:false});model.updateMatrixWorld(true)
+  for(const y of [.08,.2,.35,.44])for(const z of [-.25,0,.25])for(const direction of [[1,0,0],[-1,0,0],[0,0,-1],[0,0,1],[0,-1,0]]){
+   const origin=model.userData.seat.clone().add(new THREE.Vector3(0,y,z))
+   const ray=new THREE.Raycaster(origin,new THREE.Vector3(...direction))
+   const hits=ray.intersectObjects(model.userData.parts).filter(h=>!h.object.material.transparent)
+   // A triangle seam can return the same mesh twice; compare distinct surfaces.
+   const first=hits[0],next=hits.find(h=>h.object!==first?.object)
+   assert.ok(first,`${id}: missing cockpit surface`)
+   assert.ok(!next||next.distance-first.distance>.001,`${id}: ${first.object.name} overlaps ${next?.object.name}`)
+  }
+  model.userData.dispose()
+ }
+})
 test('each outward opening is the first shared expansion and growth avoids the hangar and lander',()=>{
  const projects=standbyMagiThreads().map(t=>({...t,cells:1})),base=allocateMagiCells(projects)
  for(let c=0;c<3;c++) {

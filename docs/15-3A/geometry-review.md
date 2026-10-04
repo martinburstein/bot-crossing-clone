@@ -49,3 +49,9 @@ The browser inspection sheet CPU-skins the same rig and samples four drive-anima
 The assembly audit now includes circulating track links in its mechanism checks. All 55 assembly samples remain connected with zero mechanism clearance failures. A separate regression compares instanced and unbatched tread transforms, checks travel along both belts and exact loop closure, and checks reduced-motion behavior. The full suite passes 101 tests; the production build succeeds.
 
 Updated views: [occupied fleet](vehicle-pilot-fit.jpg) and [Claw-Tank in the hangar](claw-tank-pilot.jpg).
+
+## Cockpit surface repair
+
+The recessed hull blocks originally exposed coincident interior faces, including differently colored hull/base walls and the seat pad. Those surfaces caused depth fighting. The structural cuts now sit 0.04 units behind a single cabin lining; the floor and backrest have their own separated visible surfaces. The vehicle exteriors, pilot scale, and seating positions are unchanged.
+
+A regression casts 660 rays across the eleven interiors and checks that their first visible opaque surfaces do not coincide with another mesh. The original geometry failed this check. All 44 browser pilot-fit samples still report no intrusion, all 55 moving-assembly samples pass, and the full suite now passes 102 tests. The production build succeeds. Close-up orbit inspection confirmed clean surfaces; [updated hangar view](cockpit-interiors.jpg).
