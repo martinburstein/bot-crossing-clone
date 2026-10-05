@@ -1,0 +1,9 @@
+# Double map area
+
+The October 4 expansion doubles the surrounding map area. Both ground dimensions and the flat colony radius use a square-root-of-two scale; camps, earned hexagons, structures and their coordinates retain their original scale. The baseline ground changes from 340 × 340 to approximately 480.83 × 480.83 scene units. Larger colonies retain the same factor relative to the former automatic terrain-fit rule, with no repeated multiplication during polling.
+
+The navigation grid covers the expanded flat ground. Camera pan limits, maximum zoom distance, home framing, clipping range and fog visibility extend proportionally. Existing decorative scatter stays at its original horizontal coordinates, leaving the new outer ground open. Far-field prop sizing keeps a valid fade interval as the colony grows. Construction still uses measured receipts and its existing awards; the map expansion adds no earned hexagons or model work.
+
+Verification: all 116 tests passed, including actual terrain geometry at initial and expanded sizes, repeated-fit stability, routing into the added ground, preserved homes, approved fleet geometry and read-only adapters. `npm run build` passed with the existing Three.js chunk-size warning. The built map was inspected in the browser with all three camps visible and the display menus hidden.
+
+During live verification the Vite viewing helper stalled. The verified visual helper was stopped and its runtime evidence preserved separately; the existing production `server/serve.mjs` served the built application against the same local read-only MAGI source and the same saved colony directory. Both MAGI health and world endpoints returned HTTP 200 with fifteen workers. The Swarm remained complete with zero occupied execution slots; arranging the desktop made zero model calls. Machine-specific ports, runtime records and screenshots stay outside Git.

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { PLANETS, createTerrain, createScatter, terrainHeight,fitColonyTerrain } from '../world/planet.js'
+import { PLANETS, COLONY_RADIUS, createTerrain, createScatter, terrainHeight,fitColonyTerrain } from '../world/planet.js'
 import { Sky } from '../world/sky.js'
 import {
   Plot,
@@ -149,7 +149,7 @@ export class Colony {
     // missing. A badge is a single quad; the spare instances cost almost nothing.
     this.indicators = new Indicators(scene, settings, MAX_AGENT_CAP)
     this.particles = new Particles(scene, settings)
-    this.nav = new Navigation()
+    this.nav = new Navigation({half:Math.ceil((COLONY_RADIUS+8)/16)*16})
     this.astronauts.setNavigation(this.nav)
 
     this.plotGroup = new THREE.Group()
@@ -449,7 +449,7 @@ export class Colony {
     this.plotOrder = [...this.plots.values()]
     const extent=Math.max(46,...this.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+12)))
     if(fitColonyTerrain(extent)) this._buildTerrain()
-    if(extent+8>this.nav.half){this.nav=new Navigation({half:Math.ceil((extent+8)/16)*16});this.astronauts.setNavigation(this.nav)}
+    if(COLONY_RADIUS+8>this.nav.half){this.nav=new Navigation({half:Math.ceil((COLONY_RADIUS+8)/16)*16});this.astronauts.setNavigation(this.nav)}
     // Zones that just moved, appeared or grew are zones the scatter does not know about.
     if (this.scatterGroup && this._plotFootprint() !== this._scatterFootprint) this._buildScatter()
     // Which hex cells are decked. Ground height is asked for once per moving agent per

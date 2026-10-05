@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { COLONY_RADIUS, mulberry } from './planet.js'
+import { COLONY_RADIUS, MAP_LINEAR_SCALE, mulberry } from './planet.js'
 
 /**
  * Sky, stars, the sun, the thing hanging in the sky, and all the lighting.
@@ -363,8 +363,8 @@ export class Sky {
     this._envDirty = true
     this.domeUniforms.uHaze.value = 0.25 + planet.atmosphere * 0.5
     this.scene.fog.color.set(planet.fog.color)
-    this.scene.fog.near = planet.fog.near
-    this.scene.fog.far = planet.fog.far
+    this.scene.fog.near = planet.fog.near * MAP_LINEAR_SCALE
+    this.scene.fog.far = planet.fog.far * MAP_LINEAR_SCALE
     this.setTime(this.time ?? 0.32)
   }
 

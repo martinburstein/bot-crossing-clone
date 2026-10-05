@@ -9,7 +9,7 @@ import { MissionPanel } from './ui/mission.js'
 import { SwarmPanel } from './ui/swarm.js'
 import {MessageBoards} from './world/message-boards.js'
 import {MessageBoardPanel} from './ui/message-boards.js'
-import { PLANETS } from './world/planet.js'
+import { PLANETS, MAP_LINEAR_SCALE } from './world/planet.js'
 import { loadKit } from './world/kit.js'
 import { crewRig, loadCrew } from './agents/crew.js'
 import { TIMES } from './world/sky.js'
@@ -72,10 +72,10 @@ let framedSwarmRun = null
 function frameSwarm() {
   rig.resetView()
   const radius=Math.max(25,...colony.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+8)))
-  rig.maxDistance=Math.max(150,radius*4)
-  rig.worldLimit=Math.max(82,radius+20)
-  if(engine.camera.far<radius*6) {engine.camera.far=radius*6;engine.camera.updateProjectionMatrix()}
-  rig.focus(new THREE.Vector3(),{distance:Math.max(110,radius*(MAGI_VIEW?2.65:3.5))})
+  rig.maxDistance=Math.max(150,radius*4)*MAP_LINEAR_SCALE
+  rig.worldLimit=Math.max(82,radius+20)*MAP_LINEAR_SCALE
+  if(engine.camera.far<radius*6*MAP_LINEAR_SCALE) {engine.camera.far=radius*6*MAP_LINEAR_SCALE;engine.camera.updateProjectionMatrix()}
+  rig.focus(new THREE.Vector3(),{distance:Math.max(110,radius*(MAGI_VIEW?2.65:3.5))*MAP_LINEAR_SCALE})
 }
 let hoverId = null
 let statusCursor = 0

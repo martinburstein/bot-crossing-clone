@@ -67,13 +67,16 @@ export const PLANETS = {
   },
 }
 
-let GROUND_SIZE = 340
+// Twice the map area: scale the surrounding ground, never camp/plot coordinates.
+export const MAP_AREA_MULTIPLIER = 2
+export const MAP_LINEAR_SCALE = Math.sqrt(MAP_AREA_MULTIPLIER)
+let GROUND_SIZE = 340 * MAP_LINEAR_SCALE
 /** Everything inside this radius is the buildable colony, and is kept nearly flat. */
-export let COLONY_RADIUS = 46
+export let COLONY_RADIUS = 46 * MAP_LINEAR_SCALE
 export function fitColonyTerrain(radius) {
-  const next=Math.max(46,Math.ceil(radius/16)*16)
+  const next=Math.max(46,Math.ceil(radius/16)*16)*MAP_LINEAR_SCALE
   if(next<=COLONY_RADIUS)return false
-  COLONY_RADIUS=next;GROUND_SIZE=Math.max(340,next*2+160);_samplers.clear();return true
+  COLONY_RADIUS=next;GROUND_SIZE=Math.max(340*MAP_LINEAR_SCALE,next*2+160*MAP_LINEAR_SCALE);_samplers.clear();return true
 }
 const DETAIL_SEGMENTS = { low: 72, medium: 128, high: 190 }
 
@@ -303,7 +306,7 @@ export function createScatter(planet, density, keepClear = [], seed = 4242) {
     if (slot >= mesh.instanceMatrix.count) continue
 
     // Far-field props are allowed to be much bigger, which reads as distance.
-    const far = THREE.MathUtils.smoothstep(d, COLONY_RADIUS, 130)
+    const far = THREE.MathUtils.smoothstep(d, COLONY_RADIUS, Math.max(COLONY_RADIUS+40,130*MAP_LINEAR_SCALE))
     const [lo, hi] = kind.size
     const s = (lo + rand() * (hi - lo)) * (1 + far * 1.9)
 
