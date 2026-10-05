@@ -93,7 +93,8 @@ body {
 
 .display-menus-hidden .magi-panel,
 .display-menus-hidden .hud .side,
-.display-menus-hidden .hud .settings {
+.display-menus-hidden .hud .settings,
+.display-menus-hidden .hud .help {
   display: none !important;
 }
 .display-menu-toggle {
