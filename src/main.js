@@ -798,7 +798,7 @@ async function boot() {
     if (!document.hidden) poll()
   })
 
-  if (!localStorage.getItem('botcrossing.seen-help')) {
+  if (!MAGI_VIEW && !localStorage.getItem('botcrossing.seen-help')) {
     hud.toggleHelp(true)
     localStorage.setItem('botcrossing.seen-help', '1')
   } else {
