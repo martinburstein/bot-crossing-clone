@@ -1,4 +1,6 @@
 import {MAGI_COLOR} from '../src/game/magi-world.js'
+import {assertCampusProjection,projectCampusState} from './campus-magi.mjs'
+import {assertRoArm16Projection,projectRoArm16} from './roarm16-magi.mjs'
 const WORKER_IDS = Array.from({ length: 15 }, (_, i) => `w${String(i + 1).padStart(2, '0')}`)
 const CLUSTERS = [
   { id: 'melchior', workerIds: WORKER_IDS.slice(0, 5), color: '#55d890' },
@@ -19,6 +21,8 @@ export function magiSourceUrl(env = process.env) {
 }
 
 function assertProjection(state, now = Date.now()) {
+  if(state?.magi?.profile==='roarm-campus')return assertCampusProjection(state,now)
+  if(state?.magi?.profile==='roarm-16')return assertRoArm16Projection(state,now)
   if (!state || typeof state !== 'object' || state.schemaVersion !== 1 || !['live', 'standby'].includes(state.mode) ||
       !Number.isSafeInteger(state.revision) || typeof state.projectId !== 'string' || !state.projectId ||
       !Number.isFinite(state.observedAt) || now - state.observedAt > 20_000 || state.observedAt > now + 5_000 ||
@@ -97,6 +101,8 @@ function alignment(state) {
 }
 
 export function projectMagiState(state, now = Date.now(), usage = new Map()) {
+  if(state?.magi?.profile==='roarm-campus')return projectCampusState(state,now,usage)
+  if(state?.magi?.profile==='roarm-16')return projectRoArm16(state,now,usage)
   assertProjection(state, now)
   const colors = alignment(state)
   const threads = WORKER_IDS.map((workerId, index) => {
@@ -113,17 +119,23 @@ export function projectMagiState(state, now = Date.now(), usage = new Map()) {
       shellColor: MAGI_COLOR, projectAccent: 0xe9a45b, suitColor: 0xf3f1ec, project: `MAGI ${workerId}`,
       worldProfile:'15-3A', clusterId:cluster.id, title:worker.name,
       tokenUsage: usage.get(workerId) || null, vehicleId:worker.vehicleId || null,
+      earnedRewards: (state.magi.earnedRewards || []).filter(reward=>reward.workerId===workerId),
       projectLabel: worker.name, projectPath: '', projectRoot: '', constructionRunId: `magi:${state.projectId}`,
       milestones, running, hasError, archived: false, unread: false, canOpen: false,
       createdAt: index + 1, lastActivityAt: state.observedAt, sizeBytes: 0, dependencies: [], reviewer: null,
       assignmentRole: running ? (status === 'reviewing' ? 'review' : 'work') : (status === 'reserved' ? 'reserved' : 'idle'),
       assignmentState: status, shellStatus: hasError ? 'Failed' : running ? (status === 'reviewing' ? 'Reviewing' : 'Working') : status === 'reserved' ? 'Reserved' : status === 'accepted' ? 'Accepted' : status === 'submitted' ? 'Submitted for review' : 'Ready',
-      runId: state.projectId, protocolExecution: status, attemptCount: 0, workerBackend: worker.bound ? 'codex-cli' : null,
+      runId: state.projectId, protocolExecution: status, attemptCount: 0, workerBackend: worker.bound ? (worker.backend || 'unknown') : null,
       workflow: 'MAGI 15/3', taskTitle: worker.taskTitle || task?.title || null,
       scrollUrl: null, alignment: colors,
     }
   })
-  return { threads, alignment: colors }
+  return { threads, alignment: colors, worksite: {
+    pilot: state.magi.pilot || null,
+    contracts: state.magi.contracts || [], earnedRewards: state.magi.earnedRewards || [],
+    bounties: state.magi.bounties || [], serviceCredits: state.magi.serviceCredits || [],
+    observedAt: state.observedAt, updatedAt: state.observedAt, revision: state.revision, stale: false,
+  } }
 }
 
 export async function magiHealth(options = {}) {

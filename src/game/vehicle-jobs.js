@@ -1,21 +1,25 @@
 // Visual assignments only: never issue work, complete a task or award territory.
 import {magiOnShift} from './magi-world.js'
 export const VEHICLE_JOBS = Object.freeze({
-  eagle: {id:'survey',label:'Mapping the camp approach',operation:'scan',speed:8},
+  eagle: {id:'survey',label:'Inspecting arm-base fasteners',operation:'scan',speed:8},
   defender: {id:'intercept',label:'Intercepting an incoming meteor',operation:'intercept',speed:5},
-  dropship: {id:'cargo',label:'Delivering supplies to camp',operation:'cargo',speed:8},
-  'cargo-rover': {id:'samples',label:'Collecting mineral samples',operation:'drill',speed:4},
-  'mining-truck': {id:'posts',label:'Drilling foundation post holes',operation:'drill',speed:4},
-  trike: {id:'perimeter',label:'Checking the camp perimeter',operation:'scan',speed:6},
-  'astro-fighter': {id:'air-scout',label:'Scouting the route ahead',operation:'scan',speed:9},
-  'claw-tank': {id:'handling',label:'Moving construction materials',operation:'claw',speed:3.5},
-  'drill-unit': {id:'excavate',label:'Excavating a foundation trench',operation:'drill',speed:3},
-  'drill-flyer': {id:'remote-survey',label:'Surveying a remote work site',operation:'scan',speed:8},
-  'drill-pod': {id:'reports',label:'Carrying reports between camps',operation:'report',speed:6},
+  dropship: {id:'cargo',label:'Delivering arm service tools',operation:'cargo',speed:8},
+  'cargo-rover': {id:'samples',label:'Delivering cable clips and fasteners',operation:'drill',speed:4},
+  'mining-truck': {id:'posts',label:'Checking arm-base anchor bolts',operation:'drill',speed:4},
+  trike: {id:'perimeter',label:'Inspecting arm joint guards',operation:'scan',speed:6},
+  'astro-fighter': {id:'air-scout',label:'Inspecting overhead cable clearance',operation:'scan',speed:9},
+  'claw-tank': {id:'handling',label:'Moving spare gripper parts',operation:'claw',speed:3.5},
+  'drill-unit': {id:'excavate',label:'Checking base mounts and footing',operation:'drill',speed:3},
+  'drill-flyer': {id:'remote-survey',label:'Inspecting upper-link clearances',operation:'scan',speed:8},
+  'drill-pod': {id:'reports',label:'Carrying visual service diagnostics',operation:'report',speed:6},
+})
+export const ROARM_SERVICE_DESTINATIONS = Object.freeze({
+  melchior:'Melchior arm service point',balthasar:'Balthasar arm service point',casper:'Casper arm service point',
 })
 
 export function confirmedVehicleWorker(agent) {
-  return agent?.thread.worldProfile==='15-3A' && agent.status==='working' && magiOnShift(agent.thread) &&
+  if(agent?.thread.worldProfile==='roarm-campus'&&(agent.thread.slotId!=='casper'||agent.thread.campusPosition!=='working'))return false
+  return ['15-3A','roarm-16','roarm-campus'].includes(agent?.thread.worldProfile) && agent.status==='working' && magiOnShift(agent.thread) &&
     !['leaving','gone'].includes(agent.state)
 }
 
@@ -39,5 +43,7 @@ export function vehicleJob(thread, preferred) {
   // A preference chooses the visual job; it cannot manufacture a meteor alert.
   if(VEHICLE_JOBS[preferred] && (!contextual||preferred===vehicle) && (preferred!=='defender'||alert) && thread.assignmentRole!=='review') vehicle=preferred
   if(thread.assignmentRole==='review') vehicle='drill-pod'
-  return {...VEHICLE_JOBS[vehicle],vehicle,contextual,meteorAlert:vehicle==='defender'&&alert}
+  const destination=ROARM_SERVICE_DESTINATIONS[thread.clusterId]||'RoArm service point'
+  const job=VEHICLE_JOBS[vehicle]
+  return {...job,label:`${job.label} · ${destination}`,vehicle,contextual,meteorAlert:vehicle==='defender'&&alert,destination}
 }

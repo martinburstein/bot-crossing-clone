@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import {workerSpeech,workerInspection} from '../src/ui/worker-data.mjs'
 import {VEHICLE_JOBS} from '../src/game/vehicle-jobs.js'
 import {standbyMagiThreads} from '../src/game/magi-world.js'
+import {DOCKLIGHT_MERIDIAN_CROWN} from '../src/world/roarm-rewards.js'
 
 const make=()=>({thread:{...standbyMagiThreads()[0],running:true,assignmentState:'running',taskTitle:'Deliver actual camp supplies',tokenUsage:{total:275000,cached:true,completedTurns:2,pendingTurns:1}},mounted:true,pos:{x:4,y:2,z:1}})
 const fleetFor=job=>({job,phase:'working',operating:false,model:{position:{x:4,y:2,z:1},userData:{spec:{name:'Recon Dropship'}}},stops:[{x:7,z:5}],stopIndex:0,visitedStops:[0],pathAt:1,path:[{},{}]})
@@ -35,4 +36,14 @@ test('inspection reports real assignment, vehicle position, route distance, rece
  assert.equal(Object.fromEntries(idle.rows).Vehicle,'Off duty · at camp');assert.equal(Object.fromEntries(idle.detail).Feed,'Unavailable · crew off shift')
  assert.ok(!idle.rows.some(([label])=>label==='Mission'||label==='Destination'))
  const unchanged=JSON.stringify(agent.thread);workerInspection(agent,null);assert.equal(JSON.stringify(agent.thread),unchanged)
+})
+
+test('worker inspector retains all projected wearable rewards and identifies the latest one worn',()=>{
+ const agent=make(),badge={name:'Back Relay Badge',story:'A compact blue marker.',kind:'accessory',anchor:'back',parts:[{shape:'box',color:'#5AAFC0',position:[0,.05,-.62],rotation:[0,0,0],scale:[.28,.22,.08]}]}
+ const reward=(sequence,awardedAt,rewardDesign,fingerprint)=>({taskId:`task-${sequence}`,submissionId:`submission-${sequence}`,leaseId:`lease-${sequence}`,workerId:'w01',awardedAt,sequence,fingerprint:fingerprint.repeat(64),rewardDesign})
+ agent.thread.earnedRewards=[reward(1,100,DOCKLIGHT_MERIDIAN_CROWN,'a'),reward(2,200,badge,'b')]
+ const before=JSON.stringify(agent.thread),rows=Object.fromEntries(workerInspection(agent,null).rows)
+ assert.equal(rows['Earned wearables'],'Docklight Meridian Crown, Back Relay Badge')
+ assert.equal(rows.Wearing,'Back Relay Badge')
+ assert.equal(JSON.stringify(agent.thread),before,'inspection must not mint or mutate projected awards')
 })

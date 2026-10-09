@@ -3,9 +3,12 @@ import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import { buildFaceAtlas, FACE, FACE_LOOPS, FRAME_COLS, FRAME_ROWS } from './faces.js'
 import { attachMatrixAt, decorateSkinned, frameFor } from './crew.js'
 import {MagiLife} from './magi-life.js'
+import {syncRewardWearable,applyRewardBoneTransform} from '../world/roarm-rewards.js'
+import {createRoArmPilotGear} from '../world/roarm-pilot-gear.js'
+import {isCampusPilot,createCampusPilotGear} from '../world/campus-pilot-gear.js'
 
 /**
- * Every astronaut in the colony, drawn in seven draw calls.
+ * Every astronaut in the colony, mostly drawn in seven shared draw calls.
  *
  * The body is one instanced, GPU-skinned mesh playing KayKit's hand-animated clips (see
  * `crew.js`) — every torso, arm and leg in the colony in a single draw, whether there are
@@ -106,6 +109,11 @@ const PATH_BUDGET = 6
  * own units so the helmet does not have to be re-tuned when this moves.
  */
 const CREW_SCALE = 0.56
+const PILOT_CAPTAIN_SCALE=1.14
+const PILOT_SUIT_COLOR=0x28728e
+const PILOT_HELMET_COLOR=0x80d4e7
+const PILOT_PACK_COLOR=0xe99a46
+const isRoArm16Captain=thread=>thread?.worldProfile==='roarm-16'&&thread.slotId==='melchior'&&thread.workerId==='w00'
 
 /**
  * Where the worn parts sit relative to the bone they hang off, in the mannequin's own
@@ -156,6 +164,7 @@ export class Astronauts {
     this._m2 = new THREE.Matrix4()
     this._m3 = new THREE.Matrix4()
     this._m4 = new THREE.Matrix4()
+    this._m5 = new THREE.Matrix4()
     this._q = new THREE.Quaternion()
     this._e = new THREE.Euler()
     this._v = new THREE.Vector3()
@@ -299,6 +308,49 @@ export class Astronauts {
     // at — and reading it off the rig means it follows CREW_SCALE without a second constant.
     const restHeadY = rig.attach[(this.headSlot + 0) * 16 + 13]
     this.headHeight = (restHeadY + P.headUp) * CREW_SCALE
+    for(const agent of this.agents){this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent)}
+  }
+
+  _disposeRewardWearable(agent) {
+    agent.rewardWearable?.dispose();agent.rewardWearable=null
+  }
+
+  _syncPilotCaptain(agent) {
+    const captain=isRoArm16Captain(agent.thread)
+    if(agent.isRoArm16Captain===captain)return
+    agent.pilotGear?.dispose();agent.pilotGear=null
+    agent.isRoArm16Captain=captain;agent.colorDirty=true
+    if(captain)agent.pilotGear=createRoArmPilotGear(this.group)
+  }
+
+  _disposePilotCaptain(agent) {
+    agent.pilotGear?.dispose();agent.pilotGear=null
+  }
+
+  _syncCampusPilot(agent) {
+    const campusPilot=isCampusPilot(agent.thread)
+    if(agent.isCampusPilot===campusPilot)return
+    agent.campusPilotGear?.dispose();agent.campusPilotGear=null
+    agent.isCampusPilot=campusPilot;agent.colorDirty=true
+    if(campusPilot) {
+      agent.campusPilotGear=createCampusPilotGear()
+      this.group.add(agent.campusPilotGear)
+    }
+  }
+
+  _disposeCampusPilot(agent) {
+    agent.campusPilotGear?.dispose();agent.campusPilotGear=null
+  }
+
+  _renderScale(agent) {
+    if(agent.thread?.worldProfile==='roarm-campus'&&agent.thread.shellId==='w16')return 0
+    const roleScale=agent.isRoArm16Captain?PILOT_CAPTAIN_SCALE:
+      agent.isCampusPilot?(agent.campusPilotGear?.userData.characterScale||1.14):1
+    return agent.scale*CREW_SCALE*roleScale
+  }
+
+  _syncRewards(agent) {
+    syncRewardWearable(agent,agent.thread?.earnedRewards,agent.thread?.rewardWorkerId||agent.thread?.executorWorkerId||agent.thread?.shellId,this.group,!!this.rig)
   }
 
   _disposeCrew() {
@@ -597,12 +649,14 @@ export class Astronauts {
     this._applyStatus(agent, entry.status)
     this.agents.push(agent)
     this.byId.set(agent.id, agent)
+    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent)
     return agent
   }
 
   _updateAgent(agent, entry) {
     const newSwarmProject=entry.thread?.isShell && agent.thread?.constructionRunId!==entry.thread.constructionRunId
     agent.thread = entry.thread
+    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent)
     if(entry.home) agent.home.copy(entry.home)
     const suit = entry.thread?.suitColor ?? SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length]
     if (agent.suit !== suit) { agent.suit = suit; agent.colorDirty = true }
@@ -694,6 +748,9 @@ export class Astronauts {
       this._face(agent, dt)
 
       if (agent.state === 'gone') {
+        this._disposeRewardWearable(agent)
+        this._disposePilotCaptain(agent)
+        this._disposeCampusPilot(agent)
         this.agents.splice(i, 1)
         this.byId.delete(agent.id)
         continue
@@ -1162,9 +1219,10 @@ export class Astronauts {
     // just under the line.
     const speed = agent.groundSpeed || 0
     let key
-    if (agent.mounted) key = 'drive'
+    if (agent.mounted) key = agent.magiActivity==='pilot-rest'?'sit':'drive'
     else if (agent.state === 'spawning') key = 'spawn'
     else if (speed > 0.12) key = speed > WALK_SPEED * 1.25 ? 'run' : 'walk'
+      else if ((agent.magiActivity === 'pilot-rest' || agent.magiActivity === 'symbiosis-handoff') && agent.magiSettled) key = 'sit'
     else if(agent.magiActivity && agent.magiSettled && agent.status==='idle') {
       key={tinker:'tinker',talk:'talk',board:'readBoard',snack:'snack'}[agent.magiActivity] || 'idle'
     } else {
@@ -1222,12 +1280,15 @@ export class Astronauts {
     const child = this._m2
     const bone = this._m3
     const worn = this._m4
+    const headBone = this._m5
     const q = this._q
     const e = this._e
     const v = this._v
     const one = this._one
     const frames = this.frameAttr.array
     const crewFrames = this.crewFrameAttr?.array
+
+    for(const agent of this.agents){if(agent.rewardWearable)agent.rewardWearable.group.visible=false;agent.pilotGear?.hide();agent.campusPilotGear?.hide()}
 
     let i = 0
     let hands = 0
@@ -1253,7 +1314,7 @@ export class Astronauts {
       e.set(0, agent.yaw, 0)
       q.setFromEuler(e)
       v.set(agent.pos.x, agent.pos.y, agent.pos.z)
-      root.compose(v, q, one.setScalar(s * CREW_SCALE))
+      root.compose(v, q, one.setScalar(this._renderScale(agent)))
       one.setScalar(1)
 
       if (crew) {
@@ -1288,6 +1349,21 @@ export class Astronauts {
           worn.multiplyMatrices(root, bone)
           setPart(child, worn, hammer, hands++, P.gripX, P.gripY, P.gripZ, P.gripRx, 0, P.gripRz)
         }
+        if(agent.rewardWearable) {
+          attachMatrixAt(rig,agent.frame,agent.rewardWearable.anchor==='head'?this.headSlot:this.chestSlot,bone)
+          worn.multiplyMatrices(root,bone)
+          applyRewardBoneTransform(agent.rewardWearable,root,bone)
+        }
+        if(agent.pilotGear) {
+          attachMatrixAt(rig,agent.frame,this.headSlot,bone);headBone.copy(bone)
+          attachMatrixAt(rig,agent.frame,this.chestSlot,bone)
+          agent.pilotGear.update(root,headBone,bone)
+        }
+        if(agent.campusPilotGear) {
+          attachMatrixAt(rig,agent.frame,this.headSlot,bone);headBone.copy(bone)
+          attachMatrixAt(rig,agent.frame,this.chestSlot,bone)
+          agent.campusPilotGear.update(root,headBone,bone)
+        }
       }
 
       // Suit and trim only change when the status does, or when an agent leaving the roster
@@ -1295,9 +1371,9 @@ export class Astronauts {
       const c = this._color
       if (agent.index !== i || agent.colorDirty) {
         agent.colorDirty = false
-        crew?.setColorAt(i, c.setHex(agent.suit))
-        helmet.setColorAt(i, c.setHex(agent.suit))
-        pack.setColorAt(i, agent.trim)
+        crew?.setColorAt(i, c.setHex(agent.isRoArm16Captain?PILOT_SUIT_COLOR:agent.suit))
+        helmet.setColorAt(i, c.setHex(agent.isRoArm16Captain?PILOT_HELMET_COLOR:agent.suit))
+        pack.setColorAt(i, agent.isRoArm16Captain?c.setHex(PILOT_PACK_COLOR):agent.trim)
         face.setColorAt(i, agent.eye)
         staticDirty = true
       }
@@ -1357,7 +1433,7 @@ export class Astronauts {
     const lifted = this._pickLifted
 
     for (const agent of this.agents) {
-      if (agent.scale < 0.3 || agent.state === 'gone') continue
+      if (agent.scale < 0.3 || agent.state === 'gone' || this._renderScale(agent)===0) continue
       v.set(agent.pos.x, agent.pos.y + (this.headHeight || 0.75), agent.pos.z).project(camera)
       if (v.z > 1) continue // behind the camera
       agent.screen.copy(v)
@@ -1449,6 +1525,7 @@ export class Astronauts {
 
   dispose() {
     this.magiLife.dispose()
+    for(const agent of this.agents){this._disposeRewardWearable(agent);this._disposePilotCaptain(agent);this._disposeCampusPilot(agent)}
     for (const mesh of Object.values(this.parts)) {
       mesh.geometry.dispose()
       mesh.material.dispose()

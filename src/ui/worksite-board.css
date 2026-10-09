@@ -1,0 +1,10 @@
+.worksite-board{position:fixed;left:16px;top:16px;z-index:12;max-width:min(360px,calc(100vw - 32px));color:#f3eee5;background:#1b2626e8;border:1px solid #efb56860;border-radius:12px;box-shadow:0 6px 24px #0003;font:12px/1.5 system-ui}
+.worksite-board summary{cursor:pointer;padding:10px 14px;font-weight:650;letter-spacing:.02em}
+.worksite-board-body{padding:0 14px 12px;max-height:55vh;overflow:auto}
+.worksite-board button{border:1px solid #bdb09a70;background:#eee5d4;color:#233335;border-radius:6px;padding:5px 9px;cursor:pointer}
+.worksite-board article{border-top:1px solid #ffffff25;padding:9px 0}.worksite-board article p{margin:3px 0;color:#d5c4a9}.worksite-board-body>p{color:#cdc7ba}
+.worksite-board .symbiosis-cycle{margin:10px 0;padding:9px 10px;border:1px solid #8acbd455;border-radius:8px;background:#1021228c}
+.worksite-board .symbiosis-cycle>strong{display:block;color:#ace5ef;text-transform:capitalize}
+.worksite-board .symbiosis-cycle p{margin:5px 0;color:#d5c4a9;overflow-wrap:anywhere}
+.worksite-board .symbiosis-cycle article{border-top:1px solid #ace5ef35;padding:8px 0;color:#f3eee5}
+body:not(.display-menus-hidden) .worksite-board{left:auto;right:18px;top:70px}

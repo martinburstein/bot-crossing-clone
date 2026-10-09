@@ -1,0 +1,314 @@
+{
+  "simulation-preview": {
+    "rewardDesign": {
+      "name": "Amber Signal Cap",
+      "story": "A cyan beacon on an amber cap marks the pilot who checks each hypothetical trial against measured evidence.",
+      "kind": "hat",
+      "anchor": "head",
+      "parts": [
+        {
+          "shape": "cylinder",
+          "color": "#E99A46",
+          "position": [
+            0,
+            1.11,
+            -0.3
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.84,
+            0.1,
+            0.84
+          ]
+        },
+        {
+          "shape": "torus",
+          "color": "#384751",
+          "position": [
+            0,
+            1.07,
+            -0.3
+          ],
+          "rotation": [
+            1.5708,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.06
+          ]
+        },
+        {
+          "shape": "sphere",
+          "color": "#91CBD3",
+          "position": [
+            0,
+            1.25,
+            -0.3
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.12,
+            0.12,
+            0.12
+          ]
+        }
+      ]
+    },
+    "successorContract": {
+      "title": "Verify held-joint behavior in a bounded base-wave preview",
+      "objective": "Use a fresh measured observation as the simulation start, then check a small candidate base-wave sequence while holding shoulder, elbow, and gripper constant. This is a hypothetical preview only.",
+      "acceptance": [
+        "Use no more than ten finite targets within illustrative simulation bounds.",
+        "Verify shoulder, elbow and gripper remain unchanged at every sampled preview step.",
+        "Verify the preview reaches each requested base endpoint and is labeled simulation-only.",
+        "Make no controller, serial, camera or physical movement requests."
+      ],
+      "evidence": "Provide passing simulation tests with starting observation source and timestamp, target sequence, per-step held-joint checks and endpoint checks."
+    }
+  },
+  "wearable-rewards": {
+    "rewardDesign": {
+      "name": "Docklight Meridian Crown",
+      "story": "A low-profile copper survey cap with a pale crown, a blue rearward marker, and an amber beacon. It marks a worker whose accepted reward is projected into their inventory and stays attached to the animated astronaut head.",
+      "kind": "hat",
+      "anchor": "head",
+      "parts": [
+        {
+          "shape": "torus",
+          "color": "#E99A46",
+          "position": [
+            0,
+            0.96,
+            -0.22
+          ],
+          "rotation": [
+            1.5707963267948966,
+            0,
+            0
+          ],
+          "scale": [
+            0.68,
+            0.68,
+            0.12
+          ]
+        },
+        {
+          "shape": "cone",
+          "color": "#E7E1D7",
+          "position": [
+            0,
+            1.12,
+            -0.22
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.48,
+            0.34,
+            0.48
+          ]
+        },
+        {
+          "shape": "box",
+          "color": "#91CBD3",
+          "position": [
+            0,
+            1,
+            -0.4
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.24,
+            0.08,
+            0.055
+          ]
+        },
+        {
+          "shape": "sphere",
+          "color": "#F2BD55",
+          "position": [
+            0,
+            1.31,
+            -0.22
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.13,
+            0.12,
+            0.13
+          ]
+        }
+      ]
+    },
+    "successorContract": {
+      "title": "Replay RoArm joint fixtures and verify freshness transitions",
+      "objective": "Using a clearly labeled deterministic synthetic joint trace, and optional provided numeric measured samples only when source, units and timestamps are documented, verify documented forward-kinematics wrist pose within a declared tolerance and that stale samples cannot be shown as current. Use only the existing read-only observation path; do not issue motion commands or save camera frames.",
+      "acceptance": [
+        "Trace input, provenance, units, timestamp basis and tolerance are explicit; malformed, future, out-of-order and stale samples have deterministic outcomes.",
+        "Synthetic replay reproduces expected wrist coordinates within declared tolerance; measured provenance stays distinct.",
+        "Tests demonstrate stale-to-fresh recovery without claiming stale data is current.",
+        "No motion, reset, home or camera-frame persistence.",
+        "Independent review checks provenance, tolerance, tests, unsupported cases and scoped diff."
+      ],
+      "evidence": "Provide source and units, replay expected/observed coordinates and residual, valid/malformed/stale/future/out-of-order/recovery tests, diff showing no motion or camera-frame writes, and independent review receipt."
+    }
+  },
+  "contract-core": {
+    "rewardDesign": {
+      "name": "Ledger Halo Crown",
+      "story": "Twin tilted halos carry the beacon from one owner to the next, honoring an evidence trail that survives each accepted RoArm contract handoff.",
+      "kind": "hat",
+      "anchor": "head",
+      "parts": [
+        {
+          "shape": "cylinder",
+          "color": "#24364B",
+          "position": [
+            0,
+            1.03,
+            -0.2
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.74,
+            0.1,
+            0.64
+          ]
+        },
+        {
+          "shape": "torus",
+          "color": "#D4A65A",
+          "position": [
+            -0.34,
+            1.38,
+            -0.22
+          ],
+          "rotation": [
+            0.4,
+            0,
+            -0.45
+          ],
+          "scale": [
+            0.55,
+            0.45,
+            0.08
+          ]
+        },
+        {
+          "shape": "torus",
+          "color": "#4EA6A1",
+          "position": [
+            0.34,
+            1.38,
+            -0.22
+          ],
+          "rotation": [
+            -0.4,
+            0,
+            0.45
+          ],
+          "scale": [
+            0.55,
+            0.45,
+            0.08
+          ]
+        },
+        {
+          "shape": "box",
+          "color": "#D4A65A",
+          "position": [
+            -0.34,
+            1.22,
+            -0.22
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.05,
+            0.3,
+            0.05
+          ]
+        },
+        {
+          "shape": "box",
+          "color": "#4EA6A1",
+          "position": [
+            0.34,
+            1.22,
+            -0.22
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.05,
+            0.3,
+            0.05
+          ]
+        },
+        {
+          "shape": "sphere",
+          "color": "#F2BD55",
+          "position": [
+            0,
+            1.57,
+            -0.22
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.13,
+            0.13,
+            0.13
+          ]
+        }
+      ]
+    },
+    "successorContract": {
+      "title": "Verify joint observation provenance and restart lineage",
+      "objective": "Use deterministic fixtures and the existing read-only observation path to check joint source, timestamp, units and process lineage across a simulated controller restart. Compare joint vectors with declared tolerance and verify stale or out-of-order samples cannot appear current. Do not restart the real controller, connect hardware or issue motion.",
+      "acceptance": [
+        "Record source, timestamp, units, joint vector and process/session identifier per fixture.",
+        "Declare per-joint tolerances and compare expected/observed vectors and residuals across simulated restart.",
+        "Malformed, future, out-of-order and stale samples cannot be labeled current.",
+        "Fresh post-restart fixture restores status without obsolete process/session identity.",
+        "Use deterministic fixtures only; no camera frames or physical movement."
+      ],
+      "evidence": "Fixture inputs/expected transitions, observed provenance and lineage, per-joint residuals and passing rejection/recovery tests."
+    }
+  }
+}

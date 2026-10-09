@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { loadSwarm, projectShells, scrollFor, SWARM_ROOT } from './swarm.mjs'
 import { magiHealth, magiSourceUrl, projectMagiState, readMagiState } from './magi.mjs'
 import {readMagiTokens} from './magi-tokens.mjs'
+import {readRoArmObservation} from './roarm.mjs'
 import {standbyMagiThreads} from '../src/game/magi-world.js'
 import {archiveRoot,readArchive,listArchives} from './run-archives.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
@@ -368,6 +369,10 @@ export async function apiMiddleware(req, res, next) {
   }
 
   try {
+    if(url.pathname==='/api/roarm/observation') {
+      if(req.method!=='GET')return send(res,405,{error:'Read-only observation endpoint'})
+      return send(res,200,await readRoArmObservation())
+    }
     if(url.pathname==='/api/magi/archives'&&req.method==='GET') {
       try {return send(res,200,{runs:await listArchives(await archiveRoot(DATA_DIR))})}
       catch {return send(res,200,{runs:[]})}
@@ -391,7 +396,7 @@ export async function apiMiddleware(req, res, next) {
       try {
         const state = await readMagiState()
         const projection = projectMagiState(state,Date.now(),await readMagiTokens(state,{cacheFile:path.join(DATA_DIR,'magi-token-receipts.json')}))
-        return send(res, 200, { threads: projection.threads, scannedAt: Date.now(), warnings: [], messageBoards: null, mode: 'magi', alignment: projection.alignment })
+        return send(res, 200, { threads: projection.threads, scannedAt: Date.now(), warnings: [], messageBoards: null, mode: 'magi', alignment: projection.alignment, worksite: projection.worksite })
       } catch {
         return send(res, 503, { error: 'MAGI state is unavailable or invalid', mode: 'magi', threads: [], alignment: null })
       }

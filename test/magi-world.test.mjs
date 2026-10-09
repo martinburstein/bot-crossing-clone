@@ -4,10 +4,11 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import * as THREE from 'three'
-import {tokenConstruction,allocateMagiCells,standbyMagiThreads,MAGI_CLUSTERS,magiOnShift,magiShiftLabel,magiCrewStatus} from '../src/game/magi-world.js'
+import {tokenConstruction,allocateMagiCells,standbyMagiThreads,MAGI_CLUSTERS,MAGI_HOME_CELLS,infrastructureCell,magiOnShift,magiShiftLabel,magiCrewStatus} from '../src/game/magi-world.js'
 import {usageFromEvents,readMagiTokens} from '../server/magi-tokens.mjs'
 import {VEHICLES,createVehicle} from '../src/world/mars-vehicles.js'
 import {idlePlan,MagiLife} from '../src/agents/magi-life.js'
+import {createRoArmWorksite} from '../src/world/roarm-worksite.js'
 
 test('MAGI task outcomes present off-shift crew without rewriting task state',()=>{
  const base=standbyMagiThreads()[0]
@@ -33,16 +34,19 @@ test('token awards respect boundaries, ignore tasks, and bound rendering without
  assert.equal(plan(275000).structures.length,7);assert.equal(plan(250000).nextHex,250000)
  const big=plan(20_000_000);assert.equal(big.cells,61);assert.equal(big.major,80);assert.equal(big.deferredHexagons,20)
 })
-test('15 homes have one color, three disconnected five-cell clusters, and preserve camps through growth',()=>{
+test('15 stable persona homes form one contiguous fixed colony around the arm',()=>{
  const threads=standbyMagiThreads();assert.equal(new Set(threads.map(t=>t.shellColor)).size,1);assert.equal(threads.some(t=>t.running),false)
  const projects=threads.map(t=>({...t,cells:1})),base=allocateMagiCells(projects)
  const adjacent=(a,b)=>Math.max(Math.abs(a.q-b.q),Math.abs(a.r-b.r),Math.abs(a.q+a.r-b.q-b.r))===1
- for(let start=0;start<15;start+=5){const cells=projects.slice(start,start+5).map(t=>base.get(t.id)[0]);assert.ok(cells.every(c=>cells.some(d=>adjacent(c,d))));for(const other of projects.filter((_,i)=>i<start||i>=start+5))assert.ok(cells.every(c=>!adjacent(c,base.get(other.id)[0])))}
- const expanded=allocateMagiCells(projects.map((p,i)=>({...p,cells:i===0?61:7})),base)
- const keys=[...expanded.values()].flat().map(c=>`${c.q},${c.r}`);assert.equal(keys.length,new Set(keys).size)
- for(const p of projects)assert.deepEqual(expanded.get(p.id)[0],base.get(p.id)[0])
- for(const c of MAGI_CLUSTERS)assert.ok(!keys.includes(`${c.q},${c.r}`))
- assert.deepEqual(allocateMagiCells(projects.map((p,i)=>({...p,cells:i===0?61:7})),expanded),expanded)
+ const homes=[...base.values()].map(c=>c[0]),keys=homes.map(c=>`${c.q},${c.r}`)
+ assert.equal(new Set(keys).size,15);assert.deepEqual(homes,MAGI_HOME_CELLS)
+ for(const home of homes)assert.ok(homes.some(other=>adjacent(home,other)),'each identity home touches the common worksite')
+ assert.ok(homes.every(home=>!infrastructureCell(home)),'identity homes stay clear of worksite landmarks')
+ const reached=new Set([homes[0].q+','+homes[0].r]);for(let pass=0;pass<homes.length;pass++)for(const home of homes)if(reached.has(home.q+','+home.r))for(const other of homes)if(adjacent(home,other))reached.add(other.q+','+other.r)
+ assert.equal(reached.size,15,'all homes form a connected colony')
+ const grown=allocateMagiCells(projects.map(p=>({...p,cells:61})),base)
+ assert.deepEqual([...grown.values()].map(c=>c.length),Array(15).fill(1),'token construction does not expand the shared 15-identity base')
+ assert.equal(MAGI_CLUSTERS.length,3,'three executor groups remain logical identities')
 })
 test('usage parser excludes cached input, ignores partial/malformed events and does not double count repeated terminal records',()=>{
  const event={type:'turn.completed',usage:{input_tokens:30000,cached_input_tokens:10000,output_tokens:5000}}
@@ -68,7 +72,7 @@ test('receipts are exact-identity scoped, durable, deduplicated across polls, an
  state.state.revision=5;await fs.writeFile(path.join(storeDirectory,'state.json'),JSON.stringify(state));assert.equal((await read()).get('w01').total,25000)
  state.state.revision=4;state.state.leases={a:{...lease,turnToken:'bad-turn'}};await fs.writeFile(path.join(storeDirectory,'state.json'),JSON.stringify(state));assert.equal((await read()).get('w01').total,25000)
 })
-test('idle plans pair available bots and rotate through all four activities without pairing with active workers',()=>{
+test('idle plans pair available bots and rotate through camp activities without pairing with active workers',()=>{
  const ids=new Set(standbyMagiThreads().map(t=>t.shellId))
  for(const id of ids){const activities=new Set();for(let epoch=0;epoch<5;epoch++){const p=idlePlan(id,epoch*64,ids);activities.add(p.activity);if(p.activity==='talk')assert.equal(idlePlan(p.peer,epoch*64,ids).peer,id)}assert.deepEqual([...activities].sort(),['board','snack','talk','tinker'])}
  const p=idlePlan('w01',0,new Set(['w01']));assert.notEqual(p.activity,'talk')
@@ -79,15 +83,15 @@ test('fleet covers eight sets and every model has finite geometry, a seat, bound
  for(const v of VEHICLES){const m=createVehicle(v.id);assert.ok(m.userData.seat.toArray().every(Number.isFinite));assert.ok(m.userData.footprint<=2.36);if(wheelCounts[v.id])assert.equal(m.userData.wheels.length,wheelCounts[v.id]);m.userData.animate(2,true);m.traverse(o=>{if(o.geometry)assert.ok([...o.geometry.attributes.position.array].every(Number.isFinite))});m.userData.dispose()}
 })
 test('compact hangar rents only for confirmed work, returns vehicles, and reuses its three bays',()=>{
- const scene=new THREE.Scene(),life=new MagiLife(scene,{transient:true,get:()=>false}),threads=standbyMagiThreads()
+ const scene=new THREE.Scene(),worksite=createRoArmWorksite(scene),life=new MagiLife(scene,{transient:true,get:()=>false}),threads=standbyMagiThreads()
  const agents=threads.map(t=>({id:t.id,thread:t,status:'idle',state:'at-site',home:new THREE.Vector3(40,0,0),pos:new THREE.Vector3(40,0,0)}))
- const world={groundAt:()=>.45};let time=0
+ const world={groundAt:()=>.45,worksite};let time=0
  const tick=(n=1)=>{for(let i=0;i<n;i++)life.update(agents,world,time+=.1)}
  life.sync(agents,world);tick();assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
  const a=agents[0];a.status='working';a.thread.running=true;a.thread.assignmentState='running';tick()
  let item=life.fleet.get(a.id);a.pos.copy(item.dock);tick(60)
  assert.equal(a.mounted,true);assert.equal(item.active,true);assert.equal(item.phase,'working');assert.notDeepEqual(item.model.position,a.home)
- const travelled=item.rolling;tick(200);assert.ok(item.rolling>travelled+1,'working vehicle resumes its route after operating at an outer work stop')
+ const operationTime=item.operationTime;tick(200);assert.ok(item.operationTime>operationTime,'working vehicle continues its service stop activity at the RoArm')
  a.thread.running=false;a.thread.assignmentState='unknown';a.status='idle';tick()
  assert.equal(item.active,false);assert.equal(item.phase,'parked');tick(60)
  assert.equal(a.mounted,false);assert.ok(['talk','tinker','board','snack'].includes(a.magiActivity));assert.equal(life.fleet.size,0);assert.equal(life.hangar.bays.filter(b=>b.model).length,3)
@@ -95,14 +99,14 @@ test('compact hangar rents only for confirmed work, returns vehicles, and reuses
  assert.equal(life.fleet.size,3);assert.equal(life.hangar.bays.filter(b=>b.rented).length,3)
  const next=agents[1];const previous=life.fleet.get(next.id);life.choose(next.thread.shellId,'claw-tank');tick(2)
  item=life.fleet.get(next.id);assert.equal(item.choice,'claw-tank');assert.notEqual(item.model,previous.model)
- life.dispose();assert.equal(scene.children.length,0)
+ life.dispose();worksite.dispose();assert.equal(scene.children.length,0)
 })
 
 test('drilling rover retains its approved heading and seat fit, then parks immediately when work stops',()=>{
- const scene=new THREE.Scene(),life=new MagiLife(scene,{transient:true,get:()=>false}),thread=standbyMagiThreads()[0]
+ const scene=new THREE.Scene(),worksite=createRoArmWorksite(scene),life=new MagiLife(scene,{transient:true,get:()=>false}),thread=standbyMagiThreads()[0]
  const agent={id:thread.id,thread,status:'working',state:'at-site',home:new THREE.Vector3(40,0,0),pos:new THREE.Vector3(40,0,0)}
  thread.running=true;thread.assignmentState='running';const world={groundAt:()=>.45},agents=[agent];let time=0
- const tick=()=>life.update(agents,world,time+=.1)
+ world.worksite=worksite;const tick=()=>life.update(agents,world,time+=.1)
  life.choose(thread.shellId,'cargo-rover');life.sync(agents,world);tick()
  const item=life.fleet.get(agent.id);agent.pos.copy(item.dock);tick()
  const data=item.model.userData,yAxis=new THREE.Vector3(0,1,0)
@@ -115,5 +119,5 @@ test('drilling rover retains its approved heading and seat fit, then parks immed
  assert.ok(data.wheels[0].rotation.x<angle,'outbound wheels turn toward the drill')
  angle=data.wheels[0].rotation.x;agent.status='idle';thread.running=false;tick()
  assert.equal(item.phase,'parked');assert.equal(life.fleet.size,0);assert.equal(data.wheels[0].rotation.x,0,'inactive vehicle mechanisms stop')
- life.dispose()
+ life.dispose();worksite.dispose()
 })

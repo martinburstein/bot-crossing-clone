@@ -13,17 +13,17 @@ export class MagiPanel {
   constructor(root,colony,select,focus) {
     this.colony=colony;this.select=select;this.focus=focus;this.shells=[]
     this.el=el('section',undefined,'magi-panel');this.el.setAttribute('aria-label','15-3A mission control')
-    const eyebrow=el('p','BOT CROSSING  /  MARS EXPEDITION','magi-eyebrow')
-    const header=el('header');header.append(el('h1','Swarm 15–3A'),el('span','15 / 3','magi-tag'))
-    this.status=el('p','Preparing the colony…','magi-connection')
-    const rule=el('div',undefined,'magi-rules');rule.append(el('span','25k tokens → small addition'),el('span','250k tokens → new hexagon'))
+    const eyebrow=el('p','BOT CROSSING  /  ROARM WORKSITE','magi-eyebrow')
+    const header=el('header');this.heading=el('h1','Swarm 15–3A');this.rosterTag=el('span','15 / 3','magi-tag');header.append(this.heading,this.rosterTag)
+    this.status=el('p','Preparing the worksite…','magi-connection')
+    const rule=el('div',undefined,'magi-rules');rule.append(el('span','One shared RoArm worksite'),el('span','Blockers → reviewed fixes → service credits'))
     this.total=el('p','','magi-total')
     const garage=el('button','Explore the vehicle hangar','magi-hangar-button');garage.onclick=()=>this.openHangar()
     const runs=el('select',undefined,'magi-run-selector');runs.setAttribute('aria-label','Saved runs');runs.append(new Option('Live world',''))
     fetch('/api/magi/archives').then(r=>r.json()).then(data=>{for(const run of data.runs||[])runs.append(new Option(run.label,run.id));runs.value=new URLSearchParams(location.search).get('run')||''}).catch(()=>{})
     runs.onchange=()=>{const url=new URL(location.href);if(runs.value)url.searchParams.set('run',runs.value);else url.searchParams.delete('run');location.assign(url)}
     this.groups=el('div',undefined,'magi-groups')
-    const caption=el('p','Three crews. Five personas each. One shared suit colour.','magi-caption')
+    const caption=el('p','Three computers. Fifteen personas. One shared camp.','magi-caption');this.caption=caption
     this.el.append(eyebrow,header,this.status,rule,this.total,garage,runs,this.groups,caption);root.append(this.el)
     this.root=root
   }
@@ -31,43 +31,45 @@ export class MagiPanel {
     this.shells=shells
     this.flags={stale,standby,replay}
     const working=shells.filter(magiOnShift).length
-    this.status.textContent=stale?'Connection unavailable · crew off shift':standby?'Standby · connect Swarm to begin':`${working} / 3 sessions active · ${15-working} personas resting`
+    const campus=shells.some(s=>s.worldProfile==='roarm-campus')
+    const dedicated=campus||shells.some(s=>s.worldProfile==='roarm-16')
+    this.heading.textContent=campus?'RoArm � Campus':dedicated?'RoArm · 16 personas':'Swarm 15–3A';this.rosterTag.textContent=campus?'15 + 2 / 3':dedicated?'16 / 3':'15 / 3'
+    this.caption.textContent=campus?'One pilot. One camper. Fifteen executor skills, one Casper.':dedicated?'One captain. Two independent role choices. 225 ordered symbioses.':'Three computers. Fifteen personas. One shared camp.'
+    this.status.textContent=stale?'Connection unavailable · crew off shift':standby?'Standby · connect Swarm to begin':dedicated?`${working} / 3 sessions active · pilot duty shown separately`:`${working} / 3 sessions active · ${15-working} personas resting`
     this.status.dataset.state=stale?'stale':working?'live':'standby'
     if(replay)this.status.textContent=`${replay} replay · no live workers`
     const plans=shells.map(tokenConstruction),total=plans.reduce((n,p)=>n+p.tokens,0),measured=plans.filter(p=>p.measured).length
-    this.total.textContent=`${plans.reduce((n,p)=>n+p.cells,0)} hexagons · ${measured?number(total)+' measured tokens':'usage not yet available'}`
+    this.total.textContent=`${campus?'1 pilot + 1 camper + 15 executors':dedicated?'1 pilot + 15 shared roles':'15 shared hexagons'} · ${measured?number(total)+' measured tokens':'usage not yet available'}`
     const signature=JSON.stringify(shells.map(s=>[s.shellId,s.shellName,s.shellStatus,s.tokenUsage,s.vehicleId,s.assignmentState,s.taskTitle,s.assignmentRole]))+stale
     if(signature===this.signature)return
     this.signature=signature
     const open=new Set([...this.groups.querySelectorAll('details[open]')].map(g=>g.dataset.cluster))
     this.groups.replaceChildren()
-    for(const cluster of MAGI_CLUSTERS) {
+    for(const cluster of [...MAGI_CLUSTERS,...(dedicated&&!campus?[{id:'roles',name:'Shared role library'}]:[])]) {
       const details=el('details');details.dataset.cluster=cluster.id;details.open=open.has(cluster.id)
       const crew=shells.filter(s=>s.clusterId===cluster.id),summary=el('summary')
-      const label=el('span',cluster.name),count=el('small',`${crew.filter(magiOnShift).length} active · 5 bots`)
+      const label=el('span',cluster.name),count=el('small',dedicated?(cluster.id==='roles'?'Available personas':`${crew.filter(magiOnShift).length} active · 1 session`):`${crew.filter(magiOnShift).length} active · 5 bots`)
       summary.append(label,count);details.append(summary)
       const fly=el('button','Go to crew','magi-link');fly.onclick=()=>this.focus(cluster.id);details.append(fly)
       for(const shell of crew) {
         const row=el('article',undefined,'magi-worker'),name=el('button',`${shell.shellId.toUpperCase()}  ${shell.shellName}`,'magi-worker-name')
         name.onclick=()=>this.select(shell.id)
         const p=tokenConstruction(shell),status=el('span',magiShiftLabel(shell),'magi-worker-status')
-        const progress=el('p',p.measured?`${number(p.tokens)} tokens · ${p.cells} hex · ${p.minor} additions / upgrades`:'Token usage unavailable','magi-worker-progress')
+        const progress=el('p',p.measured?`${number(p.tokens)} measured tokens`:'Token usage unavailable','magi-worker-progress')
         row.append(name,status,progress)
+        if(dedicated&&shell.rolePurpose)row.append(el('small',shell.rolePurpose))
         if(p.measured) {
-          const meter=el('progress');meter.max=250000;meter.value=p.tokens%250000;meter.setAttribute('aria-label',`${shell.shellName}: progress to next hexagon`)
-          row.append(meter,el('small',`${number(p.nextSmall)} to next addition · ${number(p.nextHex)} to next hex`))
           if(shell.tokenUsage.cached)row.append(el('small','Last measured usage · awaiting fresh receipt'))
           if(shell.tokenUsage.persistenceWarning)row.append(el('small','Usage cache could not be saved; keep receipts available'))
           if(shell.tokenUsage.pendingTurns)row.append(el('small',`${shell.tokenUsage.pendingTurns} turn(s) await usage receipts`))
-          if(p.deferredHexagons)row.append(el('small',`${p.deferredHexagons} further earned hexagons held beyond the scene limit`))
         }
         const job=vehicleJob(shell,this.colony.astronauts.magiLife.choices[shell.shellId]||shell.vehicleId)
-        if(magiOnShift(shell)&&!stale)row.append(el('p',`Visual mission: ${job.label}`,'magi-worker-progress'))
+        if(magiOnShift(shell)&&!stale&&(!campus||shell.slotId==='casper'))row.append(el('p',`Visual mission: ${job.label}`,'magi-worker-progress'))
         const select=el('select');select.setAttribute('aria-label',`Vehicle preference for ${shell.shellName}`)
         for(const v of VEHICLES){const option=el('option',v.name);option.value=v.id;if(job.contextual&&v.id!==job.vehicle){option.disabled=true;option.title='This mission needs a different vehicle'}if(v.id==='defender'&&!job.meteorAlert){option.disabled=true;option.title='Available for an incoming meteor alert'}select.append(option)}
         select.value=job.vehicle
         select.onchange=()=>this.choose(shell.shellId,select.value)
-        row.append(select);details.append(row)
+        if(!campus||/^r/.test(shell.roleId||''))row.append(select);details.append(row)
       }
       this.groups.append(details)
     }

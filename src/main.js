@@ -26,6 +26,10 @@ import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-project
 import {standbyMagiThreads} from './game/magi-world.js'
 import {MagiPanel} from './ui/magi-panel.js'
 import {mountDisplayToggle} from './ui/display-toggle.js'
+import {WorksiteBoard} from './ui/worksite-board.js'
+import {createRoArmPreview} from './world/roarm-preview.js'
+import {RoArmPreviewPanel} from './ui/roarm-preview.js'
+import './ui/roarm-preview.css'
 
 /**
  * Boot and the outer game loop.
@@ -58,6 +62,14 @@ if(MAGI_VIEW)document.body.classList.add('magi-world')
 const engine = new Engine(settings).mount(app)
 const rig = new CameraRig(engine.camera, engine.canvas, settings)
 const colony = new Colony(engine.scene, settings, engine.camera, engine.renderer)
+let lastArmObservation=null
+const armPreview=MAGI_VIEW&&!REPLAY_RUN?createRoArmPreview(engine.scene):null
+const armPreviewPanel=armPreview?RoArmPreviewPanel(app,armPreview,()=>lastArmObservation):null
+if(armPreviewPanel)armPreviewPanel.element.hidden=true
+if(armPreview)window.roarmSimulation=Object.freeze({
+  preview:moves=>armPreview.preview({startPose:lastArmObservation,moves}),
+  clear:()=>armPreview.clear(),snapshot:()=>armPreview.snapshot(),
+})
 
 let state = { archived: [], archivedAt: {}, opened: [], plots: {}, seen: {}, hiddenProjects: [], viewedAt: {} }
 let threads = []
@@ -75,7 +87,7 @@ function frameSwarm() {
   rig.maxDistance=Math.max(150,radius*4)*MAP_LINEAR_SCALE
   rig.worldLimit=Math.max(82,radius+20)*MAP_LINEAR_SCALE
   if(engine.camera.far<radius*6*MAP_LINEAR_SCALE) {engine.camera.far=radius*6*MAP_LINEAR_SCALE;engine.camera.updateProjectionMatrix()}
-  rig.focus(new THREE.Vector3(),{distance:Math.max(110,radius*(MAGI_VIEW?2.65:3.5))*MAP_LINEAR_SCALE})
+  rig.focus(new THREE.Vector3(0,MAGI_VIEW?2:0,MAGI_VIEW?-10:0),{distance:MAGI_VIEW?125:Math.max(110,radius*3.5)*MAP_LINEAR_SCALE})
 }
 let hoverId = null
 let statusCursor = 0
@@ -301,6 +313,9 @@ const magiPanel = MAGI_VIEW ? new MagiPanel(app,colony,id=>select(id,{fly:true})
   if(camp)rig.focus(camp.group.position,{distance:66})
 }) : null
 const messageBoards=new MessageBoards(engine.scene)
+const worksiteBoard = MAGI_VIEW ? new WorksiteBoard(app,()=>rig.focus(new THREE.Vector3(-22,5,22),{distance:40}),()=>rig.focus(new THREE.Vector3(0,8,3),{distance:48,elevated:true}),()=>{
+  if(armPreviewPanel){armPreviewPanel.element.hidden=!armPreviewPanel.element.hidden;armPreviewPanel.refresh();rig.focus(new THREE.Vector3(0,8,3),{distance:48,elevated:true})}
+},()=>rig.focus(new THREE.Vector3(12,2,-38),{distance:78,elevated:true})) : null
 const boardPanel=new MessageBoardPanel(app,id=>{
   const board=messageBoards.boards.get(id)
   if(board)rig.focus(board.position,{distance:25})
@@ -329,7 +344,7 @@ function select(id, { fly = false } = {}) {
   if (thread?.project && colony.plots.has(thread.project)) selectedProject = thread.project
   syncProject()
   if (fly) {
-    rig.focus(new THREE.Vector3(agent.pos.x, 0, agent.pos.z), { distance: Math.min(rig.desiredDistance, 26) })
+    rig.focus(agent.pos, { distance: Math.min(rig.desiredDistance, 26), elevated: agent.magiActivity==='pilot' })
   }
 }
 
@@ -703,15 +718,37 @@ function previousMagiProjection() {
   try {
     const saved=JSON.parse(localStorage.getItem('botcrossing.15-3A.lastProjection')||'null')
     if(Array.isArray(saved)&&saved.length===15&&saved.every((t,i)=>t.id===`magi:w${String(i+1).padStart(2,'0')}`&&t.worldProfile==='15-3A'))return saved
+    if(Array.isArray(saved)&&saved.length===17&&saved.every((t,i)=>t.id===`magi:w${String(i).padStart(2,'0')}`&&t.worldProfile==='roarm-campus'))return saved
+    if(Array.isArray(saved)&&saved.length===16&&saved.every((t,i)=>t.id===`magi:w${String(i).padStart(2,'0')}`&&t.worldProfile==='roarm-16'))return saved
   } catch { /* Optional local display cache. */ }
   return standbyMagiThreads()
 }
 let polling = false
+let pollingArm=false
+async function pollArm() {
+  if(pollingArm)return
+  pollingArm=true
+  try {
+    const response=await fetch('/api/roarm/observation',{cache:'no-store',signal:AbortSignal.timeout(3500)})
+    if(!response.ok)throw Error('Observation unavailable')
+    const observation=await response.json()
+    lastArmObservation=observation
+    colony.worksite?.updateObservation(observation)
+    worksiteBoard?.observation(observation)
+    armPreviewPanel?.refresh()
+  } catch {
+    lastArmObservation={state:'offline'}
+    colony.worksite?.updateObservation({state:'offline'})
+    worksiteBoard?.observation({state:'offline'})
+    armPreviewPanel?.refresh()
+  } finally {pollingArm=false}
+}
 async function poll() {
   if (polling) return
   polling = true
   try {
     const res = await fetchThreads(MAGI_VIEW)
+    colony.setWorksiteProjection(res.worksite || {})
     if(MAGI_VIEW&&res.mode==='magi'&&!REPLAY_RUN)try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
     applyThreads(res.threads || [])
     const shells = (res.threads || []).filter(t=>t.isShell)
@@ -719,6 +756,7 @@ async function poll() {
     hud.setMagiAlignment(null)
     swarm.update(MAGI_VIEW?[]:shells)
     magiPanel?.update(shells,{standby:res.mode==='standby',replay:res.replay})
+    worksiteBoard?.update(res.worksite || {})
     messageBoards.sync(MAGI_VIEW?[]:shells,colony.plotOrder)
     boardPanel.update(res.messageBoards,MAGI_VIEW?[]:shells)
     if (shells.length) mission.el.hidden = true
@@ -728,11 +766,13 @@ async function poll() {
     if (MAGI_VIEW) {
       // Preserve earned visuals during an outage, but invalidate all prior activity.
       const unknown=(threads.length?threads:REPLAY_RUN?standbyMagiThreads():previousMagiProjection()).map(t=>({...t,running:false,hasError:false,assignmentState:'unknown',shellStatus:'Connection unavailable',tokenUsage:t.tokenUsage?{...t.tokenUsage,cached:true}:null}))
+      colony.setWorksiteProjection({stale:true})
       applyThreads(unknown)
       colony.astronauts.setAlignmentLights(null)
       hud.setMagiAlignment(null)
       swarm.update([])
       magiPanel?.update(unknown,{stale:true})
+      worksiteBoard?.update({stale:true})
       messageBoards.sync([], colony.plotOrder)
       boardPanel.update(null, [])
     }
@@ -791,6 +831,7 @@ async function boot() {
   if (!kitError) colony.onAssetsReady()
 
   await poll()
+  if(MAGI_VIEW&&!REPLAY_RUN){void pollArm();setInterval(pollArm,1000)}
   setInterval(poll, POLL_MS)
   window.addEventListener('focus', poll)
   // A tab that was hidden for an hour should catch up the moment it comes back.
@@ -829,6 +870,7 @@ engine.add({
   update(dt, elapsed) {
     rig.update(dt)
     colony.update(dt, elapsed, rig.target)
+    armPreview?.update(dt)
     if(MAGI_VIEW&&engine.scene.fog){engine.scene.fog.near=rig.distance+45;engine.scene.fog.far=rig.distance+320}
     magiPanel?.tick(elapsed)
     // Whatever the camera is orbiting is what should be in focus.

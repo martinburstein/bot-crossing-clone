@@ -263,7 +263,6 @@ export class CameraRig {
       t.x = (t.x / len) * this.worldLimit
       t.z = (t.z / len) * this.worldLimit
     }
-    t.y = 0
   }
 
   /** True when the pointer went down and up without really moving — a click, not a drag. */
@@ -272,9 +271,9 @@ export class CameraRig {
   }
 
   /** Glide the view to a world point without yanking it — used when you pick an astronaut. */
-  focus(point, { distance } = {}) {
+  focus(point, { distance, elevated = false } = {}) {
     this.desiredTarget.copy(point)
-    this.desiredTarget.y = 0
+    this.desiredTarget.y = elevated ? point.y : 0
     this._clampTarget()
     if (distance) this.desiredDistance = THREE.MathUtils.clamp(distance, MIN_DIST, this.maxDistance)
     this._zoom = null

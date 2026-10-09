@@ -2,12 +2,63 @@ import * as THREE from 'three'
 import {MAGI_CLUSTERS,HANGAR,clusterWorkFront} from '../game/magi-world.js'
 import {createVehicle,chooseVehicle} from '../world/mars-vehicles.js'
 import {createHangar} from '../world/mars-hangar.js'
-import {createMessageBoard} from '../world/message-boards.js'
 import {vehicleJob,confirmedVehicleWorker} from '../game/vehicle-jobs.js'
 import {createVehicleMission} from '../world/vehicle-mission.js'
 import {Navigation} from './navigation.js'
 
-export const IDLE_LABELS={tinker:'Tinkering',talk:'Chatting',board:'Reading the board',snack:'Snack break',drive:'Operating vehicle'}
+export const IDLE_LABELS={tinker:'Tinkering',talk:'Chatting',board:'Reading the worksite console',snack:'Snack break',drive:'Operating vehicle'}
+const PILOT_ID=/^w(?:0[1-9]|1[0-5])$/
+const pilotId=workerId=>PILOT_ID.test(workerId||'')
+const isRoArm16Pilot=(thread)=>thread?.worldProfile==='roarm-16'&&thread.slotId==='melchior'&&thread.workerId==='w00'
+function canonicalPilotHistory(projection) {
+  const {history,generation,workerId,previousWorkerId}=projection
+  if(!Array.isArray(history)||history.length!==generation)return null
+  let owner=null
+  for(let index=0;index<history.length;index++) {
+    const entry=history[index],expectedGeneration=index+1
+    if(!entry||entry.generation!==expectedGeneration||typeof entry.operationId!=='string'||!entry.operationId||typeof entry.evidence!=='string'||!entry.evidence||!Number.isFinite(entry.at))return null
+    if(index===0) {
+      if(entry.kind!=='enable'||entry.fromWorkerId!==null||!pilotId(entry.toWorkerId))return null
+    } else if(entry.kind!=='handoff'||entry.fromWorkerId!==owner||!pilotId(entry.toWorkerId)||entry.toWorkerId===owner)return null
+    owner=entry.toWorkerId
+  }
+  const latest=history.at(-1)
+  if(owner!==workerId||(generation>1&&latest.fromWorkerId!==previousWorkerId)||(generation===1&&previousWorkerId!==null))return null
+  return history
+}
+function canonicalRoArm16PilotHistory(projection) {
+  const {history,generation,duty}=projection
+  if(!Array.isArray(history)||history.length!==generation)return null
+  let current='off'
+  for(let index=0;index<history.length;index++) {
+    const entry=history[index]
+    if(!entry||entry.generation!==index+1||typeof entry.operationId!=='string'||!entry.operationId||typeof entry.evidence!=='string'||!entry.evidence||!Number.isFinite(entry.at))return null
+    if(index===0) {
+      if(entry.kind!=='enable'||(entry.toWorkerId!==undefined&&entry.toWorkerId!=='w00')||
+        (entry.toDuty!==undefined&&entry.toDuty!=='on'))return null
+      current='on'
+    } else {
+      if(entry.kind!=='duty-change'||entry.fromDuty!==current||!['on','off'].includes(entry.toDuty)||entry.toDuty===current)return null
+      current=entry.toDuty
+    }
+  }
+  return current===duty?history:null
+}
+function completedSymbiosisForThread(thread,cycle) {
+  const pair=thread?.symbiosisPair
+  if(cycle?.phase!=='completed'||typeof cycle.id!=='string'||pair?.cycleId!==cycle.id||pair.phase!=='completed'||
+    !['balthasar','casper'].includes(thread.slotId)||pair.partnerSlotId!==(thread.slotId==='balthasar'?'casper':'balthasar'))return false
+  const role=thread.slotId==='balthasar'?cycle.bRoleId:cycle.cRoleId,task=cycle.taskIds?.[thread.slotId]
+  return thread.roleId===role&&(!thread.taskId||thread.taskId===task)
+}
+function makePilotKey() {
+  const key=new THREE.Group();key.name='roarm-pilot-control-key'
+  const material=new THREE.MeshStandardMaterial({color:0xf2bd55,metalness:.55,roughness:.35})
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.11,.025,6,12),material);ring.name='pilot-control-key-ring'
+  const stem=new THREE.Mesh(new THREE.BoxGeometry(.22,.035,.035),material);stem.position.x=.14;stem.name='pilot-control-key-stem'
+  const tooth=new THREE.Mesh(new THREE.BoxGeometry(.035,.075,.035),material);tooth.position.set(.22,-.045,0);tooth.name='pilot-control-key-tooth'
+  key.add(ring,stem,tooth);key.visible=false;return key
+}
 // Shared cluster clock pairs off-duty personas while the on-shift crew stays at work.
 export function idlePlan(workerId,seconds,idleIds) {
   const index=(Number(workerId.slice(1))-1)%5, epoch=Math.floor(seconds/64)
@@ -20,6 +71,8 @@ export function idlePlan(workerId,seconds,idleIds) {
 export class MagiLife {
   constructor(scene,settings) {
     this.scene=scene;this.settings=settings;this.fleet=new Map();this.camps=new Map();this.choices={};this.elapsed=0;this.persist=!settings.transient
+    this.pilotDuty=null;this.pilotFeed='unassigned';this.pilotHandoff=null;this.pilotLastSeat=null
+    this.pilotKey=makePilotKey();this.scene.add(this.pilotKey)
     try {if(this.persist)this.choices=JSON.parse(localStorage.getItem('botcrossing.15-3A.vehicles')||'{}')} catch { /* Storage is optional. */ }
   }
   choose(workerId,vehicleId) {
@@ -33,11 +86,8 @@ export class MagiLife {
     this.vehicleNav.rebuild(obstacles.filter(o=>!o.parking).map(o=>({...o,r:o.r+2})))
   }
   missionStops(job,agent,bay) {
-    const allCells=this.world?.magiCells?.(),sites=clusterWorkFront(agent.thread.clusterId,this.world?.magiCells?.(agent.thread.clusterId),allCells)
-    const stops=sites.map(s=>{const v=new THREE.Vector3(s.x,0,s.z);v.workNormal=s.normal;return v})
+    const stops=clusterWorkFront(agent.thread.clusterId).map(s=>{const v=new THREE.Vector3(s.x,0,s.z);v.workNormal=s.normal;return v})
     if(!stops.length)return [bay.work.clone()]
-    // Couriers and scouts make rounds between their own group's outer outposts.
-    if(job.operation==='report'||job.id==='remote-survey'||job.id==='air-scout')return [stops[0],stops[2]||stops[0],stops[1]||stops[0]]
     return stops
   }
   moveMission(item,dt) {
@@ -74,8 +124,9 @@ export class MagiLife {
     bay.model=createVehicle(id);bay.model.rotation.y=bay.model.userData.seatYaw;bay.model.position.copy(bay.position);this.scene.add(bay.model)
   }
   sync(agents,world) {
+    if(!this.pilotKey.parent){if(this.pilotKey.userData.disposed)this.pilotKey=makePilotKey();this.scene.add(this.pilotKey)}
     this.agents=agents;this.world=world
-    const eligible=agents.filter(a=>a.thread.worldProfile==='15-3A'&&a.state!=='leaving'&&a.state!=='gone')
+    const eligible=agents.filter(a=>['15-3A','roarm-16','roarm-campus'].includes(a.thread.worldProfile)&&a.state!=='leaving'&&a.state!=='gone')
     if(eligible.length&&!this.hangar){
       this.hangar=createHangar();this.scene.add(this.hangar.group)
       let parked=['eagle','trike','drill-unit']
@@ -83,10 +134,12 @@ export class MagiLife {
       this.hangar.bays.forEach((b,i)=>this.parkModel(b,parked[i]))
     }
     if(!eligible.length){this.dispose();return}
-    const clusters=new Set(eligible.map(a=>a.thread.clusterId))
-    for(const [id,camp] of this.camps)if(!clusters.has(id)){this.scene.remove(camp.group);camp.dispose();this.camps.delete(id)}
-    for(const cluster of MAGI_CLUSTERS)if(clusters.has(cluster.id)&&!this.camps.has(cluster.id)) {
-      const camp=createCamp(cluster);this.scene.add(camp.group);this.camps.set(cluster.id,camp)
+    this.syncPilotDuty(world?.worksiteProjection)
+    const sharedCamp=eligible.length?world.worksite?.camp:null
+    this.camps.clear()
+    if(sharedCamp) {
+      for(const cluster of MAGI_CLUSTERS)this.camps.set(cluster.id,sharedCamp)
+      if(eligible.some(agent=>agent.thread.worldProfile==='roarm-16'))this.camps.set('roles',sharedCamp)
     }
     for(const agent of eligible){agent.magiGoal ||= new THREE.Vector3();agent.magiLook ||= new THREE.Vector3()}
     for(const [id,item] of this.fleet){
@@ -116,10 +169,69 @@ export class MagiLife {
       }
     }
   }
-  obstacles() {return [...this.camps.values()].flatMap(c=>c.obstacles).concat(this.hangar?.obstacles||[])}
+  syncPilotDuty(worksiteProjection) {
+    const projection=worksiteProjection?.pilot??worksiteProjection?.magi?.pilot
+    const profile=worksiteProjection?.profile??worksiteProjection?.magi?.profile
+    if(profile==='roarm-campus'){this.pilotDuty=null;this.pilotKey.visible=false;return}
+    if(projection===undefined||projection===null){if(this.pilotDuty)this.pilotFeed='unknown';return}
+    if(worksiteProjection?.stale===true||projection.stale===true) {if(this.pilotDuty)this.pilotFeed='unknown';return}
+    if(profile==='roarm-16') {
+      if(projection.workerId!=='w00'||projection.slotId!=='melchior'||projection.roleId!=='pilot'||
+        !['on','off'].includes(projection.duty)||!Number.isSafeInteger(projection.generation)||projection.generation<1||
+        !Number.isFinite(projection.changedAt)||typeof projection.evidence!=='string'||!projection.evidence||
+        !canonicalRoArm16PilotHistory(projection)) {if(this.pilotDuty)this.pilotFeed='unknown';return}
+      if(this.pilotDuty?.profile==='roarm-16') {
+        if(projection.generation===this.pilotDuty.generation&&projection.workerId===this.pilotDuty.workerId&&projection.duty===this.pilotDuty.duty) {this.pilotFeed='confirmed';return}
+        if(projection.generation<=this.pilotDuty.generation) {this.pilotFeed='unknown';return}
+        const chain=projection.history.slice(this.pilotDuty.generation)
+        if(chain.length!==projection.generation-this.pilotDuty.generation||chain[0]?.fromDuty!==this.pilotDuty.duty||chain.at(-1)?.toDuty!==projection.duty) {this.pilotFeed='unknown';return}
+      }
+      this.pilotDuty={profile:'roarm-16',workerId:'w00',slotId:'melchior',roleId:'pilot',duty:projection.duty,generation:projection.generation}
+      this.pilotFeed='confirmed';this.pilotHandoff=null;return
+    }
+    if(profile&&profile!=='15-3A'){if(this.pilotDuty)this.pilotFeed='unknown';return}
+    const workerId=projection.workerId,generation=projection.generation
+    if(!pilotId(workerId)||!Number.isSafeInteger(generation)||generation<1){if(this.pilotDuty)this.pilotFeed='unknown';return}
+    if(projection.history!==undefined&&!canonicalPilotHistory(projection)){this.pilotFeed='unknown';return}
+    if(!this.pilotDuty||this.pilotDuty.profile==='roarm-16'){this.pilotDuty={profile:'15-3A',workerId,generation,duty:'on'};this.pilotFeed='confirmed';this.pilotHandoff=null;return}
+    if(generation===this.pilotDuty.generation&&workerId===this.pilotDuty.workerId){this.pilotFeed='confirmed';return}
+    if(generation<=this.pilotDuty.generation){this.pilotFeed='unknown';return}
+    const previousWorkerId=this.pilotDuty.workerId
+    let transfers
+    if(generation===this.pilotDuty.generation+1&&projection.history===undefined&&projection.previousWorkerId===previousWorkerId) {
+      // Preserve compatibility with one-step projections that predate history.
+      transfers=[{from:previousWorkerId,to:workerId,generation,changedAt:projection.changedAt??null}]
+    } else {
+      const history=canonicalPilotHistory(projection)
+      const chain=history?.slice(this.pilotDuty.generation)
+      if(!chain||chain.length!==generation-this.pilotDuty.generation||chain[0]?.fromWorkerId!==previousWorkerId||chain.at(-1)?.toWorkerId!==workerId) {
+        this.pilotFeed='unknown';return
+      }
+      transfers=chain.map(entry=>({from:entry.fromWorkerId,to:entry.toWorkerId,generation:entry.generation,changedAt:entry.at}))
+    }
+    this.pilotDuty={profile:'15-3A',workerId,generation,duty:'on'};this.pilotFeed='confirmed'
+    const handoffPath=[previousWorkerId,...transfers.map(transfer=>transfer.to)]
+    this.pilotHandoff={from:previousWorkerId,to:workerId,generation,changedAt:projection.changedAt??null,transfers,
+      label:transfers.length===1?`Control key handed from ${transfers[0].from} to ${transfers[0].to}`:`Control key history: ${handoffPath.join(' → ')}`}
+  }
+  obstacles() {return this.hangar?.obstacles||[]}
+  campusDepartureReady(agent,world,elapsed) {
+    if(agent.thread.worldProfile!=='roarm-campus')return true
+    const c=world?.worksiteProjection?.campus
+    if(!c||c.mode!=='awake'||c.phase!=='working'||agent.thread.roleId!==c.activeRoleId)return false
+    const key=`${c.cycleNumber}:${c.activeRoleId}`
+    if(agent.campusDownload?.key!==key)agent.campusDownload={key,arrivedAt:null,ready:false}
+    const state=agent.campusDownload
+    if(state.ready)return true
+    const target=world.worksite?.target?.(agent.thread)?.position
+    if(target&&Math.hypot(agent.pos.x-target.x,agent.pos.z-target.z)<1) {
+      state.arrivedAt??=elapsed
+      if(elapsed-state.arrivedAt>=2)state.ready=true
+    }
+    return state.ready
+  }
   clearings() {
-    const fronts=[...this.camps.keys()].flatMap(id=>clusterWorkFront(id,this.world?.magiCells?.(id),this.world?.magiCells?.()).map(p=>({x:p.x,z:p.z,r:8})))
-    return [...this.camps.values()].map(c=>({x:c.group.position.x,z:c.group.position.z,r:6})).concat(this.hangar?.clearings||[],fronts)
+    return this.hangar?.clearings||[]
   }
   pickHangar(camera,x,y){return !!this.hangar?.pick(camera,x,y)}
   release(id,item,agent,world) {
@@ -132,12 +244,24 @@ export class MagiLife {
   }
   update(agents,world,elapsed) {
     const dt=Math.max(0,Math.min(.25,elapsed-this.elapsed));this.elapsed=elapsed
+    this.syncPilotDuty(world?.worksiteProjection)
+    const completedCycle=world?.worksiteProjection?.symbiosisCycle
+    const completedParticipants=agent=>completedSymbiosisForThread(agent?.thread,completedCycle)
+    // A canonical joint conclusion ends the visual worksite trip for both role
+    // bodies, even if the underlying task label has not refreshed yet. This
+    // does not change worker status or claim that a model turn is running.
+    for(const [id,item] of this.fleet) {
+      const agent=agents.find(candidate=>candidate.id===id)
+      if(agent&&completedParticipants(agent))this.release(id,item,agent,world)
+    }
     const reduced=this.settings.get('reducedMotion'),motionDt=reduced?0:dt;this.returnOrder ??= 3
     if(!this.hangar)return
     const idleIds=new Set(agents.filter(a=>a.status==='idle'&&a.state!=='leaving'&&!a.mounted).map(a=>a.thread.shellId))
-    for(const camp of this.camps.values())camp.group.position.y=world.groundAt(camp.group.position.x,camp.group.position.z)+.03
+    const camp=this.camps.get(MAGI_CLUSTERS[0].id)
+    if(camp)camp.group.position.y=world.groundAt(camp.group.position.x,camp.group.position.z)+.03
     // Only the confirmed live persona of each cluster gets a moving rental.
-    const occupied=new Set(),active=agents.filter(agent=>{if(!confirmedVehicleWorker(agent)||occupied.has(agent.thread.clusterId)||occupied.size>=3)return false;occupied.add(agent.thread.clusterId);return true})
+    const pilotWorkerId=this.pilotDuty?.workerId
+    const occupied=new Set(),active=agents.filter(agent=>{if(completedParticipants(agent)||agent.thread.shellId===pilotWorkerId||isRoArm16Pilot(agent.thread)||!confirmedVehicleWorker(agent)||!this.campusDepartureReady(agent,world,elapsed)||occupied.has(agent.thread.clusterId)||occupied.size>=3)return false;occupied.add(agent.thread.clusterId);return true})
     for(const [id,item] of this.fleet){const agent=active.find(a=>a.id===id);if(!agent||this.choice(agent)!==item.choice)this.release(id,item,agents.find(a=>a.id===id),world)}
     for(const agent of active)if(!this.fleet.has(agent.id)) {
       const available=this.hangar.bays.filter(b=>!b.rented).sort((a,b)=>a.parkedAt-b.parkedAt)
@@ -182,40 +306,92 @@ export class MagiLife {
       agent.magiActivity='drive';agent.magiGoal.copy(item.dock);agent.magiLook.copy(p);agent.magiSeat=item.seat;agent.magiYaw=item.model.rotation.y+item.model.userData.seatYaw
     }
     for(const agent of agents) {
-      if(agent.thread.worldProfile!=='15-3A'||this.fleet.has(agent.id))continue
+      if(!['15-3A','roarm-16','roarm-campus'].includes(agent.thread.worldProfile)||this.fleet.has(agent.id))continue
+      if(agent.thread.worldProfile==='roarm-campus') {
+        const campus=world?.worksiteProjection?.campus,target=world.worksite?.target?.(agent.thread)
+        agent.mounted=false;agent.magiSeat=null
+        if(agent.thread.roleId==='pilot'&&campus?.mode==='awake'&&campus?.pilot?.instructionState==='station'&&world.worksiteProjection?.pilot?.duty==='on') {
+          const seat=world.worksite?.pilotSeat?.()
+          if(seat){agent.mounted=true;agent.magiActivity='pilot';agent.magiSeat=seat.position;agent.magiYaw=seat.yaw;agent.magiGoal.copy(seat.position);agent.magiLook.copy(seat.position);continue}
+          agent.magiActivity='pilot';agent.magiGoal.set(0,0,-6);agent.magiLook.set(0,0,0);continue
+        }
+        if(target){agent.magiActivity=target.activity;agent.magiGoal.copy(target.position);agent.magiLook.copy(target.look)}
+        continue
+      }
+      const legacyPilot=agent.thread.worldProfile==='15-3A'&&agent.thread.shellId===pilotWorkerId
+      const captain=isRoArm16Pilot(agent.thread)
+      const currentCaptain=this.pilotDuty?.profile==='roarm-16'&&this.pilotDuty.workerId==='w00'
+      if(legacyPilot||(captain&&currentCaptain)) {
+        const isResting=this.pilotDuty.profile==='roarm-16'&&this.pilotDuty.duty==='off'
+        agent.magiPilotStatus=this.pilotFeed==='confirmed'?(isResting?'off-duty':'confirmed'):'unknown'
+        agent.magiPilotGeneration=this.pilotDuty.generation;agent.magiPilotHandoff=this.pilotHandoff
+        if(captain&&isResting) {
+          // An explicit release sends the captain to a reserved camp rest spot;
+          // the cab remains available for the next confirmed on-duty period.
+          agent.mounted=false;agent.magiSeat=null;agent.magiActivity='pilot-rest'
+          const camp=world.worksite?.camp,spot=camp?.restSpot||new THREE.Vector3(0,0,10.5)
+          agent.magiGoal.copy(spot).add(camp?.group?.position||new THREE.Vector3(0,0,-38))
+          agent.magiLook.copy(camp?.group?.position||new THREE.Vector3(0,0,-38))
+          this.pilotKey.visible=false
+          continue
+        }
+        const seat=world.worksite?.pilotSeat?.()
+        if(seat?.position?.isVector3&&Number.isFinite(seat.yaw)) {
+          this.pilotLastSeat={position:seat.position.clone(),yaw:seat.yaw}
+          agent.mounted=true;agent.magiActivity=isResting?'pilot-rest':'pilot';agent.magiSeat=seat.position;agent.magiYaw=seat.yaw
+          agent.magiGoal.copy(seat.position);agent.magiLook.copy(seat.position).add(new THREE.Vector3(0,0,1).applyAxisAngle(new THREE.Vector3(0,1,0),seat.yaw))
+          this.pilotKey.visible=!isResting
+          if(!isResting){this.pilotKey.position.copy(seat.position).add(new THREE.Vector3(.2,.3,0).applyAxisAngle(new THREE.Vector3(0,1,0),seat.yaw));this.pilotKey.rotation.y=seat.yaw}
+          continue
+        }
+        // Without any observation the model is intentionally hidden. Keep the
+        // captain beside the station and label the missing pose; do not invent a
+        // seat transform or remove the permanent pilot from the scene.
+        agent.mounted=false;agent.magiSeat=null;agent.magiPilotStatus=isResting?'off-duty-awaiting-telemetry':'awaiting-telemetry'
+        agent.magiActivity=isResting?'pilot-rest':'pilot'
+        const station=world.worksite?.layout?.arm||{x:0,z:0},goal=agent.magiGoal
+        goal.set(station.x,0,station.z-6)
+        agent.magiLook.set(station.x,0,station.z)
+        this.pilotKey.visible=false
+        continue
+      }
+      if(captain&&this.pilotDuty?.profile!=='roarm-16') {
+        // The dedicated slot remains stationed while a profile/duty projection
+        // is unavailable, but no key ownership or seated pose is inferred.
+        agent.magiPilotStatus='unknown';agent.mounted=false;agent.magiSeat=null;agent.magiActivity='pilot'
+        const station=world.worksite?.layout?.arm||{x:0,z:0}
+        agent.magiGoal.set(station.x,0,station.z-6);agent.magiLook.set(station.x,0,station.z)
+        this.pilotKey.visible=false
+        continue
+      }
+      if(completedParticipants(agent)) {
+        const camp=this.camps.get('roles')||this.camps.get('balthasar')
+        const side=agent.thread.slotId==='balthasar'?0:1,targets=camp?.targets?.talk
+        if(!camp||!Array.isArray(targets)||!targets[side])continue
+        agent.mounted=false;agent.magiSeat=null;agent.magiActivity='symbiosis-handoff'
+        agent.magiGoal.copy(targets[side]).add(camp.group.position)
+        agent.magiLook.copy(camp.looks?.console?camp.looks.console.clone().add(camp.group.position):camp.group.position)
+        continue
+      }
+      delete agent.magiPilotStatus;delete agent.magiPilotGeneration;delete agent.magiPilotHandoff
+      agent.mounted=false;agent.magiSeat=null
       if(agent.status==='idle') {
         const plan=idlePlan(agent.thread.shellId,elapsed,idleIds),camp=this.camps.get(agent.thread.clusterId)
         if(!camp)continue
-        const slot=plan.activity==='board'&&plan.role===3?2:plan.role%camp.targets[plan.activity].length
-        agent.magiActivity=plan.activity;agent.magiGoal.copy(camp.targets[plan.activity][slot]).add(camp.group.position)
-        agent.magiLook.copy(camp.looks[plan.activity]).add(camp.group.position)
+        const slot=Number(agent.thread.shellId.slice(1))-1,goal=camp.idleGoals?.[slot],look=camp.looks[plan.activity]
+        if(!goal||!look)continue
+        agent.magiActivity=plan.activity;agent.magiGoal.copy(goal).add(camp.group.position)
+        agent.magiLook.copy(look).add(camp.group.position)
         if(plan.activity==='talk') {const peer=agents.find(a=>a.thread.shellId===plan.peer);if(peer)agent.magiLook.copy(peer.pos)}
       } else {agent.magiActivity=null;agent.mounted=false}
     }
   }
   dispose(){
     for(const [id,f] of this.fleet)this.release(id,f,this.agents?.find(a=>a.id===id),this.world)
-    for(const c of this.camps.values()){this.scene.remove(c.group);c.dispose()}
+    this.camps.clear()
     if(this.hangar){for(const b of this.hangar.bays)if(b.model){this.scene.remove(b.model);b.model.userData.dispose()}this.scene.remove(this.hangar.group);this.hangar.dispose();this.hangar=null}
-    this.fleet.clear();this.camps.clear()
+    this.fleet.clear();this.camps.clear();this.pilotKey.visible=false;this.scene.remove(this.pilotKey)
+    const geometries=new Set(),materials=new Set();this.pilotKey.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material)})
+    for(const geometry of geometries)geometry.dispose();for(const material of materials)material.dispose();this.pilotKey.userData.disposed=true
   }
-}
-
-function createCamp(cluster) {
-  const group=new THREE.Group();group.name=`camp-${cluster.id}`
-  group.position.set(11.4*cluster.q,0,7.6*Math.sqrt(3)*(cluster.r+cluster.q/2))
-  const materials={white:new THREE.MeshStandardMaterial({color:0xeae4da,roughness:.7}),dark:new THREE.MeshStandardMaterial({color:0x404b53,roughness:.8}),orange:new THREE.MeshStandardMaterial({color:0xe9a45b,roughness:.5}),blue:new THREE.MeshStandardMaterial({color:0x80d4dd,emissive:0x316779,emissiveIntensity:.3})}
-  function box(x,y,z,w,h,d,key){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),materials[key]);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m}
-  const board=createMessageBoard(0xe9a45b);board.position.set(0,0,-2.2);group.add(board)
-  // Furniture belongs to the starting camp; it does not represent earned token additions.
-  box(-2.7,.72,1,1.7,.14,.95,'white');for(const x of [-3.3,-2.1])box(x,.35,1,.1,.7,.65,'dark')
-  box(-2.7,.94,1,.48,.28,.42,'orange');box(-2.7,1.12,1,.22,.08,.25,'blue')
-  box(2.65,.72,1.25,1.5,.15,1.1,'white');box(2.65,.36,1.25,.3,.72,.3,'dark')
-  for(const x of [2.2,3.1])box(x,.86,1.2,.2,.17,.2,'orange')
-  box(2.65,.3,2.5,1.7,.2,.5,'orange');for(const x of [2.1,3.2])box(x,.13,2.5,.1,.26,.38,'dark')
-  const v=(x,z)=>new THREE.Vector3(x,0,z)
-  const targets={talk:[v(-.9,2.6),v(.9,2.6)],tinker:[v(-2.7,2.1)],board:[v(-.7,-.65),v(.7,-.65),v(0,.3)],snack:[v(2.65,2.4)]}
-  const looks={talk:v(0,2.6),tinker:v(-2.7,1),board:v(0,-2.2),snack:v(2.65,1.25)}
-  const obstacles=[{x:0,z:-2.2,r:1.1},{x:-2.7,z:1,r:1},{x:2.65,z:1.25,r:.95}].map(o=>({...o,x:o.x+group.position.x,z:o.z+group.position.z}))
-  return {group,targets,looks,obstacles,dispose(){board.userData.dispose();group.traverse(o=>o.geometry?.dispose());Object.values(materials).forEach(m=>m.dispose())}}
 }

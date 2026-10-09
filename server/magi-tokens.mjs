@@ -28,7 +28,7 @@ async function readTokens(projection,{root=process.env.BOT_CROSSING_PROTOCOL_ROO
   const result=new Map(),receipts=new Map();let available=false,changed=false
   if(cacheFile) try {
     const saved=JSON.parse(await fs.readFile(cacheFile,'utf8'))
-    if(saved.format===1)for(const entry of saved.receipts||[])if(typeof entry.key==='string'&&typeof entry.projectId==='string'&&/^w(0[1-9]|1[0-5])$/.test(entry.workerId)&&integer(entry.total))receipts.set(entry.key,entry)
+    if(saved.format===1)for(const entry of saved.receipts||[])if(typeof entry.key==='string'&&typeof entry.projectId==='string'&&/^(?:w(?:0[0-9]|1[0-5])|balthasar|casper)$/.test(entry.workerId)&&integer(entry.total))receipts.set(entry.key,entry)
   } catch { /* First observation has no cache. */ }
   for(const worker of projection.workers)result.set(worker.id,{total:0,source:'codex-executor',completedTurns:0,pendingTurns:0,cached:true})
   try {
@@ -43,7 +43,7 @@ async function readTokens(projection,{root=process.env.BOT_CROSSING_PROTOCOL_ROO
     available=true
     const seen=new Set()
     for(const lease of Object.values(state.leases||{})) {
-      const owner=result.get(lease.workerId),cluster=['melchior','balthasar','casper'][Math.floor((Number(lease.workerId?.slice(1))-1)/5)]
+      const owner=result.get(lease.workerId),cluster=['roarm-16','roarm-campus'].includes(state.magi.profile)?({w00:'melchior',balthasar:'balthasar',casper:'casper'})[lease.workerId]:['melchior','balthasar','casper'][Math.floor((Number(lease.workerId?.slice(1))-1)/5)]
       if(!owner||typeof lease.id!=='string'||typeof lease.turnToken!=='string'||!lease.turnToken||lease.clusterId!==cluster) continue
       const key=createHash('sha256').update(JSON.stringify([projection.projectId,lease.id,lease.turnToken])).digest('hex')
       if(seen.has(key))continue;seen.add(key)

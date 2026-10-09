@@ -1,0 +1,15 @@
+.roarm-preview-panel{position:fixed;right:16px;bottom:16px;z-index:30;width:min(340px,calc(100vw - 32px));padding:14px 16px;border:1px solid #4e8a91;border-radius:10px;background:rgba(17,30,37,.94);color:#e9f5f4;font:13px/1.4 system-ui,sans-serif;box-shadow:0 8px 28px #0008;backdrop-filter:blur(7px)}
+.roarm-preview-panel h2{margin:0 0 8px;font-size:16px}
+.roarm-preview-warning{margin:0 0 4px;color:#ffd48a;font-size:11px;font-weight:650}
+.roarm-preview-jaw-note{margin:0 0 8px;color:#c9d8d8;font-size:10px}
+.roarm-preview-source,.roarm-preview-status{margin:6px 0;color:#b9d1d2;font-size:11px}
+.roarm-preview-controls{margin:8px 0;border:1px solid #425c64;border-radius:7px;padding:6px 10px 9px}
+.roarm-preview-controls legend{padding:0 5px;color:#a9dfe5;font-size:11px}
+.roarm-preview-joint{display:grid;grid-template-columns:72px 1fr 42px;gap:8px;align-items:center;margin:5px 0;color:#e1e9e7;font-size:12px}
+.roarm-preview-joint input{width:100%;accent-color:#52e2ef}
+.roarm-preview-joint output{text-align:right;font-variant-numeric:tabular-nums}
+.roarm-preview-panel button{margin:4px 6px 0 0;padding:7px 11px;border:1px solid #75b6bd;border-radius:6px;background:#254d55;color:#fff;font:inherit;cursor:pointer}
+.roarm-preview-panel button:hover:not(:disabled){background:#326771}
+.roarm-preview-panel button:disabled{opacity:.48;cursor:not-allowed}
+.roarm-preview-reset{background:#39464b!important;border-color:#69797f!important}
+@media(max-width:600px){.roarm-preview-panel{right:8px;bottom:8px;width:min(320px,calc(100vw - 16px));padding:11px}}

@@ -22,6 +22,8 @@ import { Navigation } from '../agents/navigation.js'
 import { liveThreadsForColony } from './hidden-projects.js'
 import {constructionFor,allocateSwarmCells} from './swarm-construction.js'
 import {magiCrewStatus} from './magi-world.js'
+import {createRoArmCampus} from '../world/roarm-campus.js'
+import {createRoArmWorksite, ROARM_LAYOUT} from '../world/roarm-worksite.js'
 
 /**
  * The colony: everything that turns a list of agent threads into a place.
@@ -65,7 +67,7 @@ export const STATUS_LABEL = {
 
 /** Thread → behaviour. First match wins, exactly like the board's auto-sort. */
 export function statusFor(thread, now = Date.now()) {
-  if (thread.worldProfile === '15-3A') return magiCrewStatus(thread)
+  if (['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile)) return magiCrewStatus(thread)
   if (thread.hasError) return 'blocked'
   if (thread.running) return 'working'
   if (thread.prState === 'MERGED') return 'celebrating'
@@ -188,7 +190,7 @@ export class Colony {
     // The ship has legs, and legs have to reach the ground. Its landing spot is a fixed hex
     // cell, but the height of that spot is the planet's, so it is set here rather than once
     // at construction — a world with more relief would otherwise leave it hovering.
-    const ship = shipPosition()
+    const ship = this._shipPosition()
     this.ship.group.position.y = terrainHeight(ship.x, ship.z, this.planet)
 
     this._dustTint.set(this.planet.ground.high)
@@ -215,7 +217,8 @@ export class Colony {
         clear.push({ x: plot.center.x + local.x, z: plot.center.z + local.z, r: 8.6 })
       }
     }
-    const ship = shipPosition()
+    if (this.worksite) clear.push(...this.worksite.clearings())
+    const ship = this._shipPosition()
     clear.push({ x: ship.x, z: ship.z, r: 7.5 })
     this.scatterGroup = createScatter(this.planet, this.settings.get('scatterDensity'), clear)
     this.worldGroup.add(this.scatterGroup)
@@ -270,6 +273,17 @@ export class Colony {
   setThreads(threads, archivedIds = new Set(), hiddenProjects = new Set(), knownIds = new Set()) {
     const now = Date.now()
     const live = liveThreadsForColony(threads, archivedIds, hiddenProjects)
+    const isWorksite = live.some(thread => ['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile))
+    const campus=live.some(thread=>thread.worldProfile==='roarm-campus')
+    if (isWorksite !== Boolean(this.worksite)||(isWorksite&&campus!==(this.worksite?.profile==='roarm-campus'))) {
+      this.worksite?.dispose()
+      this.worksite=isWorksite?(campus?createRoArmCampus(this.scene):createRoArmWorksite(this.scene)):null
+      this.worksite?.update(this.worksiteProjection||{})
+      const ship = this._shipPosition()
+      this.ship.group.position.set(ship.x, terrainHeight(ship.x, ship.z, this.planet), ship.z)
+      this.ship.group.rotation.y = Math.atan2(-ship.x, -ship.z)
+      this._buildScatter()
+    }
 
     // Group by repo, biggest project first so the busiest work lands nearest the middle.
     const byProject = new Map()
@@ -344,14 +358,16 @@ export class Colony {
         if (status === 'waiting' || status === 'blocked' || status === 'working') active.add(plot.id)
         stats.agents++
 
-        const building = thread.isShell ? this._syncSwarmBuildings(thread,plot,seenBuildings) : this._syncBuilding(thread, plot, i)
+        const building = ['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile)
+          ? {mesh:{position:new THREE.Vector3(0,DECK_TOP,0),userData:{footprint:0.5}}}
+          : thread.isShell ? this._syncSwarmBuildings(thread,plot,seenBuildings) : this._syncBuilding(thread, plot, i)
         if(!thread.isShell) seenBuildings.add(thread.id)
 
         roster.push({
           id: thread.id,
           thread,
           status,
-          site: thread.worldProfile==='15-3A' ? new THREE.Vector3(plot.center.x+3.5,DECK_TOP,plot.center.z) : this._workSite(plot, building, i),
+          site: ['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile) ? new THREE.Vector3(plot.center.x+3.5,DECK_TOP,plot.center.z) : this._workSite(plot, building, i),
           home: plot.center,
           // Where the work actually is. A working astronaut circles it rather than standing
           // at one spot, so it needs the building, not just a place to stand near it.
@@ -435,6 +451,10 @@ export class Colony {
       const accent = list[0]?.isShell ? list[0].projectAccent : this._pickAccent(name)
       this.usedAccents.add(accent)
       const plot = new Plot({ id: name, name, index, cells, accent, milestoneOnly: !!list[0]?.isShell })
+      if (['15-3A','roarm-16','roarm-campus'].includes(list[0]?.worldProfile)) {
+        if (plot.clutter) plot.clutter.visible = false
+        plot.clutterSpots = []
+      }
       plot.signature = wanted.get(name)
       this.plots.set(name, plot)
       this.plotGroup.add(plot.group)
@@ -472,13 +492,17 @@ export class Colony {
   /** The bits of the world the crew needs to know about, as plain callbacks. */
   _world() {
     return {
+      worksite: this.worksite,
+      worksiteProjection: this.worksiteProjection,
       shipDoor: () => this.ship.shipDoor(),
       groundAt: (x, z) => this.groundAt(x, z),
-      magiCells: clusterId => [...(this.threads?.values()||[])].filter(t=>t.worldProfile==='15-3A'&&(!clusterId||t.clusterId===clusterId)).flatMap(t=>this.plots.get(t.project)?.cells||[]),
+      magiCells: clusterId => [...(this.threads?.values()||[])].filter(t=>['15-3A','roarm-16','roarm-campus'].includes(t.worldProfile)&&(!clusterId||t.clusterId===clusterId)).flatMap(t=>this.plots.get(t.project)?.cells||[]),
     }
   }
 
   groundAt(x, z) {
+    const worksiteHeight = this.worksite?.surfaceHeight?.(x,z)
+    if (worksiteHeight != null) return worksiteHeight
     if(this.astronauts?.magiLife?.hangar?.contains(x,z))return DECK_TOP
     const ramp=this.astronauts?.magiLife?.hangar?.rampHeight(x,z)
     if(ramp!=null)return Math.max(ramp,terrainHeight(x,z,this.planet))
@@ -534,6 +558,16 @@ export class Colony {
     return entry
   }
 
+  _shipPosition() {
+    return this.worksite ? ROARM_LAYOUT.ship : shipPosition()
+  }
+
+  setWorksiteProjection(projection = {}) {
+    this.worksiteProjection=projection
+    if(this.astronauts.world)this.astronauts.world.worksiteProjection=projection
+    this.worksite?.update(projection)
+  }
+
   _syncSwarmBuildings(thread,plot,seen) {
     const plan=constructionFor(thread)
     let latest=null
@@ -577,6 +611,7 @@ export class Colony {
    */
   _rebuildNavigation() {
     const obstacles = this.astronauts?.magiLife?.obstacles() || []
+    if (this.worksite) obstacles.push(...this.worksite.obstacles())
     for (const entry of this.buildings.values()) {
       if (entry.retiring) continue
       const p = entry.mesh.position
@@ -612,7 +647,7 @@ export class Colony {
       }
     }
 
-    const ship = shipPosition()
+    const ship = this._shipPosition()
     obstacles.push({ x: ship.x, z: ship.z, r: 3.4 + AGENT_RADIUS })
     this.nav.rebuild(obstacles)
     this.astronauts.magiLife.setNavigationObstacles(obstacles,this.nav.half)
@@ -890,6 +925,7 @@ export class Colony {
   }
 
   dispose() {
+    this.worksite?.dispose()
     this.sky.dispose()
     this.ship.dispose()
     this.astronauts.dispose()
