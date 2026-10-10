@@ -54,18 +54,18 @@ const exchanges = {
   r15: ['How can an interaction become a story?', 'By leaving a thread for someone else to follow.', 'Small moments make good beginnings.', 'Let’s keep the wonder easy to pass along.'],
 }
 Object.assign(exchanges, odradekDiscussion)
-const replies = ['What could we try to explore that?', 'Let’s carry that question into the next idea.']
 
 export function campfireExchange(campus, elapsed, roleCatalog = []) {
   if (!campus || campus.mode !== 'awake' || !Number.isFinite(elapsed) || elapsed < 0) return null
   const session=campfirePhilosophy(campus, roleCatalog),voices = session.voices
   if (!voices.length) return null
   const beat = Math.floor(elapsed / 7), turn = Math.floor(beat / 2)
-  const voice = voices[turn % voices.length], round = Math.floor(turn / voices.length) % 3
+  const voice = voices[turn % voices.length]
   const lines = exchanges[voice.id]
+  const round = Math.floor(turn / voices.length) % Math.floor(lines.length / 2)
   return { ...voice,hostSlotId:session.hostSlotId,hostName:session.hostName, turn, replying: beat % 2 === 1,
-    thought: lines[round === 0 ? 0 : round + 1],
-    reply: round === 0 ? lines[1] : replies[round - 1],
+    thought: lines[round * 2],
+    reply: lines[round * 2 + 1],
   }
 }
 
