@@ -1,3 +1,4 @@
+import { odradekDiscussion } from './campfire-odradek-discussion.js'
 // Prospective discussion authored by Balthasar; these are imagined role voices.
 const questions = {
   "r01": "What kind of companion would make a person feel more curious about the world?",
@@ -47,6 +48,7 @@ const exchanges = {
   r14: ['What can playful ideas uncover?', 'Paths we might never plan in advance.', 'A silly sketch may hold a useful seed.', 'Play lets possibility stretch its legs.'],
   r15: ['How can an interaction become a story?', 'By leaving a thread for someone else to follow.', 'Small moments make good beginnings.', 'Let’s keep the wonder easy to pass along.'],
 }
+Object.assign(exchanges, odradekDiscussion)
 const replies = ['What could we try to explore that?', 'Let’s carry that question into the next idea.']
 
 export function campfireExchange(campus, elapsed, roleCatalog = []) {
