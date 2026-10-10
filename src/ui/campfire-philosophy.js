@@ -23,8 +23,8 @@ export function campfirePhilosophy(campus, roleCatalog = []) {
   const assignments=campusSlotAssignments(campus)
   if(!assignments)return {title:'Imagined camp discussion',opening:'Campus slot mapping is unavailable.',disclosure:'The discussion is hidden until the three real slot assignments are valid.',voices:[],synthesis:''}
   const hostName=campusSlotName(assignments.camper)
-  const ids = [...(campus.campRoleIds || []), campus.chargingRoleId]
-    .filter((id, i, all) => questions[id] && id !== campus.activeRoleId && all.indexOf(id) === i)
+  const ids = [...(campus.campRoleIds || [])]
+    .filter((id, i, all) => questions[id] && id !== campus.activeRoleId && id !== campus.chargingRoleId && all.indexOf(id) === i)
   return {
     title: 'Odradek at the Campfire',
     opening: 'How might an expressive arm make a small greeting feel clear and alive?',

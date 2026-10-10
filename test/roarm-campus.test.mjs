@@ -69,6 +69,14 @@ test('only a confirmed selected executor may take a vehicle after visiting its o
 test('campfire discussion stays prospective and follows its assigned camper host',()=>{
   const state=fixture(),campus=projectMagiState(state,now).worksite.campus
   const session=campfirePhilosophy(campus,roles)
+  assert.equal(session.voices.length,13)
+  assert.deepEqual(session.voices.map(voice=>voice.id),campus.campRoleIds)
+  for(let turn=0;turn<26;turn++){
+    const voice=campfireExchange(campus,turn*14,roles)
+    assert.ok(campus.campRoleIds.includes(voice.id))
+    assert.notEqual(voice.id,campus.activeRoleId)
+    assert.notEqual(voice.id,campus.chargingRoleId)
+  }
   assert.equal(session.hostName,'Balthasar');assert.match(session.disclosure,/imagined project discussion/)
   assert.match(session.synthesis,/latency/);assert.match(session.synthesis,/measured angles/)
   campus.slotAssignments={pilot:'melchior',executor:'balthasar',camper:'casper'}
