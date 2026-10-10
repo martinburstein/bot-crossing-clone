@@ -18,7 +18,8 @@ export const ROARM_SERVICE_DESTINATIONS = Object.freeze({
 })
 
 export function confirmedVehicleWorker(agent) {
-  if(agent?.thread.worldProfile==='roarm-campus'&&(agent.thread.slotId!=='casper'||agent.thread.campusPosition!=='working'))return false
+  if(agent?.thread.worldProfile==='roarm-campus'&&(agent.thread.campusSlotPurpose!=='executor'||agent.thread.campusPosition!=='working'||
+    agent.thread.running!==true||!agent.thread.workerId||agent.thread.workerId!==agent.thread.executorWorkerId))return false
   return ['15-3A','roarm-16','roarm-campus'].includes(agent?.thread.worldProfile) && agent.status==='working' && magiOnShift(agent.thread) &&
     !['leaving','gone'].includes(agent.state)
 }

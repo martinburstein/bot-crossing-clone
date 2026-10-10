@@ -64,7 +64,7 @@ export class MagiPanel {
           if(shell.tokenUsage.pendingTurns)row.append(el('small',`${shell.tokenUsage.pendingTurns} turn(s) await usage receipts`))
         }
         const job=vehicleJob(shell,this.colony.astronauts.magiLife.choices[shell.shellId]||shell.vehicleId)
-        if(magiOnShift(shell)&&!stale&&(!campus||shell.slotId==='casper'))row.append(el('p',`Visual mission: ${job.label}`,'magi-worker-progress'))
+        if(magiOnShift(shell)&&!stale&&(!campus||shell.campusSlotPurpose==='executor'))row.append(el('p',`Visual mission: ${job.label}`,'magi-worker-progress'))
         const select=el('select');select.setAttribute('aria-label',`Vehicle preference for ${shell.shellName}`)
         for(const v of VEHICLES){const option=el('option',v.name);option.value=v.id;if(job.contextual&&v.id!==job.vehicle){option.disabled=true;option.title='This mission needs a different vehicle'}if(v.id==='defender'&&!job.meteorAlert){option.disabled=true;option.title='Available for an incoming meteor alert'}select.append(option)}
         select.value=job.vehicle

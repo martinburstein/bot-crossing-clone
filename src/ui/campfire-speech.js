@@ -37,15 +37,17 @@ export class CampfireSpeech {
       ? campfireExchange(projection.campus, elapsed, projection.roleCatalog) : null
     const speaker = talk && agents.find(a => a.thread?.roleId === talk.id && a.state !== 'gone')
     if (!talk || !speaker || !worksite?.camper) { this.layer.hidden = true; return }
-    this.role.name.textContent = `${talk.id.toUpperCase()}${talk.remote ? ' · from charging pod' : ''}`
+    this.role.name.textContent = `Imagined ${talk.id.toUpperCase()} voice${talk.remote ? ' · from charging pod' : ''}`
     this.role.text.textContent = talk.thought
-    this.camper.name.textContent = 'Balthasar'; this.camper.text.textContent = talk.reply
+    this.camper.name.textContent = `${talk.hostName} · imagined host`; this.camper.text.textContent = talk.reply
+    this.camper.el.classList.toggle('balthasar',talk.hostSlotId==='balthasar')
     this.role.el.classList.toggle('speaking', !talk.replying)
     this.camper.el.classList.toggle('speaking', talk.replying)
-    // Balthasar is the rooted tree, rather than the hidden humanoid camper mesh.
     const roleVisible = this.place(this.role, speaker.pos, 2, camera, viewport)
     this.role.el.hidden ||= talk.replying
-    worksite.camper.getWorldPosition(this.point)
+    const hostBody=talk.hostSlotId==='balthasar'?worksite.camper:worksite.cores?.[talk.hostSlotId]
+    if(!hostBody){this.layer.hidden=true;return}
+    hostBody.getWorldPosition(this.point)
     const camperPosition = this.point.clone()
     const camperVisible = this.place(this.camper, camperPosition, 7, camera, viewport)
     this.camper.el.hidden ||= !talk.replying

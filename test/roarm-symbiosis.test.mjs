@@ -121,7 +121,10 @@ test('completed pair walks to camp then rests there even when the last task stat
 })
 
 test('board renders one shared contract and distinguishes protocol cycle from bound slot activity',async()=>{
-  const source=readFileSync(new URL('../src/ui/worksite-board.js',import.meta.url),'utf8').replace("import './worksite-board.css'",'')
+  const source=readFileSync(new URL('../src/ui/worksite-board.js',import.meta.url),'utf8')
+    .replace("import './worksite-board.css'",'')
+    .replace("import {campfirePhilosophy} from './campfire-philosophy.js'",'const campfirePhilosophy=()=>({})')
+    .replace("import {campusSlotAssignments,campusSlotName} from '../campus-slot-assignments.js'",'const campusSlotAssignments=()=>null,campusSlotName=id=>id')
   const file=path.join(await fs.mkdtemp(path.join(os.tmpdir(),'symbiosis-board-')),'board.mjs')
   try {
     await fs.writeFile(file,source)

@@ -1,5 +1,6 @@
 import './worksite-board.css'
 import {campfirePhilosophy} from './campfire-philosophy.js'
+import {campusSlotAssignments,campusSlotName} from '../campus-slot-assignments.js'
 const node=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e}
 const goodText=(v,max=2000)=>typeof v==='string'&&v.trim().length>0&&v.length<=max
 const roleId=v=>/^r(?:0[1-9]|1[0-5])$/.test(v||'')
@@ -87,8 +88,11 @@ export class WorksiteBoard {
     this.philosophy=null
     this.cycleBody.replaceChildren();this.cycleTitle.textContent='Work ahead & campfire'
     if(stale||!c){this.cycleBody.append(node('p','Waiting for a fresh campus record.'));return}
+    const mapping=campusSlotAssignments(c)
+    if(!mapping){this.cycleBody.append(node('p','Campus slot mapping is invalid; duty labels and imagined dialogue are withheld.'));return}
     this.pair.textContent=`15-1A + 2 specialists · Cycle ${c.cycleNumber} · ${c.mode==='sleeping'?'All fifteen tucked into pods':`${c.campRoleIds.length} at camp · ${c.activeRoleId} selected · ${c.chargingRoleId} charging`}`
-    this.cycleBody.append(node('p',`${c.phase} · Model sessions: ${slots.map(s=>`${s.slotId}: ${s.status}`).join(' · ')}`))
+    this.cycleBody.append(node('p',`Duty mapping: Pilot ${campusSlotName(mapping.pilot)} · executor ${campusSlotName(mapping.executor)} · camper ${campusSlotName(mapping.camper)}.`),
+      node('p',`${c.phase} · Actual slot status: ${slots.map(s=>`${campusSlotName(s.slotId)||s.slotId}: ${s.status}`).join(' · ')}`))
     if(c.mode==='awake'){
       const session=campfirePhilosophy(c,roleCatalog),d=node('details');d.className='campfire-philosophy';d.open=!!this.philosophyOpen
       d.append(node('summary',session.title),node('p',session.opening),node('small',session.disclosure))
