@@ -1,4 +1,5 @@
 import './worksite-board.css'
+import {campfirePhilosophy} from './campfire-philosophy.js'
 const node=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e}
 const goodText=(v,max=2000)=>typeof v==='string'&&v.trim().length>0&&v.length<=max
 const roleId=v=>/^r(?:0[1-9]|1[0-5])$/.test(v||'')
@@ -45,11 +46,11 @@ export class WorksiteBoard {
     const button=node('button','Locate board');button.type='button';button.onclick=focus
     const armButton=node('button','View arm');armButton.type='button';armButton.onclick=focusArm
     const simulateButton=node('button','Simulate joints');simulateButton.type='button';simulateButton.onclick=simulate
-    this.campButton=node('button','Visit camp');this.campButton.type='button';this.campButton.onclick=focusCamp;this.campButton.hidden=true
+    this.campButton=node('button','Visit camp');this.campButton.type='button';this.campButton.onclick=()=>{focusCamp?.();this.el.open=true;this.philosophyOpen=true;this.philosophy?.setAttribute('open','');this.philosophy?.scrollIntoView({block:'nearest'})};this.campButton.hidden=true
     this.status=node('p');this.list=node('div');this.cycle=node('section');this.cycle.className='symbiosis-cycle'
     this.cycleTitle=node('strong','Shared cycle');this.cycleBody=node('div');this.cycle.append(this.cycleTitle,this.cycleBody)
     this.pilot=node('p');this.sensor=node('p','Arm: waiting for measured angles');this.pair=node('p');this.roles=node('details');this.roleSummary=node('summary','15 shared roles · 225 ordered skills');this.roles.append(this.roleSummary);this.roleList=node('div');this.roles.append(this.roleList);this.roles.hidden=true
-    this.body.append(this.pilot,this.sensor,this.pair,this.roles,this.cycle,this.campButton,armButton,simulateButton,button,this.status,this.list);this.el.append(this.summary,this.body);root.append(this.el);this.update({})
+    this.body.append(this.campButton,this.pilot,this.sensor,this.pair,this.roles,this.cycle,armButton,simulateButton,button,this.status,this.list);this.el.append(this.summary,this.body);root.append(this.el);this.update({})
   }
   observation(data){
     if(data.state==='live')this.lastObservation=data
@@ -70,7 +71,7 @@ export class WorksiteBoard {
       this.pair.textContent=`16-3A = 15-2A + 1-A · Selected roles: Balthasar ${name(b?.roleId)} · Casper ${name(c?.roleId)} · ${symbiosis?.name||symbiosis?.id||''} · 225 ordered pairs. Model activity: Balthasar ${activity(b)}; Casper ${activity(c)}.`
       this.renderCycle(symbiosisCycle,executorSlots,roleCatalog,stale)
     }
-    if(profile==='roarm-campus')this.renderCampus(campus,executorSlots,stale)
+    if(profile==='roarm-campus')this.renderCampus(campus,executorSlots,stale,roleCatalog)
     const open=bounties.filter(b=>b.status==='open')
     this.summary.textContent=`RoArm · ${stale?'Board offline':earnedRewards.length+' rewards · '+contracts.length+' contracts'}${open.length?' · '+open.length+' blockers':''}`
     this.status.textContent=stale?'Waiting for a fresh work record.':profile==='roarm-16'?'Shared contract → choose roles → work together → Astra review → camp → next contract':profile==='roarm-campus'?'Report + proposed hat → Astra acceptance → own pod → next executor receives instructions':'Complete contract → independent review → earn wearable → leave next contract'
@@ -81,14 +82,22 @@ export class WorksiteBoard {
     for(const bounty of bounties){const item=node('article');item.append(node('strong',bounty.description||bounty.text||bounty.title||bounty.id),node('p',`${bounty.status||bounty.state||'open'} · ${bounty.taskId||bounty.sourceTaskId||''}`));if(bounty.solvedByWorkerId)item.append(node('small',`${bounty.solvedByWorkerId.toUpperCase()} · verified service credit`));this.list.append(item)}
     this.list.append(node('p',`${serviceCredits.reduce((sum,c)=>sum+(Number.isFinite(c.amount)?c.amount:0),0)} verified service credits`))
   }
-  renderCampus(c,slots,stale){
-    this.cycleBody.replaceChildren();this.cycleTitle.textContent='Agent cycle & camp memory'
+  renderCampus(c,slots,stale,roleCatalog=[]){
+    if(this.philosophy)this.philosophyOpen=this.philosophy.open
+    this.philosophy=null
+    this.cycleBody.replaceChildren();this.cycleTitle.textContent='Work ahead & campfire'
     if(stale||!c){this.cycleBody.append(node('p','Waiting for a fresh campus record.'));return}
     this.pair.textContent=`15-1A + 2 specialists · Cycle ${c.cycleNumber} · ${c.mode==='sleeping'?'All fifteen tucked into pods':`${c.campRoleIds.length} at camp · ${c.activeRoleId} selected · ${c.chargingRoleId} charging`}`
     this.cycleBody.append(node('p',`${c.phase} · Model sessions: ${slots.map(s=>`${s.slotId}: ${s.status}`).join(' · ')}`))
+    if(c.mode==='awake'){
+      const session=campfirePhilosophy(c,roleCatalog),d=node('details');d.className='campfire-philosophy';d.open=!!this.philosophyOpen
+      d.append(node('summary',session.title),node('p',session.opening),node('small',session.disclosure))
+      for(const voice of session.voices){const line=node('article');line.append(node('strong',`${voice.id.toUpperCase()} · ${voice.title}${voice.remote?' · imagined from charging pod':''}`),node('p',voice.text));d.append(line)}
+      d.append(node('strong','Ideas to carry forward'),node('p',session.synthesis));this.cycleBody.append(d);this.philosophy=d
+    }
     if(c.currentContract)this.cycleBody.append(node('strong',c.currentContract.title),node('p',c.currentContract.objective))
     const memory=Array.isArray(c.campMemory)?c.campMemory.at(-1):c.campMemory?.content||c.campMemory
-    if(memory?.synthesis||memory?.interpretation)this.cycleBody.append(node('strong','Around the fire'),node('p',memory.synthesis||memory.interpretation))
+    if(memory?.synthesis||memory?.interpretation)this.cycleBody.append(node('strong','Accepted camp history'),node('p',memory.synthesis||memory.interpretation))
     if(memory?.dialogue?.length){const d=node('details');d.append(node('summary','Balthasar’s imagined camp conversation'));for(const line of memory.dialogue)d.append(node('p',`${line.roleId}: ${line.text}`));this.cycleBody.append(d)}
     if(memory?.facts?.length){const d=node('details');d.append(node('summary','Source-backed project facts'));for(const fact of memory.facts)d.append(node('p',fact.text),node('small',typeof fact.source==='string'?fact.source:JSON.stringify(fact.source||{artifactPath:fact.artifactPath,sha256:fact.sha256})));this.cycleBody.append(d)}
   }

@@ -27,6 +27,7 @@ import {standbyMagiThreads} from './game/magi-world.js'
 import {MagiPanel} from './ui/magi-panel.js'
 import {mountDisplayToggle} from './ui/display-toggle.js'
 import {WorksiteBoard} from './ui/worksite-board.js'
+import {CampfireSpeech} from './ui/campfire-speech.js'
 import {createRoArmPreview} from './world/roarm-preview.js'
 import {RoArmPreviewPanel} from './ui/roarm-preview.js'
 import './ui/roarm-preview.css'
@@ -305,6 +306,7 @@ const actions = {
 }
 
 const hud = new Hud(app, settings, actions)
+const campfireSpeech = MAGI_VIEW ? new CampfireSpeech(app) : null
 if (MAGI_VIEW) mountDisplayToggle(app)
 const mission = new MissionPanel(app, id => select(id, { fly: true }))
 const swarm = new SwarmPanel(app, id => select(id, { fly: true }))
@@ -315,7 +317,7 @@ const magiPanel = MAGI_VIEW ? new MagiPanel(app,colony,id=>select(id,{fly:true})
 const messageBoards=new MessageBoards(engine.scene)
 const worksiteBoard = MAGI_VIEW ? new WorksiteBoard(app,()=>rig.focus(new THREE.Vector3(-22,5,22),{distance:40}),()=>rig.focus(new THREE.Vector3(0,8,3),{distance:48,elevated:true}),()=>{
   if(armPreviewPanel){armPreviewPanel.element.hidden=!armPreviewPanel.element.hidden;armPreviewPanel.refresh();rig.focus(new THREE.Vector3(0,8,3),{distance:48,elevated:true})}
-},()=>rig.focus(new THREE.Vector3(12,2,-38),{distance:78,elevated:true})) : null
+},()=>rig.focus(new THREE.Vector3(0,3,-40),{distance:42,elevated:true})) : null
 const boardPanel=new MessageBoardPanel(app,id=>{
   const board=messageBoards.boards.get(id)
   if(board)rig.focus(board.position,{distance:25})
@@ -870,6 +872,7 @@ engine.add({
   update(dt, elapsed) {
     rig.update(dt)
     colony.update(dt, elapsed, rig.target)
+    campfireSpeech?.update(colony.astronauts.agents, colony.worksite, colony.worksiteProjection, engine.camera, engine.viewport, elapsed)
     armPreview?.update(dt)
     if(MAGI_VIEW&&engine.scene.fog){engine.scene.fog.near=rig.distance+45;engine.scene.fog.far=rig.distance+320}
     magiPanel?.tick(elapsed)
