@@ -24,6 +24,7 @@ import {constructionFor,allocateSwarmCells} from './swarm-construction.js'
 import {magiCrewStatus} from './magi-world.js'
 import {createRoArmCampus} from '../world/roarm-campus.js'
 import {createCanonicalCampus} from '../world/canonical-campus.js'
+import {createFinancialOffice} from '../world/financial-office.js'
 import {FREE_CAMPUS} from '../world/free-campus-layout.js'
 import {createRoArmWorksite, ROARM_LAYOUT} from '../world/roarm-worksite.js'
 
@@ -276,18 +277,20 @@ export class Colony {
     const now = Date.now()
     const live = liveThreadsForColony(threads, archivedIds, hiddenProjects)
     const isWorksite = live.some(thread => ['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile))
+    const financialOffice=live.some(thread=>thread.sceneLayout==='financial-office')
     const canonicalCampus=live.some(thread=>thread.sceneLayout==='canonical-campus')
     const campus=!canonicalCampus&&live.some(thread=>thread.worldProfile==='roarm-campus')
-    const profile=campus?'roarm-campus':canonicalCampus?'canonical-campus':'roarm-worksite'
+    const profile=financialOffice?'financial-office':campus?'roarm-campus':canonicalCampus?'canonical-campus':'roarm-worksite'
     if (isWorksite !== Boolean(this.worksite)||(isWorksite&&profile!==(this.worksite?.profile??'roarm-worksite'))) {
       this.worksite?.dispose()
-      this.worksite=isWorksite?(campus?createRoArmCampus(this.scene):canonicalCampus?createCanonicalCampus(this.scene):createRoArmWorksite(this.scene)):null
+      this.worksite=isWorksite?(financialOffice?createFinancialOffice(this.scene):campus?createRoArmCampus(this.scene):canonicalCampus?createCanonicalCampus(this.scene):createRoArmWorksite(this.scene)):null
       this.worksite?.update(this.worksiteProjection||{})
       const ship = this._shipPosition()
       this.ship.group.position.set(ship.x, ship.deck??terrainHeight(ship.x, ship.z, this.planet), ship.z)
       this.ship.group.rotation.y = Math.atan2(-ship.x, -ship.z)
       this._buildScatter()
     }
+    this.ship.group.visible=!financialOffice
 
     // Group by repo, biggest project first so the busiest work lands nearest the middle.
     const byProject = new Map()
@@ -407,7 +410,7 @@ export class Colony {
     const swarmProjects=projects.filter(([,list])=>list[0]?.isShell)
     const memoryKeys=new Map(swarmProjects.map(([id,list])=>[id,`${id}@${list[0].constructionRunId}`]))
     const remembered=new Map(swarmProjects.map(([id,list])=>[id,this.plotCells.get(memoryKeys.get(id)) || list[0].growthPolicy?.preservedLayouts?.[list[0].constructionRunId]?.[list[0].shellId]]))
-    const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,worldProfile:list[0].worldProfile,dispatchMode:list[0].dispatchMode,sceneLayout:list[0].sceneLayout,cells:constructionFor(list[0]).cells})),remembered)
+    const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,worldProfile:list[0].worldProfile,dispatchMode:list[0].dispatchMode,sceneLayout:list[0].sceneLayout,officeProfileId:list[0].officeProfileId,cells:constructionFor(list[0]).cells})),remembered)
     const ordinary=allocateCells(projects.filter(([,list])=>!list[0]?.isShell).map(([id,list])=>({id,size:list.length})),this.plotCells,[...swarmLayout.values()].flat())
     const layout=new Map([...swarmLayout,...ordinary])
     // Remembered, not replaced: a project that has just lost its last thread keeps its
@@ -471,6 +474,11 @@ export class Colony {
     })
 
     this.plotOrder = [...this.plots.values()]
+    // The office has one continuous floor. Transport plots remain pickable data,
+    // not visible hex foundations or repeated world labels.
+    if(projects.some(([,list])=>list[0]?.sceneLayout==='financial-office')){
+      for(const plot of this.plotOrder){plot.group.visible=false;if(plot.label)plot.label.visible=false}
+    }
     const extent=Math.max(46,...this.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+12)),...(this.worksite?.clearings()??[]).map(p=>Math.hypot(p.x,p.z)+p.r))
     if(fitColonyTerrain(extent)) this._buildTerrain()
     if(COLONY_RADIUS+8>this.nav.half){this.nav=new Navigation({half:Math.ceil((COLONY_RADIUS+8)/16)*16});this.astronauts.setNavigation(this.nav)}
@@ -745,6 +753,7 @@ export class Colony {
    * pointing at. Everywhere else the colony stays unlabelled.
    */
   _updateLabels(dt) {
+    if(this.worksite?.profile==='financial-office'){for(const p of this.plotOrder)if(p.label)p.label.visible=false;return}
     const show = this.uiVisible && this.settings.get('showLabels')
     for (const plot of this.plotOrder) {
       const label = plot.label

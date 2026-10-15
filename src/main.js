@@ -26,6 +26,8 @@ import {
 import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-projects.js'
 import {standbyMagiThreads} from './game/magi-world.js'
 import {canonicalCampusResponse} from './world/canonical-campus.js'
+import {financialOfficeResponse} from './office/profiles.js'
+import {mountFinancialOffice} from './ui/financial-office.js'
 import {MagiPanel} from './ui/magi-panel.js'
 import {mountDisplayToggle} from './ui/display-toggle.js'
 import {mountTokenHud} from './ui/token-hud.js'
@@ -48,6 +50,7 @@ import './ui/crane-lab.css'
  */
 
 const MAGI_VIEW = new URLSearchParams(location.search).get('legacy') !== '1'
+const OFFICE_VIEW = MAGI_VIEW && new URLSearchParams(location.search).get('scene') === 'financial-office'
 const CANON_CAMPUS = MAGI_VIEW && new URLSearchParams(location.search).get('visual') !== 'legacy'
 const PRESENTATION_ONLY = new URLSearchParams(location.search).get('presentation') === '1'
 const SWARM_VIEW = MAGI_VIEW || new URLSearchParams(location.search).get('swarm') === '1'
@@ -63,20 +66,22 @@ app.insertAdjacentHTML(
    </div></div>`
 )
 
-const settings = new Settings()
+const officeSettingsKey='botcrossing.financial-office.settings.v1'
+const settings = new Settings(OFFICE_VIEW?{storageKey:officeSettingsKey}:{})
 settings.transient=Boolean(REPLAY_RUN)
-if (!hasStoredSettings()) {settings.applyPreset(DEFAULT_PRESET);if(MAGI_VIEW){settings.set('planet','mars');settings.set('timeOfDay',.46)}}
+if (!hasStoredSettings(OFFICE_VIEW?officeSettingsKey:undefined)) {settings.applyPreset(DEFAULT_PRESET);if(MAGI_VIEW){settings.set('planet',OFFICE_VIEW?'terra':'mars');settings.set('timeOfDay',.46)}}
+if(OFFICE_VIEW){document.body.classList.add('financial-office');settings.set('autoTime',false);settings.set('clockTime',false);settings.set('showLabels',false);settings.set('tiltShift',false);document.title='The Big Short · Financial Office · Bot Crossing'}
 if(MAGI_VIEW)document.body.classList.add('magi-world')
 
 const engine = new Engine(settings).mount(app)
 const rig = new CameraRig(engine.camera, engine.canvas, settings)
 const colony = new Colony(engine.scene, settings, engine.camera, engine.renderer)
-const craneLab=MAGI_VIEW&&!REPLAY_RUN?createCraneLab(engine.scene):null
+const craneLab=MAGI_VIEW&&!REPLAY_RUN&&!OFFICE_VIEW?createCraneLab(engine.scene):null
 let lastCraneFrameAt=performance.now()
 const cranePanel=craneLab?mountCraneLab(app,craneLab,{focus:p=>{rig.desiredAzimuth=0;rig.desiredPolar=.95;rig.restPolar=.95;rig.focus(new THREE.Vector3(p.x,38,p.z),{distance:195,elevated:true})},home:()=>frameSwarm()}):null
 if(craneLab)window.craneSimulation=Object.freeze({practice:moves=>craneLab.practice(moves),wave:()=>craneLab.wave(),smooth:moves=>craneLab.smooth(moves),retarget:target=>craneLab.retarget(target),scan:()=>craneLab.scan(),interrupt:()=>craneLab.interrupt(),setFaults:p=>craneLab.setFaults(p),reset:()=>craneLab.reset(),snapshot:()=>craneLab.snapshot(),startVelocity:()=>craneLab.startVelocity(),setTargetOffsetMm:v=>craneLab.setTargetOffsetMm(v),setVelocityFaults:p=>craneLab.setVelocityFaults(p)})
 let lastArmObservation=null
-const armPreview=MAGI_VIEW&&!REPLAY_RUN&&!PRESENTATION_ONLY?createRoArmPreview(engine.scene):null
+const armPreview=MAGI_VIEW&&!REPLAY_RUN&&!PRESENTATION_ONLY&&!OFFICE_VIEW?createRoArmPreview(engine.scene):null
 const armPreviewPanel=armPreview?RoArmPreviewPanel(app,armPreview,()=>lastArmObservation):null
 if(armPreviewPanel)armPreviewPanel.element.hidden=true
 if(armPreview)window.roarmSimulation=Object.freeze({
@@ -96,6 +101,7 @@ let selectedProject = null
 let framedSwarmRun = null
 function frameSwarm() {
   rig.resetView()
+  if(OFFICE_VIEW){rig.restAzimuths=[0,Math.PI/2,Math.PI,Math.PI*1.5];rig.restPolar=.92;rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.maxDistance=420;rig.worldLimit=220;rig.focus(new THREE.Vector3(0,8,-29),{distance:180,elevated:true});return}
   const radius=Math.max(25,...colony.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+8)))
   rig.maxDistance=Math.max(150,radius*4)*MAP_LINEAR_SCALE
   rig.worldLimit=Math.max(82,radius+20)*MAP_LINEAR_SCALE
@@ -330,6 +336,15 @@ const actions = {
 
 const hud = new Hud(app, settings, actions)
 const campfireSpeech = MAGI_VIEW ? new CampfireSpeech(app) : null
+let officeHistory=null
+const officeFocus=(point,distance)=>{rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.restPolar=.92;rig.focus(point,{distance,elevated:true})}
+const officePanel=OFFICE_VIEW?mountFinancialOffice(app,{
+  focusProfile:id=>{const agent=colony.agentFor(`office:${id}`);if(agent)rig.focus(agent.pos,{distance:23,elevated:true})},
+  focusOffice:()=>officeFocus(new THREE.Vector3(0,3,0),125),
+  focusCamp:()=>officeFocus(new THREE.Vector3(0,7,-49),125),
+  focusCampus:()=>frameSwarm(),
+}):null
+if(OFFICE_VIEW)window.financialOffice=Object.freeze({snapshot:()=>({...(colony.worksite?.snapshot?.()??{}),characters:colony.astronauts.agents.map(a=>({id:a.thread.officeProfileId,name:a.thread.shellName,suit:a.thread.officeStyle?.style,position:a.pos.toArray(),activity:a.magiActivity,running:a.thread.running,carrier:a.thread.carrierWorkerId})),history:{digest:officeHistory?.digest,entries:officeHistory?.totalEntries}}),office:()=>officeFocus(new THREE.Vector3(0,3,0),125),camp:()=>officeFocus(new THREE.Vector3(0,7,-49),125),campus:()=>frameSwarm()})
 if (MAGI_VIEW) mountDisplayToggle(app)
 if (MAGI_VIEW && new URLSearchParams(location.search).get('dual') === '1') mountTokenHud(app)
 const mission = new MissionPanel(app, id => select(id, { fly: true }))
@@ -776,10 +791,12 @@ async function poll() {
   polling = true
   try {
     const response = await fetchThreads(MAGI_VIEW)
-    const res = CANON_CAMPUS ? canonicalCampusResponse(response) : response
+    if(OFFICE_VIEW)try{const historyResponse=await fetch('/api/financial-office/history',{cache:'no-store'});if(historyResponse.ok)officeHistory=await historyResponse.json()}catch{/* Keep the last attributed history on a transient disconnect. */}
+    const res = OFFICE_VIEW ? financialOfficeResponse(response,officeHistory) : CANON_CAMPUS ? canonicalCampusResponse(response) : response
     colony.setWorksiteProjection(res.worksite || {})
-    if(MAGI_VIEW&&res.mode==='magi'&&!REPLAY_RUN)try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
+    if(MAGI_VIEW&&res.mode==='magi'&&!REPLAY_RUN&&!OFFICE_VIEW)try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
     applyThreads(res.threads || [])
+    officePanel?.update(res)
     const shells = (res.threads || []).filter(t=>t.isShell)
     colony.astronauts.setAlignmentLights(null)
     hud.setMagiAlignment(null)
@@ -794,9 +811,11 @@ async function poll() {
   } catch (err) {
     if (MAGI_VIEW) {
       // Preserve earned visuals during an outage, but invalidate all prior activity.
-      const unknown=(threads.length?threads:REPLAY_RUN?standbyMagiThreads():previousMagiProjection()).map(t=>({...t,running:false,hasError:false,assignmentState:'unknown',shellStatus:'Connection unavailable',tokenUsage:t.tokenUsage?{...t.tokenUsage,cached:true}:null}))
-      colony.setWorksiteProjection({stale:true})
+      const failedOffice=OFFICE_VIEW?financialOfficeResponse({threads:[],worksite:{stale:true}},officeHistory):null
+      const unknown=failedOffice?.threads??(threads.length?threads:REPLAY_RUN?standbyMagiThreads():previousMagiProjection()).map(t=>({...t,running:false,hasError:false,assignmentState:'unknown',shellStatus:'Connection unavailable',tokenUsage:t.tokenUsage?{...t.tokenUsage,cached:true}:null}))
+      colony.setWorksiteProjection(failedOffice?.worksite??{stale:true})
       applyThreads(unknown)
+      if(failedOffice)officePanel?.update(failedOffice)
       colony.astronauts.setAlignmentLights(null)
       hud.setMagiAlignment(null)
       swarm.update([])
@@ -844,7 +863,7 @@ async function boot() {
         colony.restoreLayout(state.plots)
         // And the settings, but only for a browser that has none of its own — an explicit
         // choice made here always outranks the file.
-        if ((REPLAY_RUN||!hasStoredSettings()) && state.settings) settings.applyAll(state.settings)
+        if ((REPLAY_RUN||!hasStoredSettings(OFFICE_VIEW?officeSettingsKey:undefined)) && state.settings) settings.applyAll(state.settings)
       })
       .catch(() => {
         /* first run, or the file is gone — an empty colony state is a valid one */
@@ -860,7 +879,7 @@ async function boot() {
   if (!kitError) colony.onAssetsReady()
 
   await poll()
-  if(MAGI_VIEW&&!REPLAY_RUN&&!PRESENTATION_ONLY){void pollArm();setInterval(pollArm,1000)}
+  if(MAGI_VIEW&&!REPLAY_RUN&&!PRESENTATION_ONLY&&!OFFICE_VIEW){void pollArm();setInterval(pollArm,1000)}
   setInterval(poll, POLL_MS)
   window.addEventListener('focus', poll)
   // A tab that was hidden for an hour should catch up the moment it comes back.

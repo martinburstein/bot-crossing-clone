@@ -175,8 +175,9 @@ const RENDER_KEYS = new Set([
 ])
 
 export class Settings {
-  constructor() {
-    this.values = { ...DEFAULTS, ...load() }
+  constructor({storageKey=STORE_KEY}={}) {
+    this.storageKey=storageKey
+    this.values = { ...DEFAULTS, ...load(storageKey) }
     this.listeners = new Set()
     this._saveTimer = 0
   }
@@ -234,7 +235,7 @@ export class Settings {
     if(this.transient)return
     this._saveTimer = setTimeout(() => {
       try {
-        localStorage.setItem(STORE_KEY, JSON.stringify(this.values))
+        localStorage.setItem(this.storageKey, JSON.stringify(this.values))
       } catch {
         /* private mode, quota — the game just forgets between sessions */
       }
@@ -269,18 +270,18 @@ export class Settings {
   }
 }
 
-function load() {
+function load(storageKey=STORE_KEY) {
   try {
-    const raw = JSON.parse(localStorage.getItem(STORE_KEY) || '{}')
+    const raw = JSON.parse(localStorage.getItem(storageKey) || '{}')
     return raw && typeof raw === 'object' ? raw : {}
   } catch {
     return {}
   }
 }
 
-export function hasStoredSettings() {
+export function hasStoredSettings(storageKey=STORE_KEY) {
   try {
-    return Boolean(localStorage.getItem(STORE_KEY))
+    return Boolean(localStorage.getItem(storageKey))
   } catch {
     return false
   }

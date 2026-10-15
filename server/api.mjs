@@ -8,6 +8,7 @@ import { magiHealth, magiSourceUrl, projectMagiState, readMagiState } from './ma
 import {readMagiTokens} from './magi-tokens.mjs'
 import {readRoArmObservation} from './roarm.mjs'
 import {readTokenHud} from './token-hud.mjs'
+import {readOfficeHistory} from './financial-office.mjs'
 import {standbyMagiThreads} from '../src/game/magi-world.js'
 import {archiveRoot,readArchive,listArchives} from './run-archives.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
@@ -370,6 +371,15 @@ export async function apiMiddleware(req, res, next) {
   }
 
   try {
+    if(url.pathname==='/api/financial-office/health'){
+      if(req.method!=='GET')return send(res,405,{error:'Read-only office health'})
+      return send(res,200,{application:'financial-office-viewer',version:1,readOnly:true,pid:process.pid,profiles:8,maxConcurrent:3})
+    }
+    if(url.pathname==='/api/financial-office/history'){
+      if(req.method!=='GET')return send(res,405,{error:'Read-only office history'})
+      res.setHeader('Cache-Control','no-store')
+      return send(res,200,await readOfficeHistory())
+    }
     if(url.pathname==='/api/token-hud') {
       if(req.method!=='GET')return send(res,405,{error:'Read-only usage endpoint'})
       if(req.headers.origin && req.headers.origin !== `http://${req.headers.host}`)return send(res,403,{error:'Same-origin usage only'})
@@ -437,8 +447,8 @@ export async function apiMiddleware(req, res, next) {
       return send(res, 200, { harnesses: await harnessStatus() })
     }
 
-    const colonyFile=url.pathname==='/api/magi/colony'?MAGI_STATE_FILE:STATE_FILE
-    if (['/api/state','/api/magi/colony'].includes(url.pathname) && req.method === 'GET') {
+    const colonyFile=url.pathname==='/api/office/colony'?path.join(DATA_DIR,'colony-financial-office.json'):url.pathname==='/api/magi/colony'?MAGI_STATE_FILE:STATE_FILE
+    if (['/api/state','/api/magi/colony','/api/office/colony'].includes(url.pathname) && req.method === 'GET') {
       return send(res, 200, await readState(colonyFile))
     }
 
@@ -459,7 +469,7 @@ export async function apiMiddleware(req, res, next) {
      * A missing or zero base is a first write and is allowed: nothing to lose on a fresh
      * install, and it keeps the endpoint drivable from `curl`.
      */
-    if (['/api/state','/api/magi/colony'].includes(url.pathname) && req.method === 'PUT') {
+    if (['/api/state','/api/magi/colony','/api/office/colony'].includes(url.pathname) && req.method === 'PUT') {
       const body = await readJsonBody(req)
       const base = Number(body.baseUpdatedAt) || 0
       return serialise(async () => {

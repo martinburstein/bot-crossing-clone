@@ -128,6 +128,13 @@ export class MagiLife {
     if(!this.pilotKey.parent){if(this.pilotKey.userData.disposed)this.pilotKey=makePilotKey();this.scene.add(this.pilotKey)}
     this.agents=agents;this.world=world
     const eligible=agents.filter(a=>['15-3A','roarm-16','roarm-campus'].includes(a.thread.worldProfile)&&a.state!=='leaving'&&a.state!=='gone')
+    if(eligible.some(a=>a.thread.sceneLayout==='financial-office')){
+      if(this.hangar)this.dispose()
+      this.pilotKey.visible=false;this.camps.clear()
+      for(const id of ['melchior','balthasar','casper'])if(world.worksite?.camp)this.camps.set(id,world.worksite.camp)
+      for(const a of eligible){a.magiGoal ||= new THREE.Vector3();a.magiLook ||= new THREE.Vector3()}
+      return
+    }
     const hangarLayout=eligible.some(a=>a.thread.dispatchMode==='free-15-3A'||a.thread.sceneLayout==='canonical-campus')?FREE_CAMPUS.hangar:HANGAR
     // Standby can arrive before the campus feed. Move the same building and
     // parked fleet when its designated pad changes, preserving rental state.
@@ -260,6 +267,16 @@ export class MagiLife {
   }
   update(agents,world,elapsed) {
     const dt=Math.max(0,Math.min(.25,elapsed-this.elapsed));this.elapsed=elapsed
+    if(world.worksiteProjection?.sceneLayout==='financial-office'){
+      this.pilotKey.visible=false
+      for(const agent of agents){
+        if(agent.thread.sceneLayout!=='financial-office')continue
+        const target=world.worksite?.target(agent.thread,elapsed,agent)
+        agent.mounted=false;agent.magiSeat=null
+        if(target){agent.magiActivity=target.activity;agent.magiGoal?.copy(target.position);agent.magiLook?.copy(target.look)}
+      }
+      return
+    }
     this.syncPilotDuty(world?.worksiteProjection)
     const completedCycle=world?.worksiteProjection?.symbiosisCycle
     const completedParticipants=agent=>completedSymbiosisForThread(agent?.thread,completedCycle)

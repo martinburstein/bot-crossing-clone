@@ -7,6 +7,7 @@ import {syncRewardWearable,applyRewardBoneTransform} from '../world/roarm-reward
 import {createRoArmPilotGear} from '../world/roarm-pilot-gear.js'
 import {isCampusPilot,createCampusPilotGear} from '../world/campus-pilot-gear.js'
 import {isCampusCamper,createCampusCamperGear} from '../world/campus-camper-gear.js'
+import {createOfficeSuit} from '../world/office-suit.js'
 
 /**
  * Every astronaut in the colony, mostly drawn in seven shared draw calls.
@@ -335,6 +336,13 @@ export class Astronauts {
     if(camper){agent.campusCamperGear=createCampusCamperGear();this.group.add(agent.campusCamperGear)}
   }
 
+  _syncOfficeSuit(agent) {
+    const id=agent.thread?.sceneLayout==='financial-office'?agent.thread.officeProfileId:null
+    if(agent.officeSuitId===id)return
+    agent.officeSuit?.dispose();agent.officeSuit=null;agent.officeSuitId=id
+    if(id){agent.officeSuit=createOfficeSuit(id);this.group.add(agent.officeSuit)}
+  }
+
   _syncCampusPilot(agent) {
     const campusPilot=isCampusPilot(agent.thread)
     if(agent.isCampusPilot===campusPilot)return
@@ -351,6 +359,7 @@ export class Astronauts {
   }
 
   _renderScale(agent) {
+    if(agent.thread?.sceneLayout==='financial-office')return agent.scale*CREW_SCALE*1.85
     if(agent.thread?.worldProfile==='roarm-campus'&&agent.thread.shellId==='w16'&&agent.thread.dispatchMode!=='free-15-3A')return 0
     const roleScale=agent.isRoArm16Captain?PILOT_CAPTAIN_SCALE:
       agent.isCampusPilot?(agent.campusPilotGear?.userData.characterScale||1.14):agent.isCampusCamper?1.65:1
@@ -657,14 +666,14 @@ export class Astronauts {
     this._applyStatus(agent, entry.status)
     this.agents.push(agent)
     this.byId.set(agent.id, agent)
-    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent);this._syncCampusCamper(agent)
+    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent);this._syncCampusCamper(agent);this._syncOfficeSuit(agent)
     return agent
   }
 
   _updateAgent(agent, entry) {
     const newSwarmProject=entry.thread?.isShell && agent.thread?.constructionRunId!==entry.thread.constructionRunId
     agent.thread = entry.thread
-    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent);this._syncCampusCamper(agent)
+    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent);this._syncCampusCamper(agent);this._syncOfficeSuit(agent)
     if(entry.home) agent.home.copy(entry.home)
     const suit = entry.thread?.suitColor ?? SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length]
     if (agent.suit !== suit) { agent.suit = suit; agent.colorDirty = true }
@@ -760,6 +769,7 @@ export class Astronauts {
         this._disposePilotCaptain(agent)
         this._disposeCampusPilot(agent)
         agent.campusCamperGear?.dispose()
+        agent.officeSuit?.dispose()
         this.agents.splice(i, 1)
         this.byId.delete(agent.id)
         continue
@@ -1237,7 +1247,7 @@ export class Astronauts {
     } else {
       switch (agent.status) {
         case 'working':
-          key = 'work'
+          key = agent.officeSuit?'interact':'work'
           break
         case 'waiting':
           key = 'wave'
@@ -1297,7 +1307,7 @@ export class Astronauts {
     const frames = this.frameAttr.array
     const crewFrames = this.crewFrameAttr?.array
 
-    for(const agent of this.agents){if(agent.rewardWearable)agent.rewardWearable.group.visible=false;agent.pilotGear?.hide();agent.campusPilotGear?.hide();agent.campusCamperGear?.hide()}
+    for(const agent of this.agents){if(agent.rewardWearable)agent.rewardWearable.group.visible=false;agent.pilotGear?.hide();agent.campusPilotGear?.hide();agent.campusCamperGear?.hide();agent.officeSuit?.hide()}
 
     let i = 0
     let hands = 0
@@ -1346,6 +1356,14 @@ export class Astronauts {
         worn.multiplyMatrices(root, bone)
         setPart(child, worn, pack, i, 0, P.packUp, P.packZ, 0, 0, 0)
         setPart(child, worn, lamp, i, 0, P.lightY, P.lightZ, 0, 0, 0)
+        if(agent.officeSuit){
+          // No life-support backpack, aerial or chest lamp over a business jacket.
+          child.makeScale(0,0,0)
+          for(const part of [pack,antenna,tip,lamp])part.setMatrixAt(i,child)
+          attachMatrixAt(rig,agent.frame,this.headSlot,bone);headBone.copy(bone)
+          attachMatrixAt(rig,agent.frame,this.chestSlot,bone)
+          agent.officeSuit.update(root,headBone,bone)
+        }
 
         // The hammer only exists while a thread is running, so it gets its own instance
         // counter — an unused slot in the middle of an instanced mesh still draws.
@@ -1353,7 +1371,7 @@ export class Astronauts {
           attachMatrixAt(rig,agent.frame,this.handSlot,bone);worn.multiplyMatrices(root,bone)
           setPart(child,worn,snack,snacks++,0,-.13,.06,0,0,Math.PI)
         }
-        if (agent.clipKey === 'work' || agent.clipKey === 'tinker') {
+        if (!agent.officeSuit&&(agent.clipKey === 'work' || agent.clipKey === 'tinker')) {
           attachMatrixAt(rig, agent.frame, this.handSlot, bone)
           worn.multiplyMatrices(root, bone)
           setPart(child, worn, hammer, hands++, P.gripX, P.gripY, P.gripZ, P.gripRx, 0, P.gripRz)
@@ -1385,7 +1403,7 @@ export class Astronauts {
       if (agent.index !== i || agent.colorDirty) {
         agent.colorDirty = false
         crew?.setColorAt(i, c.setHex(agent.isRoArm16Captain?PILOT_SUIT_COLOR:agent.suit))
-        helmet.setColorAt(i, c.setHex(agent.isRoArm16Captain?PILOT_HELMET_COLOR:agent.suit))
+        helmet.setColorAt(i, c.setHex(agent.officeSuit?0xdfd7c7:agent.isRoArm16Captain?PILOT_HELMET_COLOR:agent.suit))
         pack.setColorAt(i, agent.isRoArm16Captain?c.setHex(PILOT_PACK_COLOR):agent.trim)
         face.setColorAt(i, agent.eye)
         staticDirty = true
@@ -1538,7 +1556,7 @@ export class Astronauts {
 
   dispose() {
     this.magiLife.dispose()
-    for(const agent of this.agents){this._disposeRewardWearable(agent);this._disposePilotCaptain(agent);this._disposeCampusPilot(agent);agent.campusCamperGear?.dispose()}
+    for(const agent of this.agents){this._disposeRewardWearable(agent);this._disposePilotCaptain(agent);this._disposeCampusPilot(agent);agent.campusCamperGear?.dispose();agent.officeSuit?.dispose()}
     for (const mesh of Object.values(this.parts)) {
       mesh.geometry.dispose()
       mesh.material.dispose()

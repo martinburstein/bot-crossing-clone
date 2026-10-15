@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import {campfireExchange} from './campfire-philosophy.js'
 import {unitConversationFrame} from './unit-conversation.js'
 import './campfire-speech.css'
+import {OFFICE_BY_ID} from '../office/profiles.js'
 
 /** Imagined camp talk, anchored to the existing bodies; no execution side effects. */
 export class CampfireSpeech {
@@ -24,7 +25,7 @@ export class CampfireSpeech {
     const {w, h} = viewport, x = (this.point.x * .5 + .5) * w, y = (-this.point.y * .5 + .5) * h, ndcZ = this.point.z
     // Cap the close-up size; perspective makes distant voices occupy less screen.
     const depth = -this.point.set(position.x, position.y + height, position.z).applyMatrix4(camera.matrixWorldInverse).z
-    const free=this.layer.classList.contains('unit-conversation')
+    const free=this.layer.classList.contains('unit-conversation')||this.layer.classList.contains('office-oral-history')
     const scale = free?Math.max(.8,Math.min(1,40/Math.max(1,depth))):Math.min(1,24/Math.max(1,depth)), halfWidth = (free?130:90) * scale + 8
     const visible = ndcZ >= -1 && ndcZ <= 1 && x >= 0 && x <= w && y >= 0 && y <= h
     bubble.el.hidden = !visible
@@ -35,6 +36,20 @@ export class CampfireSpeech {
     // A modest refresh rate keeps these little DOM plates inexpensive.
     if (elapsed < this.next) return
     this.next = elapsed + .1
+    if(projection?.sceneLayout==='financial-office'){
+      const entries=projection.office?.history?.entries??[]
+      const entry=entries[Math.floor(elapsed/11)%Math.max(1,entries.length)]
+      if(!entry||!worksite?.camp?.group){this.layer.hidden=true;return}
+      this.layer.classList.remove('unit-conversation');this.layer.classList.add('office-oral-history')
+      this.layer.setAttribute('aria-label','Saved financial-office oral history playback')
+      this.role.el.hidden=true
+      this.camper.name.textContent=`${OFFICE_BY_ID[entry.speaker]?.short??'OFFICE'} · ${entry.kind==='accepted-contribution'?'ACCEPTED HISTORY':'SOURCE NOTES'} · REPLAY`
+      this.camper.text.textContent=entry.text;this.camper.el.title=entry.sources.join(' · ')
+      this.note.textContent='Saved oral history · ambient replay · no model calls'
+      worksite.camp.group.getWorldPosition(this.point)
+      this.layer.hidden=!this.place(this.camper,this.point.clone(),5,camera,viewport)
+      return
+    }
     if(projection?.campus?.dispatchMode==='free-15-3A'){
       const line=!projection.stale&&unitConversationFrame(projection.campus,projection.executorSlots??[],elapsed)
       this.layer.classList.add('unit-conversation');this.layer.setAttribute('aria-label','Accepted Luna conversation playback')

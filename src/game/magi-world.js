@@ -1,6 +1,7 @@
 // Display policy only. No task completion, clock time or inferred usage earns territory.
 import {ROARM_WORKSITE, ROARM_SERVICE_POINTS} from '../world/roarm-worksite.js'
 import {FREE_CAMPUS_HOMES} from '../world/free-campus-layout.js'
+import {OFFICE_BY_ID} from '../office/profiles.js'
 export const MAGI_COLOR = '#e9a45b'
 // Crew presentation is a shift cycle. Task failures stay in the protocol;
 // off-duty personas rest at camp instead of becoming stalled/error characters.
@@ -56,6 +57,11 @@ export function tokenConstruction(shell) {
 export function allocateMagiCells(projects, previous=new Map()) {
   const out=new Map()
   for(const p of projects) {
+    if(p.sceneLayout==='financial-office'){
+      const home=OFFICE_BY_ID[p.officeProfileId]?.home
+      if(!home)throw Error('Unknown financial office identity')
+      out.set(p.id,[{...home}]);continue
+    }
     if(p.dispatchMode==='free-15-3A'||p.sceneLayout==='canonical-campus'){
       const home=FREE_CAMPUS_HOMES[p.shellId]
       if(!home)throw Error('Unknown free-campus resident')

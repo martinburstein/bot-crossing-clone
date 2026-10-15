@@ -17,7 +17,7 @@ const post = (url, payload) =>
 export const REPLAY_RUN=typeof location!=='undefined'?new URLSearchParams(location.search).get('run'):null
 const archive=()=>req(`/api/magi/archive/${encodeURIComponent(REPLAY_RUN)}`)
 export const fetchThreads = (magi=false) => REPLAY_RUN?archive().then(a=>a.world):req(magi?'/api/magi/world':'/api/threads')
-const STATE_URL=typeof location!=='undefined'&&new URLSearchParams(location.search).get('legacy')!=='1'?'/api/magi/colony':'/api/state'
+const STATE_URL=typeof location!=='undefined'&&new URLSearchParams(location.search).get('scene')==='financial-office'?'/api/office/colony':typeof location!=='undefined'&&new URLSearchParams(location.search).get('legacy')!=='1'?'/api/magi/colony':'/api/state'
 
 /**
  * The colony file, and the base every later save is measured against.
