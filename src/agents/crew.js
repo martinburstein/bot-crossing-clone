@@ -66,6 +66,8 @@ const CLIP = {
   readBoard: {name:'Idle_B',loop:true,pose:'read',duration:5},
   snack: {name:'Idle_A',loop:true,pose:'snack',duration:4},
   drive: {name:'Sit_Floor_Idle',loop:true,pose:'drive',duration:3},
+  carryWalk: {name:'Walking_A',loop:true,pose:'carry'},
+  carryIdle: {name:'Idle_A',loop:true,pose:'carry'},
 }
 
 const CREW_URL = `${import.meta.env.BASE_URL}assets/crew.glb`
@@ -280,6 +282,20 @@ function applyCampPose(bones,pose,time) {
   if(pose==='read') {rotate('head',.12+.06*Math.sin(time*Math.PI*2/5),.16*Math.sin(time*Math.PI*2/5));rotate('upperarml',-.45);rotate('lowerarml',-.75)}
   if(pose==='snack') {rotate('upperarmr',-.55-.38*sip,0,.12);rotate('lowerarmr',-1.15-.42*sip);rotate('head',.08*sip);rotate('handr',0,0,.1*sip)}
   if(pose==='drive') {rotate('upperarmr',-.65,0,.15);rotate('upperarml',-.65,0,-.15);rotate('lowerarmr',-.5);rotate('lowerarml',-.5);rotate('head',0,.08*Math.sin(time*Math.PI*2/3))}
+  if(pose==='carry') {
+    const find=name=>bones.find(b=>b.name.replace(/[.\s_]/g,'').toLowerCase()===name),chest=find('chest');
+    // Two-bone arm placement is baked, never evaluated by a live worker or per-frame IK.
+    if(chest)for(const [side,suffix]of [[-1,'r'],[1,'l']]){
+      const upper=find('upperarm'+suffix),lower=find('lowerarm'+suffix),hand=find('hand'+suffix);if(!upper||!lower||!hand)continue;
+      saved.push([upper,upper.quaternion.clone()],[lower,lower.quaternion.clone()]);chest.updateWorldMatrix(true,true);
+      const shoulder=upper.getWorldPosition(new THREE.Vector3()),elbow=lower.getWorldPosition(new THREE.Vector3()),palm=hand.getWorldPosition(new THREE.Vector3());
+      const target=chest.localToWorld(new THREE.Vector3(side*.4,.02,.53)),l1=shoulder.distanceTo(elbow),l2=elbow.distanceTo(palm),delta=target.clone().sub(shoulder),distance=Math.min(delta.length(),l1+l2-.001),direction=delta.normalize();
+      const out=new THREE.Vector3(side,0,0).addScaledVector(direction,-direction.x*side).normalize(),cos=THREE.MathUtils.clamp((l1*l1+distance*distance-l2*l2)/(2*l1*distance),-1,1);
+      const bend=shoulder.clone().addScaledVector(direction,l1*cos).addScaledVector(out,l1*Math.sqrt(1-cos*cos));
+      function aim(bone,child,point){const origin=bone.getWorldPosition(new THREE.Vector3()),from=child.getWorldPosition(new THREE.Vector3()).sub(origin).normalize(),to=point.clone().sub(origin).normalize(),change=new THREE.Quaternion().setFromUnitVectors(from,to),world=bone.getWorldQuaternion(new THREE.Quaternion());world.premultiply(change);const parent=bone.parent.getWorldQuaternion(new THREE.Quaternion()).invert();bone.quaternion.copy(parent.multiply(world));bone.updateWorldMatrix(true,true);}
+      aim(upper,lower,bend);aim(lower,hand,target);
+    }
+  }
   return ()=>saved.forEach(([bone,q])=>bone.quaternion.copy(q))
 }
 

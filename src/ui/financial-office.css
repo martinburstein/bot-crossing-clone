@@ -29,3 +29,20 @@ body.financial-office:not(.display-menus-hidden) .hud{z-index:30}
 body.financial-office .display-menu-toggle{left:14px;right:auto;bottom:22px;transform:none}
 @media(max-width:1100px){body.financial-office .hud .side.shifted{visibility:hidden;transform:none}}
 @media(max-width:650px){body.financial-office .token-hud{left:100px;width:calc(100vw - 112px)}body.financial-office .display-menu-toggle{left:12px;right:auto}}
+/* The toolbox and Dual View bar survive both display states. */
+body.financial-office .hud{z-index:30;opacity:1!important;transform:none!important}
+body.financial-office .hud .rail{display:flex!important;visibility:visible!important;position:fixed;left:14px;top:50%;z-index:60;pointer-events:auto!important;background:#142b2beF;border:1px solid #b4bdab77;box-shadow:0 8px 24px #0005}
+body.financial-office .hud .rail .btn{pointer-events:auto!important;color:#e4e9db;font-size:20px}
+body.financial-office .hud .side{display:none!important}
+body.financial-office.display-menus-hidden .hud>:not(.rail),
+body.financial-office.display-menus-hidden .financial-office-hud,
+body.financial-office.display-menus-hidden .office-paper-panel,
+body.financial-office.display-menus-hidden .campfire-speech,
+body.financial-office.display-menus-hidden .mission-panel,
+body.financial-office.display-menus-hidden .swarm-panel,
+body.financial-office.display-menus-hidden .message-board-panel{display:none!important}
+body.financial-office .display-menu-toggle{opacity:1;background:#183c30;z-index:65}
+.office-paper-panel{position:absolute;right:22px;top:166px;width:228px;z-index:22;pointer-events:auto;color:#f2ecda;background:#183b30f2;border:1px solid #a2b58b88;border-radius:7px;font:11px/1.4 system-ui;backdrop-filter:blur(12px)}
+.office-paper-panel summary{padding:10px 12px;cursor:pointer;font:14px Georgia,serif}.office-paper-panel summary strong{float:right;font:12px system-ui;color:#bce2a4}.office-paper-panel summary small{display:block;font:9px system-ui;color:#b1c5a8;margin-top:5px}
+.paper-bank-body{padding:0 12px 12px;max-height:calc(100vh - 310px);overflow:auto}.paper-bank-body label{display:block;margin:8px 0;color:#d4dfc6}.paper-bank-body input,.paper-bank-body select{display:block;box-sizing:border-box;width:100%;margin-top:3px;border:1px solid #aac29055;background:#102e25;color:#f1ead5;border-radius:4px;padding:7px;font:11px system-ui}.paper-bank-body button{cursor:pointer;border:1px solid #b9d29777;border-radius:4px;background:#365a3b;color:#f1ecd8;padding:6px 8px;font:10px system-ui;margin:2px 5px 2px 0}.paper-bank-body button:disabled{opacity:.5}.paper-bank-caption{font-size:9px;color:#b1c2a5}.paper-bank-counts{font-size:10px;color:#ccdfb7}.paper-bank-error{color:#ffd4a4}.paper-bank-jobs article{border-top:1px solid #b1c29844;padding:9px 0}.paper-bank-jobs p{margin:5px 0;font-size:10px}.paper-bank-result{color:#c8e9ad}.paper-bank-body :focus-visible{outline:2px solid #e6d597;outline-offset:2px}
+@media(max-width:650px){.office-paper-panel{top:204px;right:12px;width:205px}.office-masthead{max-width:200px}.paper-bank-body{max-height:calc(100vh - 350px)}}

@@ -17,6 +17,11 @@ url.searchParams.set('swarm','1');url.searchParams.set('magi','1');
 async function health(){try{const r=await fetch(new URL('/api/financial-office/health',url),{signal:AbortSignal.timeout(1500)});return r.ok?await r.json():null;}catch{return null;}}
 let ready=await health();
 if(ready&&ready.application!=='financial-office-viewer')throw Error('Office port belongs to another service.');
+if(ready&&ready.version<2){
+  const owner=Number(ready.pid);if(!Number.isSafeInteger(owner)||owner<=0)throw Error('Missing office process identity');
+  execFileSync('powershell.exe',['-NoProfile','-Command',`$taskProcess=Get-CimInstance Win32_Process -Filter 'ProcessId = ${owner}'; $taskListener=Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction Stop; if($taskProcess.Name -ne 'node.exe' -or $taskProcess.CommandLine -notmatch 'server[\\/]serve[.]mjs' -or @($taskListener | Where-Object OwningProcess -eq ${owner}).Count -eq 0){throw 'Office process identity mismatch'}; Stop-Process -Id ${owner} -ErrorAction Stop`],{windowsHide:true,stdio:['ignore','pipe','pipe']});
+  ready=null;
+}
 await fs.mkdir(path.join(root,'data'),{recursive:true});
 if(!ready){
   try{await fetch(url,{signal:AbortSignal.timeout(1200)});throw Error('Office port is occupied by a different application.');}catch(e){if(e.message==='Office port is occupied by a different application.')throw e;}

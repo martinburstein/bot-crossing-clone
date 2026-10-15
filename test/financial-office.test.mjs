@@ -63,12 +63,12 @@ test('all desk, campfire and MAGI approaches remain reachable without a hangar f
   }life.dispose();world.dispose();
 });
 
-test('eight tailored jackets remain finite through animated bone attachments',()=>{
+test('eight cloth masks retain the original body without a rigid second jacket',()=>{
   for(const p of OFFICE_PROFILES){
-    const suit=createOfficeSuit(p.id);assert.ok(suit.getObjectByName('tailored-jacket'));assert.ok(suit.getObjectByName('pocket-square'));
+    const suit=createOfficeSuit(p.id);assert.equal(suit.userData.textureMask,true);assert.equal(suit.children.length,0);
     suit.update(new THREE.Matrix4().makeScale(1.85,1.85,1.85),new THREE.Matrix4().makeTranslation(0,2,0),new THREE.Matrix4().makeTranslation(0,1,0));
     suit.updateMatrixWorld(true);suit.traverse(o=>{assert.ok(o.matrixWorld.elements.every(Number.isFinite));if(o.isMesh)assert.ok(Array.from(o.geometry.attributes.position.array).every(Number.isFinite));});
-    assert.equal(!!suit.getObjectByName('silk-necktie'),!['jamie-mai','porter-collins'].includes(p.id));suit.dispose();suit.dispose();
+    suit.dispose();suit.dispose();
   }
 });
 

@@ -17,7 +17,8 @@
     "query": {
       "dual": "1",
       "presentation": "1",
-      "scene": "financial-office"
+      "scene": "financial-office",
+      "view": "office"
     }
   },
   "campus": {

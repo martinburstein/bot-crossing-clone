@@ -7,7 +7,7 @@ import {syncRewardWearable,applyRewardBoneTransform} from '../world/roarm-reward
 import {createRoArmPilotGear} from '../world/roarm-pilot-gear.js'
 import {isCampusPilot,createCampusPilotGear} from '../world/campus-pilot-gear.js'
 import {isCampusCamper,createCampusCamperGear} from '../world/campus-camper-gear.js'
-import {createOfficeSuit} from '../world/office-suit.js'
+import {createOfficeSuit,tailorOfficeMaterial} from '../world/office-suit.js'
 
 /**
  * Every astronaut in the colony, mostly drawn in seven shared draw calls.
@@ -267,6 +267,8 @@ export class Astronauts {
     this.crewFrameAttr = new THREE.InstancedBufferAttribute(frames, 1)
     this.crewFrameAttr.setUsage(THREE.DynamicDrawUsage)
     geo.setAttribute('aFrame', this.crewFrameAttr)
+    this.officeStyleAttr=new THREE.InstancedBufferAttribute(new Float32Array(this.capacity*4),4)
+    this.officeStyleAttr.setUsage(THREE.DynamicDrawUsage);geo.setAttribute('aOfficeStyle',this.officeStyleAttr)
 
     // One uniform block for the surface and the shadow pass, the same as the buildings do.
     this.crewUniforms = {
@@ -279,6 +281,7 @@ export class Astronauts {
       this.crewUniforms
     )
 
+    tailorOfficeMaterial(material)
     const mesh = new THREE.InstancedMesh(geo, material, this.capacity)
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
     mesh.count = 0
@@ -341,6 +344,7 @@ export class Astronauts {
     if(agent.officeSuitId===id)return
     agent.officeSuit?.dispose();agent.officeSuit=null;agent.officeSuitId=id
     if(id){agent.officeSuit=createOfficeSuit(id);this.group.add(agent.officeSuit)}
+    agent.colorDirty=true
   }
 
   _syncCampusPilot(agent) {
@@ -1055,7 +1059,7 @@ export class Astronauts {
       const target=this._steerTarget(agent,this._wp)
       agent.site=site
       const direction=this._v.set(target.x-agent.pos.x,0,target.z-agent.pos.z)
-      this._walk(agent,direction,distance,dt,agent.isCampusCamper ? .38 : .7)
+      this._walk(agent,direction,distance,dt,agent.magiActivity?.startsWith('cash-')?1.75:agent.isCampusCamper ? .38 : .7)
       // A long approach can exhaust A*'s search budget, leaving a direct fallback
       // aimed through a hangar wall. Retry locally once the pilot reaches it.
       agent.magiStuck=(agent.blocked||agent.groundSpeed<.03)?(agent.magiStuck||0)+dt:0
@@ -1240,10 +1244,11 @@ export class Astronauts {
     let key
     if (agent.mounted) key = agent.magiActivity==='pilot-rest'?'sit':'drive'
     else if (agent.state === 'spawning') key = 'spawn'
+    else if(agent.magiActivity==='cash-carry')key=speed>.12?'carryWalk':'carryIdle'
     else if (speed > 0.12) key = speed > WALK_SPEED * 1.25 ? 'run' : 'walk'
       else if ((agent.magiActivity === 'pilot-rest' || agent.magiActivity === 'symbiosis-handoff') && agent.magiSettled) key = 'sit'
     else if(agent.magiActivity && agent.magiSettled && agent.status==='idle') {
-      key={tinker:'tinker',talk:'talk',board:'readBoard',snack:'snack'}[agent.magiActivity] || 'idle'
+      key={tinker:'tinker',talk:'talk',board:'readBoard',snack:'snack','cash-collect':'interact','cash-simulate':'interact'}[agent.magiActivity] || 'idle'
     } else {
       switch (agent.status) {
         case 'working':
@@ -1277,7 +1282,7 @@ export class Astronauts {
     if (!clip) return
 
     // Stride rate follows the ground, everything else runs at its authored speed.
-    const rate = key === 'walk' || key === 'run' ? THREE.MathUtils.clamp(speed / WALK_SPEED, 0.4, 2.1) : 1
+    const rate = key === 'walk' || key === 'run' || key==='carryWalk' ? THREE.MathUtils.clamp(speed / WALK_SPEED, 0.4, 2.1) : 1
     agent.clipTime += dt * anim * rate
 
     if (key === 'sitDown' && agent.clipTime >= clip.duration) {
@@ -1403,6 +1408,7 @@ export class Astronauts {
       if (agent.index !== i || agent.colorDirty) {
         agent.colorDirty = false
         crew?.setColorAt(i, c.setHex(agent.isRoArm16Captain?PILOT_SUIT_COLOR:agent.suit))
+        if(this.officeStyleAttr){const p=agent.thread.officeStyle,accent=p?new THREE.Color(p.accent):null;this.officeStyleAttr.setXYZW(i,accent?.r??0,accent?.g??0,accent?.b??0,agent.officeSuit?(p?.index??0)+1:0);this.officeStyleAttr.needsUpdate=true}
         helmet.setColorAt(i, c.setHex(agent.officeSuit?0xdfd7c7:agent.isRoArm16Captain?PILOT_HELMET_COLOR:agent.suit))
         pack.setColorAt(i, agent.isRoArm16Captain?c.setHex(PILOT_PACK_COLOR):agent.trim)
         face.setColorAt(i, agent.eye)

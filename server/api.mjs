@@ -9,6 +9,7 @@ import {readMagiTokens} from './magi-tokens.mjs'
 import {readRoArmObservation} from './roarm.mjs'
 import {readTokenHud} from './token-hud.mjs'
 import {readOfficeHistory} from './financial-office.mjs'
+import {readPaperBank,operatePaperBank} from './paper-bank.mjs'
 import {standbyMagiThreads} from '../src/game/magi-world.js'
 import {archiveRoot,readArchive,listArchives} from './run-archives.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
@@ -373,7 +374,14 @@ export async function apiMiddleware(req, res, next) {
   try {
     if(url.pathname==='/api/financial-office/health'){
       if(req.method!=='GET')return send(res,405,{error:'Read-only office health'})
-      return send(res,200,{application:'financial-office-viewer',version:1,readOnly:true,pid:process.pid,profiles:8,maxConcurrent:3})
+      return send(res,200,{application:'financial-office-viewer',version:2,readOnly:false,executionReadOnly:true,paperSimulationOnly:true,pid:process.pid,profiles:8,maxConcurrent:3})
+    }
+    if(url.pathname==='/api/financial-office/paper-bank'){
+      res.setHeader('Cache-Control','no-store')
+      if(req.method==='GET')return send(res,200,await readPaperBank())
+      if(req.method!=='POST')return send(res,405,{error:'Use GET or POST for paper simulations'})
+      if(req.headers.origin!==`http://${req.headers.host}`)return send(res,403,{error:'Same-origin paper simulations only'})
+      try{return send(res,200,await operatePaperBank(await readJsonBody(req,8192)))}catch(error){return send(res,409,{error:error.message})}
     }
     if(url.pathname==='/api/financial-office/history'){
       if(req.method!=='GET')return send(res,405,{error:'Read-only office history'})
