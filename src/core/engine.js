@@ -82,6 +82,7 @@ export class Engine {
     this.tiltShift = null
     /** How far the view is orbiting; the focal plane sits here. Fed by the frame loop. */
     this._focusDistance = 30
+    this._autoFocus = null
 
     this.perf = new PerfMonitor()
     this._boundLoop = this._loop.bind(this)
@@ -167,6 +168,7 @@ export class Engine {
     }
 
     this.resize()
+    this._applyFocus()
   }
 
   _ensureComposer() {
@@ -275,7 +277,19 @@ export class Engine {
   /** What the view is looking at, so the plane of focus can sit on it. */
   setFocusDistance(distance) {
     this._focusDistance = distance
-    this.tiltShift?.setFocusDistance(distance)
+    this._applyFocus()
+  }
+
+  setAutoFocus(focus) {
+    if(this._autoFocus===focus)return
+    this._autoFocus=focus
+    this._applyFocus()
+  }
+
+  _applyFocus() {
+    this.tiltShift?.setFocusDistance(this._autoFocus?.distance??this._focusDistance)
+    this.tiltShift?.setSharpRange(this._autoFocus?.sharpRange??0)
+    this.tiltShift?.setAngle(this._autoFocus?0:this.settings.get('tiltShiftAngle'))
   }
 
   _targetScale() {

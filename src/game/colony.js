@@ -23,6 +23,8 @@ import { liveThreadsForColony } from './hidden-projects.js'
 import {constructionFor,allocateSwarmCells} from './swarm-construction.js'
 import {magiCrewStatus} from './magi-world.js'
 import {createRoArmCampus} from '../world/roarm-campus.js'
+import {createCanonicalCampus} from '../world/canonical-campus.js'
+import {FREE_CAMPUS} from '../world/free-campus-layout.js'
 import {createRoArmWorksite, ROARM_LAYOUT} from '../world/roarm-worksite.js'
 
 /**
@@ -191,7 +193,7 @@ export class Colony {
     // cell, but the height of that spot is the planet's, so it is set here rather than once
     // at construction — a world with more relief would otherwise leave it hovering.
     const ship = this._shipPosition()
-    this.ship.group.position.y = terrainHeight(ship.x, ship.z, this.planet)
+    this.ship.group.position.y = ship.deck??terrainHeight(ship.x, ship.z, this.planet)
 
     this._dustTint.set(this.planet.ground.high)
   }
@@ -274,13 +276,15 @@ export class Colony {
     const now = Date.now()
     const live = liveThreadsForColony(threads, archivedIds, hiddenProjects)
     const isWorksite = live.some(thread => ['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile))
-    const campus=live.some(thread=>thread.worldProfile==='roarm-campus')
-    if (isWorksite !== Boolean(this.worksite)||(isWorksite&&campus!==(this.worksite?.profile==='roarm-campus'))) {
+    const canonicalCampus=live.some(thread=>thread.sceneLayout==='canonical-campus')
+    const campus=!canonicalCampus&&live.some(thread=>thread.worldProfile==='roarm-campus')
+    const profile=campus?'roarm-campus':canonicalCampus?'canonical-campus':'roarm-worksite'
+    if (isWorksite !== Boolean(this.worksite)||(isWorksite&&profile!==(this.worksite?.profile??'roarm-worksite'))) {
       this.worksite?.dispose()
-      this.worksite=isWorksite?(campus?createRoArmCampus(this.scene):createRoArmWorksite(this.scene)):null
+      this.worksite=isWorksite?(campus?createRoArmCampus(this.scene):canonicalCampus?createCanonicalCampus(this.scene):createRoArmWorksite(this.scene)):null
       this.worksite?.update(this.worksiteProjection||{})
       const ship = this._shipPosition()
-      this.ship.group.position.set(ship.x, terrainHeight(ship.x, ship.z, this.planet), ship.z)
+      this.ship.group.position.set(ship.x, ship.deck??terrainHeight(ship.x, ship.z, this.planet), ship.z)
       this.ship.group.rotation.y = Math.atan2(-ship.x, -ship.z)
       this._buildScatter()
     }
@@ -367,7 +371,7 @@ export class Colony {
           id: thread.id,
           thread,
           status,
-          site: ['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile) ? new THREE.Vector3(plot.center.x+3.5,DECK_TOP,plot.center.z) : this._workSite(plot, building, i),
+          site: thread.dispatchMode==='free-15-3A' ? (this.worksite?.target(thread,0)?.position??plot.center).clone() : ['15-3A','roarm-16','roarm-campus'].includes(thread.worldProfile) ? new THREE.Vector3(plot.center.x+3.5,DECK_TOP,plot.center.z) : this._workSite(plot, building, i),
           home: plot.center,
           // Where the work actually is. A working astronaut circles it rather than standing
           // at one spot, so it needs the building, not just a place to stand near it.
@@ -403,7 +407,7 @@ export class Colony {
     const swarmProjects=projects.filter(([,list])=>list[0]?.isShell)
     const memoryKeys=new Map(swarmProjects.map(([id,list])=>[id,`${id}@${list[0].constructionRunId}`]))
     const remembered=new Map(swarmProjects.map(([id,list])=>[id,this.plotCells.get(memoryKeys.get(id)) || list[0].growthPolicy?.preservedLayouts?.[list[0].constructionRunId]?.[list[0].shellId]]))
-    const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,worldProfile:list[0].worldProfile,cells:constructionFor(list[0]).cells})),remembered)
+    const swarmLayout=allocateSwarmCells(swarmProjects.map(([id,list])=>({id,shellId:list[0].shellId,worldProfile:list[0].worldProfile,dispatchMode:list[0].dispatchMode,sceneLayout:list[0].sceneLayout,cells:constructionFor(list[0]).cells})),remembered)
     const ordinary=allocateCells(projects.filter(([,list])=>!list[0]?.isShell).map(([id,list])=>({id,size:list.length})),this.plotCells,[...swarmLayout.values()].flat())
     const layout=new Map([...swarmLayout,...ordinary])
     // Remembered, not replaced: a project that has just lost its last thread keeps its
@@ -467,7 +471,7 @@ export class Colony {
     })
 
     this.plotOrder = [...this.plots.values()]
-    const extent=Math.max(46,...this.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+12)))
+    const extent=Math.max(46,...this.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+12)),...(this.worksite?.clearings()??[]).map(p=>Math.hypot(p.x,p.z)+p.r))
     if(fitColonyTerrain(extent)) this._buildTerrain()
     if(COLONY_RADIUS+8>this.nav.half){this.nav=new Navigation({half:Math.ceil((COLONY_RADIUS+8)/16)*16});this.astronauts.setNavigation(this.nav)}
     // Zones that just moved, appeared or grew are zones the scatter does not know about.
@@ -502,10 +506,10 @@ export class Colony {
 
   groundAt(x, z) {
     const worksiteHeight = this.worksite?.surfaceHeight?.(x,z)
-    if (worksiteHeight != null) return worksiteHeight
-    if(this.astronauts?.magiLife?.hangar?.contains(x,z))return DECK_TOP
+    if(this.astronauts?.magiLife?.hangar?.contains(x,z))return this.astronauts.magiLife.hangar.deckHeight
     const ramp=this.astronauts?.magiLife?.hangar?.rampHeight(x,z)
-    if(ramp!=null)return Math.max(ramp,terrainHeight(x,z,this.planet))
+    if(ramp!=null)return Math.max(ramp,worksiteHeight??terrainHeight(x,z,this.planet))
+    if (worksiteHeight != null) return worksiteHeight
     const cell = worldToHex(x, z)
     if (this.deckedCells?.has(`${cell.q},${cell.r}`)) return DECK_TOP
     return terrainHeight(x, z, this.planet)
@@ -559,6 +563,7 @@ export class Colony {
   }
 
   _shipPosition() {
+    if(this.worksiteProjection?.sceneLayout==='canonical-campus'||this.worksiteProjection?.dispatchMode==='free-15-3A'||this.worksiteProjection?.campus?.dispatchMode==='free-15-3A')return FREE_CAMPUS.lander
     return this.worksite ? ROARM_LAYOUT.ship : shipPosition()
   }
 

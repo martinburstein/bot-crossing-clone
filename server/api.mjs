@@ -7,6 +7,7 @@ import { loadSwarm, projectShells, scrollFor, SWARM_ROOT } from './swarm.mjs'
 import { magiHealth, magiSourceUrl, projectMagiState, readMagiState } from './magi.mjs'
 import {readMagiTokens} from './magi-tokens.mjs'
 import {readRoArmObservation} from './roarm.mjs'
+import {readTokenHud} from './token-hud.mjs'
 import {standbyMagiThreads} from '../src/game/magi-world.js'
 import {archiveRoot,readArchive,listArchives} from './run-archives.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
@@ -369,6 +370,12 @@ export async function apiMiddleware(req, res, next) {
   }
 
   try {
+    if(url.pathname==='/api/token-hud') {
+      if(req.method!=='GET')return send(res,405,{error:'Read-only usage endpoint'})
+      if(req.headers.origin && req.headers.origin !== `http://${req.headers.host}`)return send(res,403,{error:'Same-origin usage only'})
+      res.setHeader('Cache-Control','no-store')
+      return send(res,200,await readTokenHud())
+    }
     if(url.pathname==='/api/roarm/observation') {
       if(req.method!=='GET')return send(res,405,{error:'Read-only observation endpoint'})
       return send(res,200,await readRoArmObservation())

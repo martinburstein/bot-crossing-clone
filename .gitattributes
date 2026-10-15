@@ -1,0 +1,10 @@
+# Preserve the bytes pinned by the visual canon across Windows restores.
+CANON-VISUAL.json -text
+docs/canon-visual-manifest.json -text
+src/world/free-campus-scene.js -text whitespace=cr-at-eol
+src/world/free-campus-layout.js -text
+src/world/canonical-campus.js -text
+src/world/crane-lab.js -text
+tools/dual-view.mjs -text
+tools/dual-view-layout.ps1 -text
+skills/launch-dual-view/SKILL.md -text

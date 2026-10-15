@@ -143,8 +143,9 @@ export function createRoArmWorksite(scene) {
   let boardLabel=null
   if(boardCanvas) {
     textureMaterials.push(boardCanvas)
-    boardLabel=new THREE.Mesh(new THREE.PlaneGeometry(13.7,5.8),boardCanvas.material)
-    boardLabel.position.set(0,3.93,.48);board.add(boardLabel)
+    boardLabel=new THREE.Mesh(new THREE.PlaneGeometry(13.7,5.4),boardCanvas.material)
+    boardLabel.name='bounty-board-readable-face'
+    boardLabel.position.set(0,3.8,.55);board.add(boardLabel)
   }
   const boardLight=box(0,7.25,.62,10,.12,.12,'cyan',board)
   const projection={bounties:[],serviceCredits:[],stale:true,updatedAt:null}

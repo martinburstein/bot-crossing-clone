@@ -1,4 +1,16 @@
-Current campus profile: Melchior is the permanent blue pilot, Balthasar is the green rooted camper, and Casper alone runs one of fifteen executor roles. The pilot has a separate larger pod and instruction-download state; these do not alter controller authority. See ../../../swarm-protocol/docs/ROARM-CAMPUS.md. The legacy profile details below remain compatibility references.
+Current October 12 campus uses free 15-3A: any of the three reusable Luna units can select any of fifteen replaceable roles or the permanent Pilot/Camper roles. All 17 residents remain visible. See ../../../swarm-protocol/docs/FREE-15-3A.md. Older fixed assignments below are historical compatibility references.
+
+## Giant crane rehearsal lab — October 12
+
+**Crane Lab**, at the top right, focuses the 4.2x arm landmark beyond the campus. Cargo containers and low mist establish its scale. It uses the same sourced EEMode-0 linkage geometry as the small measured model. Its initial pose is explicitly synthetic and available while the hardware is offline.
+
+Use the joint sliders and **Move simulation**, or the finite **Rehearse wave** sequence. **Reset simulation** returns only the simulated arm to its illustrative pose. **Campus view** restores the wider campus framing. These controls have no physical write path.
+
+Fresh samples from the existing read-only observation bridge appear as a cyan wireframe overlay, labeled hardware or simulator according to their actual source. **Use measured pose** is enabled only for a fresh valid observation. Expired samples remove the overlay and numerical comparison after five seconds. The panel's modeled tip separation is computed in physical millimeters before the scenic magnification; it is a difference between two kinematic poses, not measured real-world position error or a calibrated score.
+
+For bounded agent rehearsals, `window.craneSimulation.practice(moves)` accepts one to ten full `{base,shoulder,elbow,gripper}` raw-radian poses inside the existing illustrative ranges. `wave()`, `reset()` and `snapshot()` are available. Rehearsals are local, transient and finite; no background training loop, contact/load/collision physics or learned policy is implemented. This is a place to develop hypotheses and compare poses alongside separately authorized physical trials. Existing Controller, supervision and observation requirements still govern those trials. No camera frames are used or saved here.
+
+Checks: `node --test test/crane-lab.test.mjs test/roarm-preview.test.mjs test/roarm-model.test.mjs test/free-campus.test.mjs` and `npm run build`.
 
 # RoArm pilot and sensor mirror
 

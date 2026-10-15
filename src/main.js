@@ -3,6 +3,7 @@ import './ui/styles.css'
 import { DEFAULT_PRESET, Settings, hasStoredSettings } from './core/settings.js'
 import { Engine } from './core/engine.js'
 import { CameraRig } from './core/camera.js'
+import {measureAutoFocus} from './core/auto-focus.js'
 import { Colony, STATUS_LABEL, STATUS_ORDER, statusFor, transcriptProgress } from './game/colony.js'
 import { Hud } from './ui/hud.js'
 import { MissionPanel } from './ui/mission.js'
@@ -24,13 +25,18 @@ import {
 } from './game/api.js'
 import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-projects.js'
 import {standbyMagiThreads} from './game/magi-world.js'
+import {canonicalCampusResponse} from './world/canonical-campus.js'
 import {MagiPanel} from './ui/magi-panel.js'
 import {mountDisplayToggle} from './ui/display-toggle.js'
+import {mountTokenHud} from './ui/token-hud.js'
 import {WorksiteBoard} from './ui/worksite-board.js'
 import {CampfireSpeech} from './ui/campfire-speech.js'
 import {createRoArmPreview} from './world/roarm-preview.js'
 import {RoArmPreviewPanel} from './ui/roarm-preview.js'
 import './ui/roarm-preview.css'
+import {createCraneLab} from './world/crane-lab.js'
+import {mountCraneLab} from './ui/crane-lab.js'
+import './ui/crane-lab.css'
 
 /**
  * Boot and the outer game loop.
@@ -42,6 +48,8 @@ import './ui/roarm-preview.css'
  */
 
 const MAGI_VIEW = new URLSearchParams(location.search).get('legacy') !== '1'
+const CANON_CAMPUS = MAGI_VIEW && new URLSearchParams(location.search).get('visual') !== 'legacy'
+const PRESENTATION_ONLY = new URLSearchParams(location.search).get('presentation') === '1'
 const SWARM_VIEW = MAGI_VIEW || new URLSearchParams(location.search).get('swarm') === '1'
 const POLL_MS = SWARM_VIEW ? 3000 : 15000
 const app = document.getElementById('app')
@@ -63,8 +71,12 @@ if(MAGI_VIEW)document.body.classList.add('magi-world')
 const engine = new Engine(settings).mount(app)
 const rig = new CameraRig(engine.camera, engine.canvas, settings)
 const colony = new Colony(engine.scene, settings, engine.camera, engine.renderer)
+const craneLab=MAGI_VIEW&&!REPLAY_RUN?createCraneLab(engine.scene):null
+let lastCraneFrameAt=performance.now()
+const cranePanel=craneLab?mountCraneLab(app,craneLab,{focus:p=>{rig.desiredAzimuth=0;rig.desiredPolar=.95;rig.restPolar=.95;rig.focus(new THREE.Vector3(p.x,38,p.z),{distance:195,elevated:true})},home:()=>frameSwarm()}):null
+if(craneLab)window.craneSimulation=Object.freeze({practice:moves=>craneLab.practice(moves),wave:()=>craneLab.wave(),smooth:moves=>craneLab.smooth(moves),retarget:target=>craneLab.retarget(target),scan:()=>craneLab.scan(),interrupt:()=>craneLab.interrupt(),setFaults:p=>craneLab.setFaults(p),reset:()=>craneLab.reset(),snapshot:()=>craneLab.snapshot(),startVelocity:()=>craneLab.startVelocity(),setTargetOffsetMm:v=>craneLab.setTargetOffsetMm(v),setVelocityFaults:p=>craneLab.setVelocityFaults(p)})
 let lastArmObservation=null
-const armPreview=MAGI_VIEW&&!REPLAY_RUN?createRoArmPreview(engine.scene):null
+const armPreview=MAGI_VIEW&&!REPLAY_RUN&&!PRESENTATION_ONLY?createRoArmPreview(engine.scene):null
 const armPreviewPanel=armPreview?RoArmPreviewPanel(app,armPreview,()=>lastArmObservation):null
 if(armPreviewPanel)armPreviewPanel.element.hidden=true
 if(armPreview)window.roarmSimulation=Object.freeze({
@@ -88,7 +100,10 @@ function frameSwarm() {
   rig.maxDistance=Math.max(150,radius*4)*MAP_LINEAR_SCALE
   rig.worldLimit=Math.max(82,radius+20)*MAP_LINEAR_SCALE
   if(engine.camera.far<radius*6*MAP_LINEAR_SCALE) {engine.camera.far=radius*6*MAP_LINEAR_SCALE;engine.camera.updateProjectionMatrix()}
-  rig.focus(new THREE.Vector3(0,MAGI_VIEW?2:0,MAGI_VIEW?-10:0),{distance:MAGI_VIEW?125:Math.max(110,radius*3.5)*MAP_LINEAR_SCALE})
+  const freeCampus=colony.worksiteProjection?.sceneLayout==='canonical-campus'||colony.worksiteProjection?.campus?.dispatchMode==='free-15-3A'
+  rig.restAzimuths=freeCampus?[0,Math.PI/2,Math.PI,Math.PI*1.5]:null;rig.restPolar=freeCampus ? .65 : null
+  if(freeCampus){rig.desiredAzimuth=0;rig.desiredPolar=.65;rig.maxDistance=Math.max(rig.maxDistance,420);rig.worldLimit=Math.max(rig.worldLimit,220)}
+  rig.focus(new THREE.Vector3(freeCampus?-15:0,freeCampus?22:MAGI_VIEW?2:0,freeCampus?-43:MAGI_VIEW?-10:0),{elevated:freeCampus,distance:freeCampus?310:MAGI_VIEW?125:Math.max(110,radius*3.5)*MAP_LINEAR_SCALE})
 }
 let hoverId = null
 let statusCursor = 0
@@ -99,6 +114,14 @@ const hoverGround = new THREE.Vector3()
 
 const actions = {
   resetView: () => SWARM_VIEW ? frameSwarm() : rig.resetView(),
+  autoFocus: () => {
+    const on=!settings.get('autoFocus')
+    settings.set('autoFocus',on)
+    autoFocusAt=-Infinity
+    if(!on)engine.setAutoFocus(null)
+    hud.hint(on?'Auto Focus on — follows your current view':'Auto Focus off — aperture settings restored')
+    return on
+  },
 
   screenshot: () => {
     // Render one more frame, then read the buffer before the compositor clears it — the
@@ -308,14 +331,15 @@ const actions = {
 const hud = new Hud(app, settings, actions)
 const campfireSpeech = MAGI_VIEW ? new CampfireSpeech(app) : null
 if (MAGI_VIEW) mountDisplayToggle(app)
+if (MAGI_VIEW && new URLSearchParams(location.search).get('dual') === '1') mountTokenHud(app)
 const mission = new MissionPanel(app, id => select(id, { fly: true }))
 const swarm = new SwarmPanel(app, id => select(id, { fly: true }))
-const magiPanel = MAGI_VIEW ? new MagiPanel(app,colony,id=>select(id,{fly:true}),clusterId=>{
+const magiPanel = MAGI_VIEW&&!PRESENTATION_ONLY ? new MagiPanel(app,colony,id=>select(id,{fly:true}),clusterId=>{
   const camp=colony.astronauts.magiLife.camps.get(clusterId)
   if(camp)rig.focus(camp.group.position,{distance:66})
 }) : null
 const messageBoards=new MessageBoards(engine.scene)
-const worksiteBoard = MAGI_VIEW ? new WorksiteBoard(app,()=>rig.focus(new THREE.Vector3(-22,5,22),{distance:40}),()=>rig.focus(new THREE.Vector3(0,8,3),{distance:48,elevated:true}),()=>{
+const worksiteBoard = MAGI_VIEW&&!PRESENTATION_ONLY ? new WorksiteBoard(app,()=>rig.focus(colony.worksite?.board?.position??new THREE.Vector3(-22,5,22),{distance:32}),()=>rig.focus(new THREE.Vector3(0,8,3),{distance:48,elevated:true}),()=>{
   if(armPreviewPanel){armPreviewPanel.element.hidden=!armPreviewPanel.element.hidden;armPreviewPanel.refresh();rig.focus(new THREE.Vector3(0,8,3),{distance:48,elevated:true})}
 },()=>rig.focus(new THREE.Vector3(0,3,-40),{distance:42,elevated:true})) : null
 const boardPanel=new MessageBoardPanel(app,id=>{
@@ -735,11 +759,13 @@ async function pollArm() {
     if(!response.ok)throw Error('Observation unavailable')
     const observation=await response.json()
     lastArmObservation=observation
+    craneLab?.updateObservation(observation)
     colony.worksite?.updateObservation(observation)
     worksiteBoard?.observation(observation)
     armPreviewPanel?.refresh()
   } catch {
     lastArmObservation={state:'offline'}
+    craneLab?.updateObservation({state:'offline'})
     colony.worksite?.updateObservation({state:'offline'})
     worksiteBoard?.observation({state:'offline'})
     armPreviewPanel?.refresh()
@@ -749,7 +775,8 @@ async function poll() {
   if (polling) return
   polling = true
   try {
-    const res = await fetchThreads(MAGI_VIEW)
+    const response = await fetchThreads(MAGI_VIEW)
+    const res = CANON_CAMPUS ? canonicalCampusResponse(response) : response
     colony.setWorksiteProjection(res.worksite || {})
     if(MAGI_VIEW&&res.mode==='magi'&&!REPLAY_RUN)try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
     applyThreads(res.threads || [])
@@ -833,7 +860,7 @@ async function boot() {
   if (!kitError) colony.onAssetsReady()
 
   await poll()
-  if(MAGI_VIEW&&!REPLAY_RUN){void pollArm();setInterval(pollArm,1000)}
+  if(MAGI_VIEW&&!REPLAY_RUN&&!PRESENTATION_ONLY){void pollArm();setInterval(pollArm,1000)}
   setInterval(poll, POLL_MS)
   window.addEventListener('focus', poll)
   // A tab that was hidden for an hour should catch up the moment it comes back.
@@ -868,15 +895,24 @@ settings.onChange((changed, scope) => {
 
 // ── frame ─────────────────────────────────────────────────────────────────────────────
 
+let autoFocusAt=-Infinity
 engine.add({
   update(dt, elapsed) {
     rig.update(dt)
     colony.update(dt, elapsed, rig.target)
+    colony.worksite?.animate?.(elapsed,colony.astronauts.agents)
     campfireSpeech?.update(colony.astronauts.agents, colony.worksite, colony.worksiteProjection, engine.camera, engine.viewport, elapsed)
     armPreview?.update(dt)
+    const craneFrameAt=performance.now();craneLab?.update(Math.max(0,(craneFrameAt-lastCraneFrameAt)/1000),elapsed);lastCraneFrameAt=craneFrameAt
+    cranePanel?.update(elapsed)
     if(MAGI_VIEW&&engine.scene.fog){engine.scene.fog.near=rig.distance+45;engine.scene.fog.far=rig.distance+320}
     magiPanel?.tick(elapsed)
-    // Whatever the camera is orbiting is what should be in focus.
+    if(settings.get('autoFocus')&&elapsed-autoFocusAt>=.5){
+      const life=colony.astronauts.magiLife
+      engine.setAutoFocus(measureAutoFocus(engine.camera,[colony.plotGroup,colony.worksite?.group,colony.worksite?.freeScene?.group,life.hangar?.group,...(life.hangar?.bays??[]).map(b=>b.model),...Array.from(life.fleet.values(),f=>f.model),craneLab?.group,colony.astronauts.group],rig.distance))
+      autoFocusAt=elapsed
+    }else if(!settings.get('autoFocus'))engine.setAutoFocus(null)
+    // Manual focus follows the orbit target; Auto Focus fits the visible objects.
     engine.setFocusDistance(rig.distance)
 
     if (selectedId) {

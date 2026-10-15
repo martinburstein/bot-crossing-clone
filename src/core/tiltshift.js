@@ -48,6 +48,8 @@ const common = {
     uFocusDistance: { value: 30 },
     /** How far from that plane a pixel has to be before it is blurred as hard as it gets. */
     uFocusRange: { value: 20 },
+    /** Auto Focus keeps this whole depth interval sharp. Zero retains the manual lens. */
+    uSharpRange: { value: 0 },
     /** Plane-of-focus tilt in radians. 0 is square to the view, as an ordinary lens is. */
     uTilt: { value: 0 },
     uNear: { value: 0.1 },
@@ -73,6 +75,7 @@ const common = {
       uniform sampler2D tDepth;
       uniform float uFocusDistance;
       uniform float uFocusRange;
+      uniform float uSharpRange;
       uniform float uTilt;
       uniform float uNear;
       uniform float uFar;
@@ -108,7 +111,7 @@ const common = {
         vec3 planeNormal = vec3( 0.0, sin( uTilt ), cos( uTilt ) );
         float signedDist = dot( viewPos - vec3( 0.0, 0.0, -uFocusDistance ), planeNormal );
 
-        return clamp( abs( signedDist ) / max( uFocusRange, 0.0001 ), 0.0, 1.0 );
+        return clamp( ( abs( signedDist ) - uSharpRange ) / max( uFocusRange, 0.0001 ), 0.0, 1.0 );
       }
     #endif
 
@@ -214,6 +217,9 @@ export function createTiltShift() {
     setFocusDistance(distance) {
       focusDistance = Math.max(0.1, distance)
       applyDerived()
+    },
+    setSharpRange(range) {
+      set('uSharpRange',Math.max(0,range))
     },
     /** Projection terms, needed to turn a depth sample back into a view-space position. */
     setCamera(camera) {

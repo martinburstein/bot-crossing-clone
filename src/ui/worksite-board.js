@@ -62,9 +62,9 @@ export class WorksiteBoard {
     this.campButton.hidden=profile!=='roarm-campus'
     if(pilot)this.lastPilot=pilot
     const duty=pilot||this.lastPilot
-    this.pilot.textContent=duty?`Pilot ${duty.workerId.toUpperCase()} · ${stale?'assignment feed unavailable':duty.duty==='off'?'Rest authorized':duty.duty==='on'?'Stationed at controls':'key assigned'} · model activity shown separately`:'Pilot: awaiting assignment'
+    this.pilot.textContent=campus?.dispatchMode==='free-15-3A'?`Pilot file · ${duty?.slotId?campusSlotName(duty.slotId)+' selected':'available to any unit'} · physical authority is separate`:duty?`Pilot ${(duty.workerId||'unassigned').toUpperCase()} · ${stale?'assignment feed unavailable':duty.duty==='off'?'Rest authorized':duty.duty==='on'?'Stationed at controls':'key assigned'} · model activity shown separately`:'Pilot: awaiting assignment'
     this.roles.hidden=!['roarm-16','roarm-campus'].includes(profile);this.pair.textContent=''
-    this.roleSummary.textContent=profile==='roarm-campus'?'15 executor skills · 225 starting tasks':'15 shared roles · 225 ordered skills'
+    this.roleSummary.textContent=campus?.dispatchMode==='free-15-3A'?'15 replaceable agent files · Pilot + Camper permanent':profile==='roarm-campus'?'15 executor skills · 225 starting tasks':'15 shared roles · 225 ordered skills'
     if(!this.roles.hidden)this.roleList.replaceChildren(...roleCatalog.map(role=>{const item=node('article');item.append(node('strong',`${role.id.toUpperCase()} · ${role.title}`),node('p',role.purpose||''));return item}))
     this.cycle.hidden=!['roarm-16','roarm-campus'].includes(profile)
     if(profile==='roarm-16'){
@@ -75,7 +75,7 @@ export class WorksiteBoard {
     if(profile==='roarm-campus')this.renderCampus(campus,executorSlots,stale,roleCatalog)
     const open=bounties.filter(b=>b.status==='open')
     this.summary.textContent=`RoArm · ${stale?'Board offline':earnedRewards.length+' rewards · '+contracts.length+' contracts'}${open.length?' · '+open.length+' blockers':''}`
-    this.status.textContent=stale?'Waiting for a fresh work record.':profile==='roarm-16'?'Shared contract → choose roles → work together → Astra review → camp → next contract':profile==='roarm-campus'?'Report + proposed hat → Astra acceptance → own pod → next executor receives instructions':'Complete contract → independent review → earn wearable → leave next contract'
+    this.status.textContent=stale?'Waiting for a fresh work record.':campus?.dispatchMode==='free-15-3A'?'Choose any unit + agent file → bounded work → verified acceptance. Idle dialogue replays accepted Luna contributions.':profile==='roarm-16'?'Shared contract → choose roles → work together → Astra review → camp → next contract':profile==='roarm-campus'?'Report + proposed hat → Astra acceptance → own pod → next executor receives instructions':'Complete contract → independent review → earn wearable → leave next contract'
     this.list.replaceChildren()
     for(const reward of earnedRewards){const item=node('article');item.append(node('strong',reward.design?.name||reward.rewardDesign?.name||reward.name||'Earned wearable'),node('p',`${reward.roleId||reward.workerId?.toUpperCase()||''} · reviewed RoArm work`));this.list.append(item)}
     for(const contract of contracts){const item=node('article');item.append(node('strong',contract.title||'Next contract'),node('p',contract.objective||''),node('small',`Proposed · ${contract.predecessorWorkerId||'previous worker'} → ${contract.successorWorkerId||'next worker'}`));this.list.append(item)}
@@ -88,6 +88,19 @@ export class WorksiteBoard {
     this.philosophy=null
     this.cycleBody.replaceChildren();this.cycleTitle.textContent='Work ahead & campfire'
     if(stale||!c){this.cycleBody.append(node('p','Waiting for a fresh campus record.'));return}
+    if(c.dispatchMode==='free-15-3A'){
+      this.cycleTitle.textContent='Three Luna units · interchangeable roles'
+      this.pair.textContent=`15-3A · 17 residents / 15 RAM roles + Pilot + Camper · ${slots.filter(s=>s.status==='running').length}/3 real turns running`
+      for(const slot of slots){const title=roleCatalog.find(r=>r.id===slot.roleId)?.title||slot.roleId||'No role selected';this.cycleBody.append(node('p',`${campusSlotName(slot.slotId)} · ${slot.status} · ${title}`))}
+      this.cycleBody.append(node('p',`Memory pods: ${c.free.chargingRoleIds.join(', ')||'no retired roles waiting'}. All 17 residents stay visible; a computer activates a role by selecting its file.`))
+      if(c.free.camperOpportunity?.visitSuggested)this.cycleBody.append(node('p',`Camper visit suggested: ${c.free.camperOpportunity.acceptedWorkSinceVisit} accepted reports to discuss.`))
+      const d=node('details');d.className='campfire-philosophy';d.open=!!this.philosophyOpen
+      d.append(node('summary','Luna conversation'),node('small','Generated during real bounded tasks, then accepted by the lead. Idle playback does not run a model.'))
+      for(const line of c.free.conversation.slice(-12)){const row=node('article');row.append(node('strong',`${campusSlotName(line.slotId)} · ${line.kind}`),node('p',line.text),node('small',`Contribution task: ${line.taskId} · Evidence tasks: ${line.sourceTaskIds.join(', ')||'none (reflection/question)'} · Accepted ${new Date(line.acceptedAt).toLocaleString()}`));d.append(row)}
+      if(!c.free.conversation.length)d.append(node('p','Waiting for the first accepted Luna contribution.'))
+      this.cycleBody.append(d);this.philosophy=d
+      return
+    }
     const mapping=campusSlotAssignments(c)
     if(!mapping){this.cycleBody.append(node('p','Campus slot mapping is invalid; duty labels and imagined dialogue are withheld.'));return}
     this.pair.textContent=`15-1A + 2 specialists · Cycle ${c.cycleNumber} · ${c.mode==='sleeping'?'All fifteen tucked into pods':`${c.campRoleIds.length} at camp · ${c.activeRoleId} selected · ${c.chargingRoleId} charging`}`

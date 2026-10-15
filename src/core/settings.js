@@ -146,6 +146,7 @@ const DEFAULTS = {
   bloomStrength: 0.25,
   tiltShiftStrength: 0.2, // 0..1 — share of the effect's full blur radius (2% of frame height)
   tiltShiftAngle: 0, // degrees — 0 keeps the sharp band horizontal
+  autoFocus: false, // follow visible object depths while panning and zooming
   iblIntensity: 1.0,
   fov: 38,
 
@@ -170,6 +171,7 @@ const RENDER_KEYS = new Set([
   'tiltShift',
   'tiltShiftStrength',
   'tiltShiftAngle',
+  'autoFocus',
 ])
 
 export class Settings {

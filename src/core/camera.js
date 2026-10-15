@@ -314,9 +314,10 @@ export class CameraRig {
   }
 
   _nearestIso() {
-    let best = ISO_AZIMUTHS[0]
+    const headings=this.restAzimuths??ISO_AZIMUTHS
+    let best = headings[0]
     let bestDelta = Infinity
-    for (const base of ISO_AZIMUTHS) {
+    for (const base of headings) {
       // Compare in the same revolution as the current heading, so easing home never takes
       // the long way round the compass.
       const wrapped = base + Math.round((this.desiredAzimuth - base) / (Math.PI * 2)) * Math.PI * 2
@@ -352,7 +353,7 @@ export class CameraRig {
     if (!this.orbiting && this.settings.get('autoFrame') && this.idleFor > 2.2 && !this.interacting) {
       const ease = Math.min(1.4, (this.idleFor - 2.2) * 0.7)
       this.desiredAzimuth = damp(this.desiredAzimuth, this._nearestIso(), ease, dt)
-      this.desiredPolar = damp(this.desiredPolar, ISO_POLAR, ease, dt)
+      this.desiredPolar = damp(this.desiredPolar, this.restPolar??ISO_POLAR, ease, dt)
     }
 
     const lambda = this.settings.get('reducedMotion') ? 40 : 9

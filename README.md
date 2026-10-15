@@ -1,3 +1,11 @@
+# Current visual canon
+
+Say **Launch Dual View** or run `node tools/dual-view.mjs` to open the current
+Waveshare campus in two equal halves: Codex left, Bot Crossing right, embedded
+usage HUD, no separate MAGI UI. `CANON-VISUAL.json` is the shared canon.
+See [Dual View](docs/DUAL-VIEW.md). This presentation command starts no workers
+or hardware.
+
 # Bot Crossing — your agent threads, as a colony
 
 The current 15/3A view has fifteen personas in three camps and a mission fleet that makes active workers visible through their vehicles. Vehicles drill, haul, scout or carry camp reports according to their jobs; idle crews retain their camp routines. See [vehicle missions and verification](docs/15-3A/VEHICLE-MISSIONS.md).

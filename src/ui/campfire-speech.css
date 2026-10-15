@@ -9,3 +9,5 @@
 .campfire-bubble.balthasar strong{color:#557744}
 .campfire-bubble.speaking{opacity:1;border-width:2px}
 .campfire-speech-note{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);padding:3px 8px;border-radius:10px;background:#201e1bbb;color:#ead6b9;font:10px/1.3 system-ui,sans-serif;white-space:nowrap}
+.unit-conversation .campfire-bubble{width:260px;font-size:13px;background:#142523f5;color:#e6f5eb;border-color:#b3d8cb;box-shadow:0 5px 20px #0006}
+.unit-conversation .campfire-bubble strong{color:#a8e6cc}.unit-conversation .campfire-bubble::after{background:#142523;border-color:#b3d8cb}

@@ -6,6 +6,7 @@ import {MagiLife} from './magi-life.js'
 import {syncRewardWearable,applyRewardBoneTransform} from '../world/roarm-rewards.js'
 import {createRoArmPilotGear} from '../world/roarm-pilot-gear.js'
 import {isCampusPilot,createCampusPilotGear} from '../world/campus-pilot-gear.js'
+import {isCampusCamper,createCampusCamperGear} from '../world/campus-camper-gear.js'
 
 /**
  * Every astronaut in the colony, mostly drawn in seven shared draw calls.
@@ -308,7 +309,7 @@ export class Astronauts {
     // at — and reading it off the rig means it follows CREW_SCALE without a second constant.
     const restHeadY = rig.attach[(this.headSlot + 0) * 16 + 13]
     this.headHeight = (restHeadY + P.headUp) * CREW_SCALE
-    for(const agent of this.agents){this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent)}
+    for(const agent of this.agents){this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent);this._syncCampusCamper(agent)}
   }
 
   _disposeRewardWearable(agent) {
@@ -327,13 +328,20 @@ export class Astronauts {
     agent.pilotGear?.dispose();agent.pilotGear=null
   }
 
+  _syncCampusCamper(agent) {
+    const camper=isCampusCamper(agent.thread)
+    if(agent.isCampusCamper===camper)return
+    agent.campusCamperGear?.dispose();agent.campusCamperGear=null;agent.isCampusCamper=camper;agent.colorDirty=true
+    if(camper){agent.campusCamperGear=createCampusCamperGear();this.group.add(agent.campusCamperGear)}
+  }
+
   _syncCampusPilot(agent) {
     const campusPilot=isCampusPilot(agent.thread)
     if(agent.isCampusPilot===campusPilot)return
     agent.campusPilotGear?.dispose();agent.campusPilotGear=null
     agent.isCampusPilot=campusPilot;agent.colorDirty=true
     if(campusPilot) {
-      agent.campusPilotGear=createCampusPilotGear()
+      agent.campusPilotGear=createCampusPilotGear({aura:agent.thread.dispatchMode==='free-15-3A'})
       this.group.add(agent.campusPilotGear)
     }
   }
@@ -343,9 +351,9 @@ export class Astronauts {
   }
 
   _renderScale(agent) {
-    if(agent.thread?.worldProfile==='roarm-campus'&&agent.thread.shellId==='w16')return 0
+    if(agent.thread?.worldProfile==='roarm-campus'&&agent.thread.shellId==='w16'&&agent.thread.dispatchMode!=='free-15-3A')return 0
     const roleScale=agent.isRoArm16Captain?PILOT_CAPTAIN_SCALE:
-      agent.isCampusPilot?(agent.campusPilotGear?.userData.characterScale||1.14):1
+      agent.isCampusPilot?(agent.campusPilotGear?.userData.characterScale||1.14):agent.isCampusCamper?1.65:1
     return agent.scale*CREW_SCALE*roleScale
   }
 
@@ -649,14 +657,14 @@ export class Astronauts {
     this._applyStatus(agent, entry.status)
     this.agents.push(agent)
     this.byId.set(agent.id, agent)
-    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent)
+    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent);this._syncCampusCamper(agent)
     return agent
   }
 
   _updateAgent(agent, entry) {
     const newSwarmProject=entry.thread?.isShell && agent.thread?.constructionRunId!==entry.thread.constructionRunId
     agent.thread = entry.thread
-    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent)
+    this._syncRewards(agent);this._syncPilotCaptain(agent);this._syncCampusPilot(agent);this._syncCampusCamper(agent)
     if(entry.home) agent.home.copy(entry.home)
     const suit = entry.thread?.suitColor ?? SUIT_TONES[(hash(entry.id) >>> 3) % SUIT_TONES.length]
     if (agent.suit !== suit) { agent.suit = suit; agent.colorDirty = true }
@@ -751,6 +759,7 @@ export class Astronauts {
         this._disposeRewardWearable(agent)
         this._disposePilotCaptain(agent)
         this._disposeCampusPilot(agent)
+        agent.campusCamperGear?.dispose()
         this.agents.splice(i, 1)
         this.byId.delete(agent.id)
         continue
@@ -1036,7 +1045,7 @@ export class Astronauts {
       const target=this._steerTarget(agent,this._wp)
       agent.site=site
       const direction=this._v.set(target.x-agent.pos.x,0,target.z-agent.pos.z)
-      this._walk(agent,direction,distance,dt,.7)
+      this._walk(agent,direction,distance,dt,agent.isCampusCamper ? .38 : .7)
       // A long approach can exhaust A*'s search budget, leaving a direct fallback
       // aimed through a hangar wall. Retry locally once the pilot reaches it.
       agent.magiStuck=(agent.blocked||agent.groundSpeed<.03)?(agent.magiStuck||0)+dt:0
@@ -1288,7 +1297,7 @@ export class Astronauts {
     const frames = this.frameAttr.array
     const crewFrames = this.crewFrameAttr?.array
 
-    for(const agent of this.agents){if(agent.rewardWearable)agent.rewardWearable.group.visible=false;agent.pilotGear?.hide();agent.campusPilotGear?.hide()}
+    for(const agent of this.agents){if(agent.rewardWearable)agent.rewardWearable.group.visible=false;agent.pilotGear?.hide();agent.campusPilotGear?.hide();agent.campusCamperGear?.hide()}
 
     let i = 0
     let hands = 0
@@ -1363,6 +1372,10 @@ export class Astronauts {
           attachMatrixAt(rig,agent.frame,this.headSlot,bone);headBone.copy(bone)
           attachMatrixAt(rig,agent.frame,this.chestSlot,bone)
           agent.campusPilotGear.update(root,headBone,bone)
+        }
+        if(agent.campusCamperGear) {
+          attachMatrixAt(rig,agent.frame,this.headSlot,bone);headBone.copy(bone)
+          attachMatrixAt(rig,agent.frame,this.chestSlot,bone);agent.campusCamperGear.update(root,headBone,bone)
         }
       }
 
@@ -1525,7 +1538,7 @@ export class Astronauts {
 
   dispose() {
     this.magiLife.dispose()
-    for(const agent of this.agents){this._disposeRewardWearable(agent);this._disposePilotCaptain(agent);this._disposeCampusPilot(agent)}
+    for(const agent of this.agents){this._disposeRewardWearable(agent);this._disposePilotCaptain(agent);this._disposeCampusPilot(agent);agent.campusCamperGear?.dispose()}
     for (const mesh of Object.values(this.parts)) {
       mesh.geometry.dispose()
       mesh.material.dispose()

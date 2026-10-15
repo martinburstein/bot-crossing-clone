@@ -50,13 +50,15 @@ function interpolate(a,b,t) { return Object.fromEntries(JOINTS.map(joint=>[joint
  * path. The only start point it accepts is a recent live observation supplied
  * by the caller; moves are complete absolute raw-radian joint targets.
  */
-export function createRoArmPreview(scene,{now=Date.now}={}) {
+export function createRoArmPreview(scene,{now=Date.now,appearance='ghost'}={}) {
   if(!scene?.add)throw new TypeError('createRoArmPreview requires a Three.js scene')
   if(typeof now!=='function')throw new TypeError('preview clock must be a function')
   const model=createRoArmModel(),group=model.group
   group.name='roarm-simulation-ghost';group.userData.simulationOnly=true;group.userData.source='simulation-preview'
   const ownedMaterials=new Set()
+  if(!['ghost','solid'].includes(appearance))throw new TypeError('Unknown preview appearance')
   group.traverse(object=>{
+    if(appearance==='solid')return
     if(!object.isMesh||!object.material)return
     const source=Array.isArray(object.material)?object.material:[object.material]
     const ghost=source.map(material=>{
@@ -88,6 +90,18 @@ export function createRoArmPreview(scene,{now=Date.now}={}) {
     poseObservation(start)
     return snapshot()
   }
+  // Offline practice has an explicit synthetic origin. It never fabricates a
+  // live observation or relaxes preview()'s fresh measured-start requirement.
+  function rehearse({startPose,moves}={}) {
+    assertActive()
+    if(!Array.isArray(moves)||moves.length<1||moves.length>MAX_MOVES)throw new RangeError(`Rehearsal needs 1 to ${MAX_MOVES} bounded moves`)
+    const start=finitePose(startPose,'rehearsalStart')
+    const targets=moves.map((pose,index)=>finitePose(pose,`moves[${index}]`))
+    source='offline-rehearsal';observedAt=null
+    sequence=[start,...targets];segment=0;elapsed=0;status='previewing'
+    poseObservation(start)
+    return snapshot()
+  }
   function update(dt) {
     assertActive()
     if(typeof dt!=='number'||!Number.isFinite(dt)||dt<0)throw new TypeError('preview delta time must be finite and nonnegative')
@@ -110,5 +124,5 @@ export function createRoArmPreview(scene,{now=Date.now}={}) {
     for(const material of ownedMaterials)material.dispose()
     ownedMaterials.clear();sequence=[];currentPose=null;status='disposed'
   }
-  return {group,preview,clear,update,snapshot,dispose,get limitsRad(){return BOUNDS}}
+  return {group,preview,rehearse,clear,update,snapshot,dispose,get limitsRad(){return BOUNDS}}
 }

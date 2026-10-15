@@ -32,20 +32,22 @@ export class MagiPanel {
     this.flags={stale,standby,replay}
     const working=shells.filter(magiOnShift).length
     const campus=shells.some(s=>s.worldProfile==='roarm-campus')
+    const free=shells.some(s=>s.dispatchMode==='free-15-3A')
     const dedicated=campus||shells.some(s=>s.worldProfile==='roarm-16')
-    this.heading.textContent=campus?'RoArm � Campus':dedicated?'RoArm · 16 personas':'Swarm 15–3A';this.rosterTag.textContent=campus?'15 + 2 / 3':dedicated?'16 / 3':'15 / 3'
-    this.caption.textContent=campus?'One pilot. One camper. Fifteen executor skills, one Casper.':dedicated?'One captain. Two independent role choices. 225 ordered symbioses.':'Three computers. Fifteen personas. One shared camp.'
-    this.status.textContent=stale?'Connection unavailable · crew off shift':standby?'Standby · connect Swarm to begin':dedicated?`${working} / 3 sessions active · pilot duty shown separately`:`${working} / 3 sessions active · ${15-working} personas resting`
+    this.heading.textContent=campus?'RoArm / Campus':dedicated?'RoArm · 16 personas':'Swarm 15–3A';this.rosterTag.textContent=campus?'15 + 2 / 3':dedicated?'16 / 3':'15 / 3'
+    if(free){this.heading.textContent='MAGI · 15–3A';this.rosterTag.textContent='15 + 2 / 3'}
+    this.caption.textContent=free?'Three Luna computers choose among 17 resident roles. Fifteen RAM files can be rewritten; Pilot and Camper are permanent.':campus?'Legacy campus: pilot, camper and one assigned executor unit.':dedicated?'One captain. Two independent role choices. 225 ordered symbioses.':'Three computers. Fifteen personas. One shared camp.'
+    this.status.textContent=stale?'Connection unavailable · crew off shift':standby?'Standby · connect Swarm to begin':free?`${working} / 3 real turns running`:dedicated?`${working} / 3 sessions active · pilot duty shown separately`:`${working} / 3 sessions active · ${15-working} personas resting`
     this.status.dataset.state=stale?'stale':working?'live':'standby'
     if(replay)this.status.textContent=`${replay} replay · no live workers`
     const plans=shells.map(tokenConstruction),total=plans.reduce((n,p)=>n+p.tokens,0),measured=plans.filter(p=>p.measured).length
-    this.total.textContent=`${campus?'1 pilot + 1 camper + 15 executors':dedicated?'1 pilot + 15 shared roles':'15 shared hexagons'} · ${measured?number(total)+' measured tokens':'usage not yet available'}`
+    this.total.textContent=`${free?'17 residents · 15 memory pods':campus?'1 pilot + 1 camper + 15 executors':dedicated?'1 pilot + 15 shared roles':'15 shared hexagons'} · ${measured?number(total)+' measured tokens':'usage not yet available'}`
     const signature=JSON.stringify(shells.map(s=>[s.shellId,s.shellName,s.shellStatus,s.tokenUsage,s.vehicleId,s.assignmentState,s.taskTitle,s.assignmentRole]))+stale
     if(signature===this.signature)return
     this.signature=signature
     const open=new Set([...this.groups.querySelectorAll('details[open]')].map(g=>g.dataset.cluster))
     this.groups.replaceChildren()
-    for(const cluster of [...MAGI_CLUSTERS,...(dedicated&&!campus?[{id:'roles',name:'Shared role library'}]:[])]) {
+    for(const cluster of [...MAGI_CLUSTERS,...(free||dedicated&&!campus?[{id:'roles',name:'Available role bots'}]:[])]) {
       const details=el('details');details.dataset.cluster=cluster.id;details.open=open.has(cluster.id)
       const crew=shells.filter(s=>s.clusterId===cluster.id),summary=el('summary')
       const label=el('span',cluster.name),count=el('small',dedicated?(cluster.id==='roles'?'Available personas':`${crew.filter(magiOnShift).length} active · 1 session`):`${crew.filter(magiOnShift).length} active · 5 bots`)

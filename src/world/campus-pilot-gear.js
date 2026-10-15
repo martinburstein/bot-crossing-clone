@@ -4,6 +4,7 @@ const HELMET_Y=.46
 
 /** True only for the fixed RoArm-campus pilot identity. */
 export function isCampusPilot(thread) {
+  if(thread?.dispatchMode==='free-15-3A')return thread.worldProfile==='roarm-campus'&&thread.roleId==='pilot'
   return thread?.worldProfile==='roarm-campus'&&thread.roleId==='pilot'&&
     thread.workerId==='w00'&&thread.slotId==='melchior'
 }
@@ -14,7 +15,7 @@ export function isCampusPilot(thread) {
  * frame's root, head-bone, and chest-bone matrices. The underlying approved
  * astronaut artwork stays visible; these are small, owned overlay details.
  */
-export function createCampusPilotGear() {
+export function createCampusPilotGear({aura=false}={}) {
   const gear=new THREE.Group()
   gear.name='campus-pilot-gear'
   const helmetFrame=new THREE.Group(),suitFrame=new THREE.Group()
@@ -52,6 +53,11 @@ export function createCampusPilotGear() {
   mesh(suitFrame,'campus-pilot-chest-rank',new THREE.BoxGeometry(.055,.17,.025),cyan,[0,.17,.372])
   for(const x of [-1,1])mesh(suitFrame,`campus-pilot-shoulder-light-${x<0?'left':'right'}`,
     new THREE.SphereGeometry(.07,8,5),cyan,[x*.44,.16,.04])
+  if(aura){
+    const halo=mesh(helmetFrame,'pilot-aura-crown',new THREE.TorusGeometry(.64,.027,8,40),cyan,[0,1.08,0]);halo.rotation.x=Math.PI/2
+    for(const x of [-1,1])mesh(suitFrame,`pilot-aura-mantle-${x}`,new THREE.BoxGeometry(.23,.19,.43),blue,[x*.47,.23,0])
+    mesh(suitFrame,'pilot-aura-core',new THREE.IcosahedronGeometry(.11,0),cyan,[0,.13,.41])
+  }
 
   let disposed=false
   gear.update=(root,headBone,chestBone)=>{
@@ -70,6 +76,6 @@ export function createCampusPilotGear() {
   }
   // Apply this to the pilot's root matrix before passing it to update; scaling
   // this attachment itself would also scale its bone-relative translations.
-  gear.userData.characterScale=1.14
+  gear.userData.characterScale=aura?1.65:1.14
   return gear
 }

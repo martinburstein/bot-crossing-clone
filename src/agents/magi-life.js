@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import {MAGI_CLUSTERS,HANGAR,clusterWorkFront} from '../game/magi-world.js'
 import {createVehicle,chooseVehicle} from '../world/mars-vehicles.js'
 import {createHangar} from '../world/mars-hangar.js'
+import {FREE_CAMPUS} from '../world/free-campus-layout.js'
 import {vehicleJob,confirmedVehicleWorker} from '../game/vehicle-jobs.js'
 import {createVehicleMission} from '../world/vehicle-mission.js'
 import {Navigation} from './navigation.js'
@@ -127,8 +128,15 @@ export class MagiLife {
     if(!this.pilotKey.parent){if(this.pilotKey.userData.disposed)this.pilotKey=makePilotKey();this.scene.add(this.pilotKey)}
     this.agents=agents;this.world=world
     const eligible=agents.filter(a=>['15-3A','roarm-16','roarm-campus'].includes(a.thread.worldProfile)&&a.state!=='leaving'&&a.state!=='gone')
+    const hangarLayout=eligible.some(a=>a.thread.dispatchMode==='free-15-3A'||a.thread.sceneLayout==='canonical-campus')?FREE_CAMPUS.hangar:HANGAR
+    // Standby can arrive before the campus feed. Move the same building and
+    // parked fleet when its designated pad changes, preserving rental state.
+    if(this.hangar&&(this.hangar.group.position.x!==hangarLayout.x||this.hangar.group.position.z!==hangarLayout.z||this.hangar.group.position.y!==(hangarLayout.y??0))){
+      this.hangar.relocate(hangarLayout)
+      for(const item of this.fleet.values()){item.dock.copy(item.bay.dock);item.home.copy(item.bay.work);item.path=null}
+    }
     if(eligible.length&&!this.hangar){
-      this.hangar=createHangar();this.scene.add(this.hangar.group)
+      this.hangar=createHangar(hangarLayout);this.scene.add(this.hangar.group)
       let parked=['eagle','trike','drill-unit']
       try {const saved=this.persist?JSON.parse(localStorage.getItem('botcrossing.15-3A.parked.v2')||'null'):null;if(Array.isArray(saved)&&saved.length===3)parked=saved.map((id,i)=>chooseVehicle(`w0${i+1}`,id))}catch{/* Optional local display history. */}
       this.hangar.bays.forEach((b,i)=>this.parkModel(b,parked[i]))
@@ -218,6 +226,14 @@ export class MagiLife {
   campusDepartureReady(agent,world,elapsed) {
     if(agent.thread.worldProfile!=='roarm-campus')return true
     const c=world?.worksiteProjection?.campus
+    if(c?.dispatchMode==='free-15-3A'){
+      if(c.mode!=='awake'||world.worksiteProjection?.stale||agent.thread.running!==true||['pilot','camper'].includes(agent.thread.roleId))return false
+      const key=`${agent.thread.roleId}:${agent.thread.roleGeneration}:${agent.thread.taskId}`
+      if(agent.campusDownload?.key!==key)agent.campusDownload={key,arrivedAt:null,ready:false}
+      const download=agent.campusDownload,pod=world.worksite?.pods?.find(p=>p.userData.roleId===agent.thread.roleId)
+      if(pod&&Math.hypot(agent.pos.x-pod.position.x,agent.pos.z-pod.position.z)<1){download.arrivedAt??=elapsed;if(elapsed-download.arrivedAt>=2)download.ready=true}
+      return download.ready
+    }
     if(!c||c.mode!=='awake'||c.phase!=='working'||agent.thread.roleId!==c.activeRoleId)return false
     const key=`${c.cycleNumber}:${c.activeRoleId}`
     if(agent.campusDownload?.key!==key)agent.campusDownload={key,arrivedAt:null,ready:false}
@@ -307,10 +323,16 @@ export class MagiLife {
     }
     for(const agent of agents) {
       if(!['15-3A','roarm-16','roarm-campus'].includes(agent.thread.worldProfile)||this.fleet.has(agent.id))continue
-      if(agent.thread.worldProfile==='roarm-campus') {
-        const campus=world?.worksiteProjection?.campus,target=world.worksite?.target?.(agent.thread)
+      if(agent.thread.sceneLayout==='canonical-campus') {
+        const target=world.worksite?.target?.(agent.thread,elapsed,agent)
         agent.mounted=false;agent.magiSeat=null
-        if(agent.thread.roleId==='pilot'&&campus?.mode==='awake'&&campus?.pilot?.instructionState==='station'&&world.worksiteProjection?.pilot?.duty==='on') {
+        if(target){agent.magiActivity=target.activity;agent.magiGoal.copy(target.position);agent.magiLook.copy(target.look)}
+        continue
+      }
+      if(agent.thread.worldProfile==='roarm-campus') {
+        const campus=world?.worksiteProjection?.campus,target=world.worksite?.target?.(agent.thread,elapsed,agent)
+        agent.mounted=false;agent.magiSeat=null
+        if(agent.thread.roleId==='pilot'&&campus?.mode==='awake'&&world.worksiteProjection?.pilot?.duty==='on'&&(campus?.dispatchMode==='free-15-3A'?agent.thread.running===true&&!world.worksiteProjection.stale:campus?.pilot?.instructionState==='station')) {
           const seat=world.worksite?.pilotSeat?.()
           if(seat){agent.mounted=true;agent.magiActivity='pilot';agent.magiSeat=seat.position;agent.magiYaw=seat.yaw;agent.magiGoal.copy(seat.position);agent.magiLook.copy(seat.position);continue}
           agent.magiActivity='pilot';agent.magiGoal.set(0,0,-6);agent.magiLook.set(0,0,0);continue

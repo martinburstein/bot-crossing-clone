@@ -1,3 +1,4 @@
+import {assertFreeCampusProjection,projectFreeCampusState} from './free-campus-magi.mjs'
 const IDS=Array.from({length:15},(_,i)=>`r${String(i+1).padStart(2,'0')}`)
 const WORKERS={melchior:'w00',balthasar:'balthasar',casper:'casper'}
 const SLOT_NAMES={melchior:'Melchior',balthasar:'Balthasar',casper:'Casper'}
@@ -10,6 +11,7 @@ function assignments(c){
   return a
 }
 export function assertCampusProjection(state,now=Date.now()){
+  if(state?.magi?.campus?.dispatchMode==='free-15-3A')return assertFreeCampusProjection(state,now)
   const m=state?.magi,c=m?.campus
   if(state?.schemaVersion!==1||m?.profile!=='roarm-campus'||!['live','standby'].includes(state.mode)||!Number.isSafeInteger(state.revision)||
     typeof state.projectId!=='string'||!state.projectId||!Number.isFinite(state.observedAt)||now-state.observedAt>20000||state.observedAt>now+5000||
@@ -37,6 +39,7 @@ export function assertCampusProjection(state,now=Date.now()){
 }
 
 export function projectCampusState(state,now=Date.now(),usage=new Map()){
+  if(state?.magi?.campus?.dispatchMode==='free-15-3A')return projectFreeCampusState(state,now,usage)
   assertCampusProjection(state,now)
   const m=state.magi,c=m.campus,slots=m.executorSlots
   const assigned=assignments(c)

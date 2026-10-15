@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {campfireExchange} from './campfire-philosophy.js'
+import {unitConversationFrame} from './unit-conversation.js'
 import './campfire-speech.css'
 
 /** Imagined camp talk, anchored to the existing bodies; no execution side effects. */
@@ -23,7 +24,8 @@ export class CampfireSpeech {
     const {w, h} = viewport, x = (this.point.x * .5 + .5) * w, y = (-this.point.y * .5 + .5) * h, ndcZ = this.point.z
     // Cap the close-up size; perspective makes distant voices occupy less screen.
     const depth = -this.point.set(position.x, position.y + height, position.z).applyMatrix4(camera.matrixWorldInverse).z
-    const scale = Math.min(1, 24 / Math.max(1, depth)), halfWidth = 90 * scale + 8
+    const free=this.layer.classList.contains('unit-conversation')
+    const scale = free?Math.max(.8,Math.min(1,40/Math.max(1,depth))):Math.min(1,24/Math.max(1,depth)), halfWidth = (free?130:90) * scale + 8
     const visible = ndcZ >= -1 && ndcZ <= 1 && x >= 0 && x <= w && y >= 0 && y <= h
     bubble.el.hidden = !visible
     if (visible) bubble.el.style.transform = `translate(${Math.max(halfWidth, Math.min(w - halfWidth, x))}px,${Math.max(84 * scale + 8, y - 6 * scale)}px) translate(-50%,-100%) scale(${scale})`
@@ -33,6 +35,22 @@ export class CampfireSpeech {
     // A modest refresh rate keeps these little DOM plates inexpensive.
     if (elapsed < this.next) return
     this.next = elapsed + .1
+    if(projection?.campus?.dispatchMode==='free-15-3A'){
+      const line=!projection.stale&&unitConversationFrame(projection.campus,projection.executorSlots??[],elapsed)
+      this.layer.classList.add('unit-conversation');this.layer.setAttribute('aria-label','Accepted Luna conversation playback')
+      this.role.el.hidden=true
+      if(!line){this.layer.hidden=true;return}
+      const core=worksite?.cores?.[line.slotId]
+      if(!core){this.layer.hidden=true;return}
+      const name=line.slotId[0].toUpperCase()+line.slotId.slice(1)
+      this.camper.name.textContent=`${name} · ${line.kind}`;this.camper.text.textContent=line.text
+      this.note.textContent=`${name} · accepted Luna conversation · replay`
+      this.note.title=`Contribution task: ${line.taskId}. Evidence tasks: ${line.sourceTaskIds.join(', ')||'none'}. Accepted ${new Date(line.acceptedAt).toLocaleString()}. Playback makes no model calls.`
+      core.getWorldPosition(this.point)
+      this.layer.hidden=!this.place(this.camper,this.point.clone(),7,camera,viewport)
+      return
+    }
+    this.layer.classList.remove('unit-conversation');this.layer.setAttribute('aria-label','Imagined campfire conversation');this.note.textContent='Campfire · imagined conversation'
     const talk = projection?.profile === 'roarm-campus' && !projection.stale
       ? campfireExchange(projection.campus, elapsed, projection.roleCatalog) : null
     const speaker = talk && agents.find(a => a.thread?.roleId === talk.id && a.state !== 'gone')

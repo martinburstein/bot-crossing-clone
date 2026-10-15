@@ -4,14 +4,15 @@ import {HANGAR} from '../game/magi-world.js'
 
 // Compact three-bay service shed. The sliding roof is retracted above the rear
 // workshop so the parked fleet remains visible from the colony camera.
-export function createHangar() {
- const group=new THREE.Group();group.name='mars-hangar';group.position.set(HANGAR.x,0,HANGAR.z)
+export function createHangar(layout=HANGAR) {
+ const group=new THREE.Group();group.name='mars-hangar';group.position.set(layout.x,layout.y??0,layout.z)
  const mats={hull:new THREE.MeshStandardMaterial({color:0xe8e2d6,roughness:.65}),dark:new THREE.MeshStandardMaterial({color:0x384751,roughness:.75}),orange:new THREE.MeshStandardMaterial({color:0xe99a46,roughness:.55}),floor:new THREE.MeshStandardMaterial({color:0x5b6569,roughness:.9}),light:new THREE.MeshStandardMaterial({color:0xace5ef,emissive:0x79bdc7,emissiveIntensity:.5})}
  function box(x,y,z,w,h,d,key){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mats[key]);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m}
  box(0,-.1,0,19,1.1,11,'floor')
  const ramp=box(0,-.13,6.5,19,1,2,'floor')
  const rampPositions=ramp.geometry.attributes.position
- for(let i=0;i<rampPositions.count;i++)if(rampPositions.getY(i)>0)rampPositions.setY(i,.38-.2*rampPositions.getZ(i))
+ const rampSlope=(layout.deck-(layout.padHeight??layout.deck-.4))/2
+ for(let i=0;i<rampPositions.count;i++)if(rampPositions.getY(i)>0)rampPositions.setY(i,layout.deck-(layout.y??0)-rampSlope+.13-rampSlope*rampPositions.getZ(i))
  ramp.geometry.computeVertexNormals()
  // Low side panels, a braced back wall and continuous load-bearing roof rails.
  box(0,2.45,-5.2,19,4,.28,'hull')
@@ -27,8 +28,8 @@ export function createHangar() {
    const ctx=canvas.getContext('2d');ctx.fillStyle='#21333f';ctx.fillRect(0,0,768,96);ctx.fillStyle='#f6eee1';ctx.font='bold 47px sans-serif';ctx.textAlign='center';ctx.fillText('MARS MOTOR POOL',384,65)
    const map=new THREE.CanvasTexture(canvas),label=new THREE.Mesh(new THREE.PlaneGeometry(5.5,.63),new THREE.MeshBasicMaterial({map}));label.position.set(0,5.03,4.7);group.add(label)
  }
- const bays=[-6,0,6].map((x,i)=>({index:i,position:new THREE.Vector3(x+HANGAR.x,HANGAR.deck,HANGAR.z),dock:new THREE.Vector3(x+HANGAR.x+2.85,HANGAR.deck,HANGAR.z+1),work:new THREE.Vector3(x+HANGAR.x,0,HANGAR.z+12),model:null,parkedAt:i}))
- for(const bay of bays){const x=bay.position.x-HANGAR.x
+ const bays=[-6,0,6].map((x,i)=>({index:i,position:new THREE.Vector3(x+layout.x,layout.deck,layout.z),dock:new THREE.Vector3(x+layout.x+2.85,layout.deck,layout.z+1),work:new THREE.Vector3(x+layout.x,0,layout.z+12),model:null,parkedAt:i}))
+ for(const bay of bays){const x=bay.position.x-layout.x
    for(const dx of [-2.6,2.6])box(x+dx,.462,0,.07,.024,5.5,'orange')
    box(x,.462,-2.72,5.2,.024,.07,'orange');box(x,4.45,4.5,1,.12,.14,'light')
  }
@@ -42,11 +43,30 @@ export function createHangar() {
  }
  const raycaster=new THREE.Raycaster()
  return {group,bays,
-   contains(x,z){return Math.abs(x-HANGAR.x)<=9.5&&Math.abs(z-HANGAR.z)<=5.5},
-   rampHeight(x,z){const localZ=z-HANGAR.z;return Math.abs(x-HANGAR.x)<=9.5&&localZ>5.5&&localZ<7.5?.45-(localZ-5.5)*.2:null},
+   get deckHeight(){return layout.deck},
+   relocate(next){
+     const dx=next.x-layout.x,dz=next.z-layout.z
+     if(!dx&&!dz&&(next.y??0)===(layout.y??0))return
+     group.position.set(next.x,next.y??0,next.z)
+     for(const bay of bays){
+       for(const point of [bay.position,bay.dock,bay.work]){point.x+=dx;point.z+=dz}
+       bay.position.y=next.deck;bay.dock.y=next.deck
+       if(bay.model)bay.model.position.copy(bay.position)
+     }
+     const nextSlope=(next.deck-(next.padHeight??next.deck-.4))/2
+     // The floor stays local to the building; update its merged ramp too.
+     const floor=group.children.find(m=>m.isMesh&&m.material===mats.floor)
+     const positions=floor.geometry.attributes.position
+     for(let i=0;i<positions.count;i++){const z=positions.getZ(i);if(z>5.5&&positions.getY(i)>-.13)positions.setY(i,next.deck-(next.y??0)-(z-5.5)*nextSlope)}
+     positions.needsUpdate=true;floor.geometry.computeVertexNormals();floor.geometry.computeBoundingBox();floor.geometry.computeBoundingSphere()
+     for(const point of [...this.clearings,...this.obstacles]){point.x+=dx;point.z+=dz}
+     layout=next;group.updateMatrixWorld(true)
+   },
+   contains(x,z){return Math.abs(x-layout.x)<=9.5&&Math.abs(z-layout.z)<=5.5},
+   rampHeight(x,z){const localZ=z-layout.z,slope=(layout.deck-(layout.padHeight??layout.deck-.4))/2;return Math.abs(x-layout.x)<=9.5&&localZ>5.5&&localZ<7.5?layout.deck-(localZ-5.5)*slope:null},
    pick(camera,x,y){raycaster.setFromCamera(new THREE.Vector2(x,y),camera);return raycaster.intersectObject(group,true).length>0},
-   clearings:[{x:HANGAR.x,z:HANGAR.z,r:13},{x:HANGAR.x,z:HANGAR.z+10,r:12}],
-   obstacles:[...[-9,-3,3,9].flatMap(x=>[-5,4.6].map(z=>({x:x+HANGAR.x,z:z+HANGAR.z,r:.5}))),...Array.from({length:19},(_,i)=>({x:i-9+HANGAR.x,z:-5.2+HANGAR.z,r:.65})),...[-9.2,9.2].flatMap(x=>Array.from({length:11},(_,i)=>({x:x+HANGAR.x,z:i-5+HANGAR.z,r:.5}))),...bays.flatMap(b=>[{x:b.position.x,z:b.position.z,r:2.65,parking:true},{x:b.work.x,z:b.work.z,r:2.65,parking:true}])],
+   clearings:[{x:layout.x,z:layout.z,r:13},{x:layout.x,z:layout.z+10,r:12}],
+   obstacles:[...[-9,-3,3,9].flatMap(x=>[-5,4.6].map(z=>({x:x+layout.x,z:z+layout.z,r:.5}))),...Array.from({length:19},(_,i)=>({x:i-9+layout.x,z:-5.2+layout.z,r:.65})),...[-9.2,9.2].flatMap(x=>Array.from({length:11},(_,i)=>({x:x+layout.x,z:i-5+layout.z,r:.5}))),...bays.flatMap(b=>[{x:b.position.x,z:b.position.z,r:2.65,parking:true},{x:b.work.x,z:b.work.z,r:2.65,parking:true}])],
    dispose(){group.traverse(o=>{o.geometry?.dispose();if(o.material?.map){o.material.map.dispose();o.material.dispose()}});Object.values(mats).forEach(m=>m.dispose())},
  }
 }
