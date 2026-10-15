@@ -33,7 +33,7 @@ export function financialOfficeResponse(response={},history=null){
   const threads=OFFICE_PROFILES.map(p=>{
     const source=assignments.get(p.id),pending=candidates.find(t=>profileForThread(t)?.id===p.id);
     return {id:`office:${p.id}`,shellId:`w${String(p.index+1).padStart(2,'0')}`,isShell:true,worldProfile:'15-3A',sceneLayout:OFFICE_SCENE,
-      officeProfileId:p.id,officeStyle:p,displayRoleId:p.id,shellName:p.name,title:p.name,project:`Research / ${p.name}`,projectLabel:p.name,
+      officeProfileId:p.id,officeStyle:p,officeThought:history?.thoughts?.profiles?.[p.id]??null,displayRoleId:p.id,shellName:p.name,title:p.name,project:`Research / ${p.name}`,projectLabel:p.name,
       shellColor:'#d1b786',projectAccent:p.color,suitColor:p.color,constructionRunId:'financial-office-2026-10-15',
       running:!!source,hasError:false,archived:false,unread:false,canOpen:false,createdAt:p.index+1,lastActivityAt:response.scannedAt??Date.now(),sizeBytes:0,
       assignmentRole:source?.assignmentRole??'idle',assignmentState:source?.assignmentState??'idle',shellStatus:source?'At work':'Between assignments',
@@ -47,6 +47,6 @@ export function financialOfficeResponse(response={},history=null){
   });
   return {...response,threads,worksite:{sceneLayout:OFFICE_SCENE,stale:!fresh,executorSlots,
     office:{profiles:8,active:assignments.size,history:history??{entries:[],digest:null},maxConcurrent:3,
-      council:candidates.some(t=>String(t.taskTitle??'').includes('— Campfire discussion'))},
+      council:candidates.some(t=>/campfire/i.test(String(t.taskTitle??'')))},
     campus:{mode:'awake',dispatchMode:'free-15-3A',free:{chargingRoleIds:[],history:[]}}}};
 }

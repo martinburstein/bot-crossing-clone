@@ -15,7 +15,7 @@ export class WorkerInspector {
   }
   select(agent,thread) {
     const eligible=thread?.worldProfile==='15-3A'
-    if(this.id!==agent?.id){this.sample=null;this.next=0;this.signature=null}
+    if(this.id!==agent?.id){this.sample=null;this.next=0;this.signature=null;this.thoughtExpanded=false}
     this.id=agent?.id;this.agent=eligible?agent:null
     this.section.hidden=!eligible;this.card.classList.toggle('magi-inspection',!!eligible)
     if(!eligible)this.bubble.hidden=true
@@ -44,7 +44,15 @@ export class WorkerInspector {
     this.signature=signature;this.renderRows(this.list,data.rows);this.renderRows(this.detail,data.detail)
   }
   renderRows(list,rows) {
-    const nodes=rows.flatMap(([key,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;dd.textContent=value;return [dt,dd]})
+    const nodes=rows.flatMap(([key,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;
+      if(key==='Thoughts'){
+        dd.className='office-thought';const button=document.createElement('button');button.type='button';
+        const note=document.createElement('p');note.textContent=value;
+        const paint=()=>{button.textContent=this.thoughtExpanded?'Close desk note':'Read desk note';button.setAttribute('aria-expanded',String(!!this.thoughtExpanded));note.hidden=!this.thoughtExpanded;};
+        button.onclick=()=>{this.thoughtExpanded=!this.thoughtExpanded;paint();this.onResize();};paint();
+        const caption=document.createElement('small');caption.textContent='Saved character flavor';dd.append(button,note,caption);
+      }else dd.textContent=value;
+      return [dt,dd]})
     list.replaceChildren(...nodes)
   }
 }

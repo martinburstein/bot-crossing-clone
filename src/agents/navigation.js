@@ -81,11 +81,13 @@ export class Navigation {
    * decides whether the gaps between buildings stay walkable.
    */
   rebuild(obstacles) {
+    this.swept=obstacles.some(o=>o.office===true)
     this.blocked.fill(0)
     const { size, cell } = this
 
     for (const o of obstacles) {
-      const r = o.r
+      const rect=o.width>0&&o.depth>0,angle=o.angle||0,cos=Math.cos(angle),sin=Math.sin(angle)
+      const r = rect?Math.hypot(o.width,o.depth)/2:o.r
       if (!(r > 0)) continue
       const minX = Math.max(0, this.toCell(o.x - r))
       const maxX = Math.min(size - 1, this.toCell(o.x + r))
@@ -100,7 +102,7 @@ export class Navigation {
         const row = iz * size
         for (let ix = minX; ix <= maxX; ix++) {
           const dx = this.toWorld(ix) - o.x
-          if (dx * dx + dz * dz <= r2) this.blocked[row + ix] = 1
+          if (rect ? Math.abs(dx*cos-dz*sin)<=o.width/2 && Math.abs(dx*sin+dz*cos)<=o.depth/2 : dx * dx + dz * dz <= r2) this.blocked[row + ix] = 1
         }
       }
     }
@@ -306,6 +308,19 @@ export class Navigation {
    * the pathfinder having succeeded.
    */
   slide(pos, dx, dz) {
+    if(!this.swept)return this._slideStep(pos,dx,dz)
+    // New scenery may cover a saved spawn. Relocate once, rather than walk through it.
+    if(this.isBlocked(pos.x,pos.z)){
+      const free=this.nearestFree(pos.x,pos.z,80)
+      if(!free)return false
+      pos.x=this.toWorld(free.ix);pos.z=this.toWorld(free.iz)
+    }
+    const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.2));let moved=false
+    for(let i=0;i<steps;i++)moved=this._slideStep(pos,dx/steps,dz/steps)||moved
+    return moved
+  }
+
+  _slideStep(pos, dx, dz) {
     // An agent a building was dropped on top of has no legal move at all; walk it out.
     if (this.isBlocked(pos.x, pos.z)) {
       const free = this.nearestFree(pos.x, pos.z)

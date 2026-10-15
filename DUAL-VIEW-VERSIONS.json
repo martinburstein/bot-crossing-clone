@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "versions": {
+    "big-crypto-short": {
+      "phrase": "Start up Dual View for The Big Crypto Short",
+      "spec": "FINANCIAL-OFFICE.json",
+      "launcher": "financial-office.mjs",
+      "project": "crypto-research-lab/projects/crypto-swarm-2026-10-15",
+      "label": "The Big Crypto Short"
+    },
+    "waveshare-arm": {
+      "phrase": "Start up Dual View for Waveshare Arm",
+      "spec": "CANON-VISUAL.json",
+      "launcher": "dual-view.mjs",
+      "label": "Waveshare Arm canon"
+    }
+  },
+  "presentationOnly": true,
+  "modelCalls": 0,
+  "workerDispatch": false,
+  "hardwareStartup": false
+}

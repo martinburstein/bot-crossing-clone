@@ -28,7 +28,7 @@ function containsHex(x,z,{x:cx,z:cz,radius}) {
   return true
 }
 
-export function createRoArmWorksite(scene) {
+export function createRoArmWorksite(scene,{sharpLabels=false}={}) {
   if (!scene?.add) throw new TypeError('createRoArmWorksite requires a Three.js scene')
   const group = new THREE.Group()
   group.name = 'roarm-worksite'
@@ -54,11 +54,11 @@ export function createRoArmWorksite(scene) {
   }
   function labelCanvas(width,height,draw) {
     if(typeof document==='undefined') return null
-    const canvas=document.createElement('canvas'); canvas.width=width;canvas.height=height
-    const ctx=canvas.getContext('2d'); draw(ctx,width,height)
-    const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace
+    const canvas=document.createElement('canvas'); canvas.width=width*(sharpLabels?2:1);canvas.height=height*(sharpLabels?2:1)
+    const ctx=canvas.getContext('2d');if(sharpLabels)ctx.scale(2,2);draw(ctx,width,height)
+    const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;if(sharpLabels)texture.anisotropy=8
     const material=new THREE.MeshBasicMaterial({map:texture,transparent:true,side:THREE.DoubleSide})
-    return {canvas,ctx,texture,material}
+    return {canvas:sharpLabels?{width,height}:canvas,ctx,texture,material}
   }
   const textureMaterials=[]
   const surfaceRecords=[]
@@ -143,7 +143,7 @@ export function createRoArmWorksite(scene) {
   let boardLabel=null
   if(boardCanvas) {
     textureMaterials.push(boardCanvas)
-    boardLabel=new THREE.Mesh(new THREE.PlaneGeometry(13.7,5.4),boardCanvas.material)
+    boardLabel=new THREE.Mesh(new THREE.PlaneGeometry(13.7,sharpLabels?13.7*520/1200:5.4),boardCanvas.material)
     boardLabel.name='bounty-board-readable-face'
     boardLabel.position.set(0,3.8,.55);board.add(boardLabel)
   }

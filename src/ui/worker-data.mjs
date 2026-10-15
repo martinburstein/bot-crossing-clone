@@ -8,6 +8,7 @@ const number=n=>n.toLocaleString('en-US')
 const xyz=p=>[p.x,p.y,p.z].map(n=>Number.isFinite(n)?n.toFixed(1):'—').join(' / ')
 
 export function workerSpeech(agent,fleet) {
+  if(agent.thread.sceneLayout==='financial-office')return agent.magiActivity==='office-work'?'At the MAGI desk':({talk:'By the campfire',board:'Reading desk notes',snack:'Coffee break',stroll:'Walking the office'}[agent.magiActivity]||'Between assignments')
   if(agent.thread.worldProfile==='roarm-campus') {if(agent.thread.campusPosition==='charging'||agent.thread.campusPosition==='sleeping')return 'Resting in my pod';if(agent.thread.campusPosition==='downloading')return 'Receiving instructions';if(agent.thread.roleId==='camper')return 'Keeping the camp history'}
   if(agent.magiActivity==='pilot-rest')return 'Captain · taking a break'
   if(agent.magiActivity==='pilot')return 'At controls'
@@ -21,10 +22,11 @@ export function workerSpeech(agent,fleet) {
 export function workerInspection(agent,fleet,{speed=null,perf={},viewport={},groundY=0,stale=false,standby=false}={}) {
   const thread=agent.thread,onShift=magiOnShift(thread),plan=tokenConstruction(thread)
   const p=fleet?.model.position||agent.pos,target=fleet?.stops[fleet.stopIndex]
+  const office=thread.sceneLayout==='financial-office'
   const rows=[
     [onShift?'Task':'Last task',thread.taskTitle||'No assignment'],
     ['Activity',workerSpeech(agent,fleet)],
-    ['Vehicle',fleet?.model.userData.spec.name||'Off duty · at camp'],
+    ...(office?[['XYZ',xyz(p)],['Thoughts',thread.officeThought||'A quiet desk, a fresh filing, and another question to check.']]:[['Vehicle',fleet?.model.userData.spec.name||'Off duty · at camp']]),
   ]
   const rewards=selectEarnedWearables(thread.earnedRewards,thread.rewardWorkerId||thread.executorWorkerId||thread.shellId)
   if(['roarm-16','roarm-campus'].includes(thread.worldProfile))rows.push(['Executor',thread.executorSlot||'Role library · no session'],['Adopted role',thread.roleTitle||thread.roleId])
@@ -37,8 +39,8 @@ export function workerInspection(agent,fleet,{speed=null,perf={},viewport={},gro
     rows.push(['Mission',fleet.job.label],['Travel',`${speed===null?'—':speed.toFixed(1)} u/s · ${Math.max(0,p.y-groundY).toFixed(1)} u altitude`])
     if(target) rows.push(['Destination',fleet.operating?'Working at stop':`Stop ${fleet.stopIndex+1}/${fleet.stops.length} · ${Math.hypot(target.x-p.x,target.z-p.z).toFixed(1)} u away`])
   }
-  rows.push(['XYZ',xyz(p)],['Tokens',plan.measured?`${number(plan.tokens)}${thread.tokenUsage.cached?' · cached':''}`:'Not measured'])
-  if(plan.measured)rows.push(['Next growth',`${number(plan.nextSmall)} tokens to addition · ${number(plan.nextHex)} to hex`])
+  if(!office)rows.push(['XYZ',xyz(p)],['Tokens',plan.measured?`${number(plan.tokens)}${thread.tokenUsage.cached?' · cached':''}`:'Not measured'])
+  if(!office&&plan.measured)rows.push(['Next growth',`${number(plan.nextSmall)} tokens to addition · ${number(plan.nextHex)} to hex`])
   const detail=[
     ['Feed',stale||thread.assignmentState==='unknown'?'Unavailable · crew off shift':standby?'Standby':'Connected'],
     ['Task record',thread.assignmentState||'idle'],

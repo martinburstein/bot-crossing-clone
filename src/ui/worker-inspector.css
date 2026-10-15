@@ -12,3 +12,10 @@
 .worker-speech { position: absolute; top: 0; left: 0; z-index: 2; padding: 7px 10px; color: #25363a; background: #fff1d4; white-space: nowrap; pointer-events: none; font: bold 12px/1.1 Consolas, monospace; box-shadow: 0 -3px #fff1d4, 0 3px #fff1d4, -3px 0 #fff1d4, 3px 0 #fff1d4, 0 6px #293439; }
 .worker-speech::after { content: ''; position: absolute; bottom: -10px; left: calc(50% - 4px); width: 8px; height: 8px; background: #fff1d4; box-shadow: 3px 3px #293439; }
 @media(max-width:820px) { .hud.worker-selected ~ .magi-panel { display: none; } }
+
+.office-thought { padding: 8px; border: 1px solid #c6a57055; border-radius: 5px; background: #c6a5700b; }
+.office-thought button { background: transparent; border: 0; padding: 0; color: #e9cf98; cursor: pointer; font: inherit; text-align: left; }
+.office-thought button:focus-visible { outline: 2px solid #8ddbcc; }
+.office-thought p { margin: 8px 0; font: 12px/1.6 Georgia,serif; color: #f0eadc; }
+.office-thought p[hidden] { display:none; }
+.office-thought small { display:block; margin-top: 5px; color: #93a49b; font: 9px/1.4 sans-serif; }

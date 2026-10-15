@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "name": "The Big Short - open-air financial office",
+  "name": "The Big Crypto Short - open-air financial office",
   "status": "editable-project-variant",
   "adoptedOn": "2026-10-15",
   "screen": "primary-working-area",
@@ -53,5 +53,6 @@
     "preservedCopy": "visuals/financial-office/canon-source.json"
   },
   "settingsNamespace": "botcrossing.financial-office.settings.v1",
-  "oralHistory": "Project-owned digest-covered ledger; source notes and accepted contributions; continuous ambient replay"
+  "oralHistory": "Project-owned digest-covered ledger; source notes and accepted contributions; continuous ambient replay",
+  "launchPhrase": "Start up Dual View for The Big Crypto Short"
 }

@@ -1,8 +1,9 @@
 import * as THREE from 'three'
+import {sharpLabelTexture} from './label-texture.js'
 import {FREE_CAMPUS as L,FREE_CAMPUS_PODS as PODS,FREE_CAMPUS_SEATS as SEATS,CAMPUS_HEX_RADIUS,campusHexPoint,FREE_CAMPUS_HOMES,freeCampusUpload} from './free-campus-layout.js'
 
 // Scenery only: every light, upload animation and resident pose follows state.
-export function createFreeCampusScene(scene,base){
+export function createFreeCampusScene(scene,base,{sharpLabels=false}={}){
   const group=new THREE.Group();group.name='free-campus-geometric-garden';group.visible=false;scene.add(group)
   const geometries=new Set(),materials=new Set(),textures=new Set()
   const mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.62,metalness:.18,...extra});materials.add(m);return m}
@@ -14,6 +15,12 @@ export function createFreeCampusScene(scene,base){
   function hex(x,z,r,y,h,m,p=group){const g=new THREE.CylinderGeometry(r,r,h,6);g.rotateY(Math.PI/6);return mesh(g,m,x,y,z,p)}
   function canvasLabel(text,sub,w,h,parent,x,y,z,{flat=false,color='#d9f7ed',background='#10272b',font=76}={}){
     if(typeof document==='undefined')return null
+    if(sharpLabels){
+      const {texture,draw}=sharpLabelTexture(w,h,{background,color,detailColor:'#dabf8a'});textures.add(texture);
+      const material=new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide});materials.add(material);
+      const label=mesh(new THREE.PlaneGeometry(w,h),material,x,y,z,parent);if(flat)label.rotation.x=-Math.PI/2;
+      draw(text,sub);label.userData.draw=draw;return label;
+    }
     const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=384;const ctx=canvas.getContext('2d')
     const draw=(title,detail)=>{ctx.fillStyle=background;ctx.fillRect(0,0,1024,384);ctx.strokeStyle='#d4ac63';ctx.lineWidth=5;ctx.strokeRect(14,14,996,356);ctx.textAlign='center';ctx.fillStyle=color;ctx.font=`600 ${font}px sans-serif`;ctx.fillText(title,512,178);ctx.fillStyle='#dabf8a';ctx.font='29px sans-serif';ctx.fillText(detail,512,274);texture.needsUpdate=true}
     const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;textures.add(texture)

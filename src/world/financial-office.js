@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {sharpLabelTexture} from './label-texture.js';
 import {createRoArmWorksite} from './roarm-worksite.js';
 import {createFreeCampusScene} from './free-campus-scene.js';
 import {FREE_CAMPUS as L,FREE_CAMPUS_SEATS} from './free-campus-layout.js';
@@ -7,7 +8,7 @@ import {createPaperBank,BANK_POSITION} from './paper-bank.js';
 
 // Editable sibling of the canon: reuse exact civic geometry, never mutate its definitions.
 export function createFinancialOffice(scene){
-  const base=createRoArmWorksite(scene),civic=createFreeCampusScene(scene,base),group=new THREE.Group();
+  const base=createRoArmWorksite(scene,{sharpLabels:true}),civic=createFreeCampusScene(scene,base,{sharpLabels:true}),group=new THREE.Group();
   group.name='financial-office-open-air-floor';scene.add(group);
   const geometries=new Set(),materials=new Set(),textures=new Set();
   const mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.74,metalness:.06,...extra});materials.add(m);return m;};
@@ -17,11 +18,9 @@ export function createFinancialOffice(scene){
   const cyl=(x,y,z,r,h,m,p=group)=>mesh(new THREE.CylinderGeometry(r,r,h,20),m,x,y,z,p);
   function label(title,detail,w,h,parent,x,y,z,{flat=false,size=60}={}){
     if(typeof document==='undefined')return null;
-    const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');
-    const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;textures.add(texture);
+    const {texture,draw}=sharpLabelTexture(w,h,{family:'Georgia'});textures.add(texture);
     const material=new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide});materials.add(material);
     const o=mesh(new THREE.PlaneGeometry(w,h),material,x,y,z,parent);if(flat)o.rotation.x=-Math.PI/2;
-    const draw=(a,b)=>{ctx.fillStyle='#243b3d';ctx.fillRect(0,0,1024,256);ctx.strokeStyle='#c6a570';ctx.lineWidth=5;ctx.strokeRect(9,9,1006,238);ctx.textAlign='center';ctx.fillStyle='#f4e9d3';ctx.font=`600 ${size}px Georgia`;ctx.fillText(a,512,110,960);ctx.font='25px sans-serif';ctx.fillStyle='#b6c7bd';ctx.fillText(b,512,191,960);texture.needsUpdate=true;};
     draw(title,detail);o.userData.draw=draw;return o;
   }
   box(0,.22,2,69,.7,53,ink,group,'office-foundation');box(0,.60,2,68,.12,52,stone,group,'office-travertine-floor');
@@ -79,8 +78,9 @@ export function createFinancialOffice(scene){
     const p=OFFICE_BY_ID[thread.officeProfileId];if(!p)return null;
     const vec=v=>new THREE.Vector3(v.x,0,v.z);
     const cashTarget=paperBank.target(thread);if(cashTarget)return cashTarget;
-    const seat=FREE_CAMPUS_SEATS[[0,2,4,6,9,11,13,15][p.index]];
-    if(data.office?.council)return {position:vec({x:seat.x*.84,z:L.camp.z+(seat.z-L.camp.z)*.84}),look:vec(L.camp),activity:'talk'};
+    const bench=FREE_CAMPUS_SEATS[[0,2,4,6,9,11,13,15][p.index]];
+    const seat={x:bench.x*.77,z:L.camp.z+(bench.z-L.camp.z)*.77};
+    if(data.office?.council)return {position:vec(seat),look:vec(L.camp),activity:'talk'};
     if(thread.running&&unitSlots[thread.clusterId])return {position:unitSlots[thread.clusterId].clone(),look:vec(L[thread.clusterId]),activity:'office-work'};
     // All eight always retain a body. Social movement costs no model turns.
     const phase=Math.floor((elapsed+p.index*9)/22)%6;
@@ -93,12 +93,16 @@ export function createFinancialOffice(scene){
       {position:{x:p.desk.x+5.4,z:p.desk.z-4},look:p.desk,activity:'stroll'}];
     const o=options[phase];return {...o,position:vec(o.position),look:vec(o.look)};
   }
+  const rect=(x,z,width,depth,worksite,angle=0)=>({x,z,width,depth,angle,worksite,office:true});
   const obstacles=()=>[
-    ...['melchior','balthasar','casper'].map(id=>({x:L[id].x,z:L[id].z,r:15.8,worksite:'magi-monument'})),
-    {x:0,z:L.camp.z,r:2.3,worksite:'hearth'},
-    {...BANK_POSITION,r:5.3,worksite:'paper-bank'},
-    ...OFFICE_PROFILES.flatMap(p=>[-3,0,3].map(dx=>({x:p.desk.x+dx,z:p.desk.z,r:2.3,worksite:'office-desk'}))),
-    ...[-7.25,7.25].map(x=>({x:L.board.x+x,z:L.board.z,r:.42,worksite:'board-post'})),
+    ...['melchior','balthasar','casper'].map(id=>rect(L[id].x,L[id].z,29.4,29.4,'magi-monument',L[id].angle)),
+    {x:0,z:L.camp.z,r:2.9,worksite:'hearth',office:true},
+    {...BANK_POSITION,r:5.7,worksite:'paper-bank',office:true},
+    ...OFFICE_PROFILES.flatMap(p=>[rect(p.desk.x,p.desk.z,11.6,6.3,'office-desk'),rect(p.desk.x,p.desk.z+4.1,3.2,3.1,'office-chair')]),
+    rect(L.board.x,L.board.z,16.8,2.4,'history-board'),
+    rect(-24,-22,12.8,4,'coffee-library'),
+    ...[-31.5,31.5].flatMap(x=>[-21,2,25].map(z=>({x,z,r:2.3,office:true,worksite:'office-plant'}))),
+    ...FREE_CAMPUS_SEATS.map((p,i)=>rect(p.x,p.z,3.3,3.0,'camp-bench',i*Math.PI*2/17+Math.PI)),
   ];
   const surfaceHeight=(x,z)=>Math.hypot(x,z-L.camp.z)<14?.9:Math.abs(x)<=34.5&&z>=-24.5&&z<=28.5?.67:Math.abs(x)<3.5&&z>-34&&z<-24?.85:null;
   update({});

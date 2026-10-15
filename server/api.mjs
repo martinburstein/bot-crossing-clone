@@ -374,7 +374,7 @@ export async function apiMiddleware(req, res, next) {
   try {
     if(url.pathname==='/api/financial-office/health'){
       if(req.method!=='GET')return send(res,405,{error:'Read-only office health'})
-      return send(res,200,{application:'financial-office-viewer',version:2,readOnly:false,executionReadOnly:true,paperSimulationOnly:true,pid:process.pid,profiles:8,maxConcurrent:3})
+      return send(res,200,{application:'financial-office-viewer',version:3,readOnly:false,executionReadOnly:true,paperSimulationOnly:true,pid:process.pid,profiles:8,maxConcurrent:3})
     }
     if(url.pathname==='/api/financial-office/paper-bank'){
       res.setHeader('Cache-Control','no-store')
