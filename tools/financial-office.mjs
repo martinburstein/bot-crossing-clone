@@ -3,8 +3,11 @@ import {openSync,closeSync} from 'node:fs';
 import path from 'node:path';
 import {spawn,execFileSync} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),desktop=path.dirname(root),swarmRoot=path.join(desktop,'swarm-protocol');
 const spec=JSON.parse(await fs.readFile(path.join(root,'FINANCIAL-OFFICE.json'),'utf8'));
+const canon=await fs.readFile(path.join(root,spec.basedOn.file)),preserved=await fs.readFile(path.join(root,spec.basedOn.preservedCopy));
+if(createHash('sha256').update(canon).digest('hex')!==spec.basedOn.sha256||!canon.equals(preserved))throw Error('Preserved source canon changed; inspect before launching the office.');
 const {requestLauncher}=await import(pathToFileURL(path.join(swarmRoot,'swarm-start.mjs')));
 let before=null,endpoint=null;
 try{endpoint=JSON.parse(await fs.readFile(path.join(swarmRoot,'runtime/launcher/endpoint.json'),'utf8'));before=await requestLauncher(endpoint.url);}catch{/* A visual office also works without an execution service. */}

@@ -32,14 +32,15 @@ test('office meshes are renderable; eight desks replace the hexes and civic posi
 
 test('eight persistent characters project at most three evidenced, fresh worker bindings',()=>{
   const slots=['melchior','balthasar','casper'];
-  const threads=OFFICE_PROFILES.map((p,i)=>({taskId:p.id,shellId:'w'+i,running:true,assignmentState:'running',clusterId:slots[i%3],workerBackend:'codex-session'}));
+  const threads=OFFICE_PROFILES.map((p,i)=>({taskTitle:`${p.name} [simulation] — research`,runId:'crypto-swarm-2026-10-15',shellId:'w'+i,running:true,assignmentState:'running',clusterId:slots[i%3],workerBackend:'codex-session'}));
   const response={scannedAt:Date.now(),threads,worksite:{stale:false}};
   const p=financialOfficeResponse(response);assert.equal(p.threads.length,8);assert.equal(p.threads.filter(t=>t.running).length,3);
   assert.equal(new Set(p.threads.map(t=>t.suitColor)).size,8);
   for(const s of p.worksite.executorSlots)assert.equal(p.threads.filter(t=>t.running&&t.clusterId===s.slotId).length,1);
   for(const invalid of [{...response,scannedAt:Date.now()-21000},{...response,worksite:{stale:true}},
     {...response,threads:threads.map(t=>({...t,workerBackend:null}))},
-    {...response,threads:threads.map(t=>({...t,taskId:'unrelated'}))}]){
+    {...response,threads:threads.map(t=>({...t,taskTitle:'unrelated'}))},
+    {...response,threads:threads.map(t=>({...t,runId:'another-project'}))}]){
     const q=financialOfficeResponse(invalid);assert.equal(q.threads.length,8);assert.equal(q.threads.some(t=>t.running),false);
   }
 });

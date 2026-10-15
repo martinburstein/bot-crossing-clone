@@ -23,7 +23,7 @@ export function profileForThread(thread){
 
 // Projection only: eight identities sit above rotating transport workers, never eight sessions.
 export function financialOfficeResponse(response={},history=null){
-  const candidates=response.threads??[],usedClusters=new Set(),assignments=new Map();
+  const candidates=(response.threads??[]).filter(t=>t.runId==='crypto-swarm-2026-10-15'),usedClusters=new Set(),assignments=new Map();
   const fresh=!response.worksite?.stale&&Number.isFinite(response.scannedAt)&&Date.now()-response.scannedAt<20000;
   for(const t of candidates){
     const p=profileForThread(t);
