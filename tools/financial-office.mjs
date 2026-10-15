@@ -28,7 +28,7 @@ if(!ready){
   if(ready?.application!=='financial-office-viewer')throw Error('Office server did not become ready; inspect data/financial-office.log.');
 }
 let layout=null;
-if(!process.argv.includes('--no-open'))layout=JSON.parse(execFileSync('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tools/financial-office-layout.ps1'),'-BotUrl',url.href,'-SwarmRoot',swarmRoot],{windowsHide:true,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+if(!process.argv.includes('--no-open'))layout=JSON.parse(execFileSync('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tools/financial-office-layout.ps1'),'-BotUrl',url.href,'-SwarmRoot',swarmRoot,...(process.argv.includes('--refresh')?['-Refresh']:[])],{windowsHide:true,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
 const after=endpoint?await requestLauncher(endpoint.url).catch(()=>null):null;
 if(before&&after&&(before.runId!==after.runId||before.coordinator.turns!==after.coordinator.turns))throw Error('Execution changed during presentation-only office launch.');
 const receipt={observedAt:new Date().toISOString(),variant:'FINANCIAL-OFFICE.json',url:url.href,pid:ready.pid,layout,modelCalls:0,workerDispatch:false,executionUnchanged:before&&after?true:null,canonPreserved:true};

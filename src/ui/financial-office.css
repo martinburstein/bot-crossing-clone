@@ -19,3 +19,13 @@ body.financial-office .display-menu-toggle{left:auto;right:22px;bottom:25px;tran
 body.financial-office .hint-pill{display:none}
 .office-roster{bottom:92px;width:min(700px,calc(100vw - 44px))}
 @media(max-width:650px){.office-masthead h1{font-size:28px}.office-execution{top:86px;left:16px;right:auto}.office-camera{top:151px;max-width:none}.office-ledger{top:18px;right:12px;width:124px}.office-ledger summary{font-size:11px;padding:8px}.office-ledger[open]{width:260px;top:200px}.office-roster{bottom:92px;gap:3px;width:calc(100vw - 24px)}body.financial-office .token-hud{left:12px;transform:none;width:calc(100vw - 90px);column-gap:8px;padding:7px}body.financial-office .token-hud strong{font-size:13px}body.financial-office .token-hud-brand{display:none}body.financial-office .token-hud{grid-template-columns:1fr 1fr}body.financial-office .display-menu-toggle{right:12px;font-size:8px;max-width:65px}}
+/* Office controls share the left edge; the source canon keeps its own layout. */
+body.financial-office .hud .side,
+body.financial-office .hud .settings{left:14px;right:auto}
+body.financial-office .hud .settings{z-index:2}
+body.financial-office .hud .settings.closed{transform:translateX(calc(-100% - 20px))}
+body.financial-office .hud .side.shifted{transform:translateX(320px)}
+body.financial-office:not(.display-menus-hidden) .hud{z-index:30}
+body.financial-office .display-menu-toggle{left:14px;right:auto;bottom:22px;transform:none}
+@media(max-width:1100px){body.financial-office .hud .side.shifted{visibility:hidden;transform:none}}
+@media(max-width:650px){body.financial-office .token-hud{left:100px;width:calc(100vw - 112px)}body.financial-office .display-menu-toggle{left:12px;right:auto}}

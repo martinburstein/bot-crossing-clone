@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$BotUrl,[Parameter(Mandatory=$true)][string]$SwarmRoot)
+param([Parameter(Mandatory=$true)][string]$BotUrl,[Parameter(Mandatory=$true)][string]$SwarmRoot,[switch]$Refresh)
 $ErrorActionPreference = 'Stop'
 $taskCanon = Get-Content -LiteralPath (Join-Path $PSScriptRoot '../FINANCIAL-OFFICE.json') -Raw | ConvertFrom-Json
 $taskUri = [uri]$BotUrl
@@ -39,7 +39,7 @@ if ($taskBots.Count -gt 1) { throw 'Multiple Bot Crossing windows; cannot choose
 if ($taskBots.Count -eq 1) {
     $taskCommand = (Get-CimInstance Win32_Process -Filter "ProcessId=$($taskBots[0].Id)").CommandLine
     if ($taskCommand.IndexOf($taskProfile,[StringComparison]::OrdinalIgnoreCase) -lt 0 -or -not $taskCommand.Contains('--app=http://127.0.0.1:')) { throw 'Bot Crossing is not the owned presentation window.' }
-    if (-not $taskCommand.Contains("--app=$BotUrl")) { Close-View $taskBots[0]; $taskBots = @() }
+    if ($Refresh -or -not $taskCommand.Contains("--app=$BotUrl")) { Close-View $taskBots[0]; $taskBots = @() }
 }
 if (-not $taskBots.Count) {
     $taskChrome = Join-Path $env:PROGRAMFILES 'Google/Chrome/Application/chrome.exe'
