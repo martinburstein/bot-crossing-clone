@@ -337,6 +337,7 @@ const actions = {
 const hud = new Hud(app, settings, actions)
 const campfireSpeech = MAGI_VIEW ? new CampfireSpeech(app) : null
 let officeHistory=null
+let officeCouncilFramed=false
 const officeFocus=(point,distance)=>{rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.restPolar=.92;rig.focus(point,{distance,elevated:true})}
 const officePanel=OFFICE_VIEW?mountFinancialOffice(app,{
   focusProfile:id=>{const agent=colony.agentFor(`office:${id}`);if(agent)rig.focus(agent.pos,{distance:23,elevated:true})},
@@ -797,6 +798,7 @@ async function poll() {
     if(MAGI_VIEW&&res.mode==='magi'&&!REPLAY_RUN&&!OFFICE_VIEW)try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
     applyThreads(res.threads || [])
     officePanel?.update(res)
+    if(OFFICE_VIEW&&res.worksite?.office?.council&&!officeCouncilFramed){officeCouncilFramed=true;officeFocus(new THREE.Vector3(0,7,-49),95)}
     const shells = (res.threads || []).filter(t=>t.isShell)
     colony.astronauts.setAlignmentLights(null)
     hud.setMagiAlignment(null)

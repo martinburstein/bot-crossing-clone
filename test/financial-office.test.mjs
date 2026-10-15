@@ -72,6 +72,17 @@ test('eight tailored jackets remain finite through animated bone attachments',()
   }
 });
 
+test('a real campfire task gathers eight distinct seats while three MAGI units keep their real activity',()=>{
+  const response={scannedAt:Date.now(),threads:OFFICE_PROFILES.slice(0,3).map((p,i)=>({runId:'crypto-swarm-2026-10-15',taskTitle:`${p.name} [simulation] — Campfire discussion`,running:true,assignmentState:'running',workerBackend:'codex-cli',clusterId:['melchior','balthasar','casper'][i]}))};
+  const value=financialOfficeResponse(response),world=createFinancialOffice(new THREE.Scene());world.update(value.worksite);
+  assert.equal(value.worksite.office.council,true);assert.equal(value.worksite.office.active,3);
+  const seats=value.threads.map(t=>world.target(t,0));assert.ok(seats.every(s=>s.activity==='talk'));
+  assert.equal(new Set(seats.map(s=>`${s.position.x},${s.position.z}`)).size,8);
+  for(const s of seats)assert.ok(Math.hypot(s.position.x,s.position.z+49)<11);
+  for(const core of Object.values(world.cores))assert.equal(core.userData.unitState,'running');
+  world.dispose();
+});
+
 test('office history fails closed on checksum tampering and the original canon bytes remain preserved',async()=>{
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'office-history-test-'));
   try{

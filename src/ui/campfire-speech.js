@@ -38,7 +38,10 @@ export class CampfireSpeech {
     this.next = elapsed + .1
     if(projection?.sceneLayout==='financial-office'){
       const entries=projection.office?.history?.entries??[]
-      const entry=entries[Math.floor(elapsed/11)%Math.max(1,entries.length)]
+      const discussion=entries.filter(e=>e.kind==='accepted-contribution'&&e.acceptedTaskId?.startsWith('camp-'))
+      const findings=entries.filter(e=>e.kind==='accepted-contribution')
+      const program=discussion.length?discussion:findings.length?findings:entries
+      const entry=program[Math.floor(elapsed/11)%Math.max(1,program.length)]
       if(!entry||!worksite?.camp?.group){this.layer.hidden=true;return}
       this.layer.classList.remove('unit-conversation');this.layer.classList.add('office-oral-history')
       this.layer.setAttribute('aria-label','Saved financial-office oral history playback')

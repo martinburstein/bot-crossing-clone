@@ -46,6 +46,7 @@ export function financialOfficeResponse(response={},history=null){
     return {slotId,status:person?'running':'idle',roleId:person?.officeProfileId??null,profileName:person?.shellName??null};
   });
   return {...response,threads,worksite:{sceneLayout:OFFICE_SCENE,stale:!fresh,executorSlots,
-    office:{profiles:8,active:assignments.size,history:history??{entries:[],digest:null},maxConcurrent:3},
+    office:{profiles:8,active:assignments.size,history:history??{entries:[],digest:null},maxConcurrent:3,
+      council:candidates.some(t=>String(t.taskTitle??'').includes('— Campfire discussion'))},
     campus:{mode:'awake',dispatchMode:'free-15-3A',free:{chargingRoleIds:[],history:[]}}}};
 }

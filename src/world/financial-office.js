@@ -76,10 +76,11 @@ export function createFinancialOffice(scene){
   function target(thread,elapsed=0){
     const p=OFFICE_BY_ID[thread.officeProfileId];if(!p)return null;
     const vec=v=>new THREE.Vector3(v.x,0,v.z);
+    const seat=FREE_CAMPUS_SEATS[[0,2,4,6,9,11,13,15][p.index]];
+    if(data.office?.council)return {position:vec({x:seat.x*.84,z:L.camp.z+(seat.z-L.camp.z)*.84}),look:vec(L.camp),activity:'talk'};
     if(thread.running&&unitSlots[thread.clusterId])return {position:unitSlots[thread.clusterId].clone(),look:vec(L[thread.clusterId]),activity:'office-work'};
     // All eight always retain a body. Social movement costs no model turns.
     const phase=Math.floor((elapsed+p.index*9)/22)%6;
-    const seat=FREE_CAMPUS_SEATS[[0,2,4,6,9,11,13,15][p.index]];
     const other=OFFICE_PROFILES[(p.index+1)%8].desk;
     const options=[{position:{x:p.desk.x,z:p.desk.z+6.3},look:p.desk,activity:'board'},
       {position:seat,look:L.camp,activity:'talk'},

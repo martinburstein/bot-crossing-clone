@@ -17,7 +17,7 @@ export function mountFinancialOffice(root,{focusProfile,focusOffice,focusCamp,fo
     const office=value?.worksite?.office??{},active=value?.threads?.filter(t=>t.running)??[];
     const status=el.querySelector('.office-execution');status.classList.toggle('active',active.length>0);
     status.querySelector('span').textContent=value?.worksite?.stale?'Live work feed unavailable':active.length?`${active.length} / 3 MAGI units working`:'0 / 3 MAGI units working';
-    status.querySelector('small').textContent=active.length?`${8-active.length} colleagues off duty`:'Eight colleagues · research standby';
+    status.querySelector('small').textContent=office.council?'Campfire council · eight colleagues':active.length?`${8-active.length} colleagues off duty`:'Eight colleagues · research standby';
     for(const t of value?.threads??[]){const b=buttons.get(t.officeProfileId);if(!b)continue;b.classList.toggle('active',t.running);b.querySelector('small').textContent=t.running?t.clusterId.toUpperCase():'OFF DUTY';}
     const history=office.history??{};el.querySelector('.office-ledger summary span').textContent=`${history.totalEntries??0} saved notes`;
     if(history.digest===digest)return;digest=history.digest;
