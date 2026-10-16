@@ -47,3 +47,8 @@ test('history accepts attributed coordinator qualifications and rejects unrecogn
   entries[0].kind='unrecognized';await save();assert.equal((await readOfficeHistory({root})).available,false);
  }finally{await fs.rm(root,{recursive:true,force:true});}
 });
+
+test('saved campfire replay does not claim a live council after workers close',()=>{
+ const v=financialOfficeResponse({scannedAt:Date.now(),threads:[{runId:'crypto-swarm-2026-10-15',taskTitle:'Steve Eisman [simulation] — Campfire discussion',running:false,assignmentState:'accepted',clusterId:'melchior',workerBackend:'codex-cli'}]});
+ assert.equal(v.worksite.office.council,false);assert.equal(v.worksite.office.active,0);assert.equal(v.threads.length,8);
+});

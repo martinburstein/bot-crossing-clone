@@ -47,6 +47,6 @@ export function financialOfficeResponse(response={},history=null){
   });
   return {...response,threads,worksite:{sceneLayout:OFFICE_SCENE,stale:!fresh,executorSlots,
     office:{profiles:8,active:assignments.size,history:history??{entries:[],digest:null},maxConcurrent:3,
-      council:candidates.some(t=>/campfire/i.test(String(t.taskTitle??'')))},
+      council:threads.some(t=>t.running&&/campfire/i.test(String(t.taskTitle??'')))},
     campus:{mode:'awake',dispatchMode:'free-15-3A',free:{chargingRoleIds:[],history:[]}}}};
 }
