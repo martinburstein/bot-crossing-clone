@@ -1,25 +1,18 @@
 ---
 name: launch-dual-view
-description: Open the canonical Bot Crossing Dual View when Martin says "Launch Dual View", "open Dual View", or asks for the saved two-half visual. Uses the current Waveshare campus visual without starting robot hardware or worker tasks.
+description: Open Martin's saved Bot Crossing Dual View. Route "Start up Dual View for The Big Crypto Short" to the financial office and "Start up Dual View for Waveshare Arm" to the original campus. Presentation only.
 ---
 
-Work in `C:/Users/marti/OneDrive/Desktop/bot-crossing-clone` and run:
+Work in `C:/Users/marti/OneDrive/Desktop/bot-crossing-clone`.
 
-```powershell
-node tools/dual-view.mjs
-```
+| Martin's phrase | Command |
+| --- | --- |
+| Start up Dual View for The Big Crypto Short | `node tools/named-dual-view.mjs big-crypto-short` |
+| Start up Dual View for Waveshare Arm | `node tools/named-dual-view.mjs waveshare-arm` |
+| Launch Dual View / open Dual View without a named project | `node tools/dual-view.mjs` |
 
-The visual canon is `CANON-VISUAL.json` in this repository: caller Codex left,
-Bot Crossing right in equal halves; the 17-resident campus, three wireless
-supercomputers, memory pods and current crane landmark; usage embedded in the
-HUD. No separate MAGI Atlas, Token Counter or camera window.
+The registry is `DUAL-VIEW-VERSIONS.json`. The crypto version is `FINANCIAL-OFFICE.json`: eight suited residents, desks, campfire, board, three supercomputers and the 137-brick paper bank. Its private history/thought snapshots live in Crypto Research Lab. The Waveshare visual is the preserved `CANON-VISUAL.json` campus. Keep both versions and their settings separate. Both use Codex left / Bot Crossing right in equal halves.
 
-This is presentation only, with zero model calls. Preserve the selected project's
-tasks, history, leases and caller model. The shared geometry does not import the
-Waveshare project's execution state. Do not use the generic Swarm `layout` command,
-which opens the retired four-window arrangement. This request does not authorize
-robot startup, camera capture, USB connection, physical motion or worker dispatch.
+Use the skill's named command for the exact phrases, even when the caller happens to be in another project. These launchers are presentation only: zero model calls, no worker dispatch, no robot startup, camera capture, USB connection or physical motion. Preserve selected tasks, leases, history and caller model. Do not use generic Swarm layout, which restores the retired four-window arrangement.
 
-Read the returned layout verification. An unreachable saved controller or uncertain
-lease remains a recovery problem; preserve evidence and follow the canonical Swarm
-`docs/RECOVERY.md`. Never delete a lock by age or restart models to fix presentation.
+Read the returned layout verification. Preserve unresolved execution evidence; never delete a lock or restart models to repair presentation.
