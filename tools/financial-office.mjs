@@ -27,7 +27,7 @@ url.searchParams.set('swarm','1');url.searchParams.set('magi','1');
 async function health(){try{const r=await fetch(new URL('/api/financial-office/health',url),{signal:AbortSignal.timeout(1500)});return r.ok?await r.json():null;}catch{return null;}}
 let ready=await health();
 if(ready&&ready.application!=='financial-office-viewer')throw Error('Office port belongs to another service.');
-if(ready&&ready.version<5){
+if(ready&&ready.version<6){
   if(process.platform!=='win32')throw Error('An older viewer is already on this port. Stop it from its owning terminal or choose BOT_CROSSING_OFFICE_PORT; no unknown process was stopped.');
   const owner=Number(ready.pid);if(!Number.isSafeInteger(owner)||owner<=0)throw Error('Missing office process identity');
   execFileSync('powershell.exe',['-NoProfile','-Command',`$taskProcess=Get-CimInstance Win32_Process -Filter 'ProcessId = ${owner}'; $taskListener=Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction Stop; if($taskProcess.Name -ne 'node.exe' -or $taskProcess.CommandLine -notmatch 'server[\\/]serve[.]mjs' -or @($taskListener | Where-Object OwningProcess -eq ${owner}).Count -eq 0){throw 'Office process identity mismatch'}; Stop-Process -Id ${owner} -ErrorAction Stop`],{windowsHide:true,stdio:['ignore','pipe','pipe']});

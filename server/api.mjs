@@ -375,7 +375,7 @@ export async function apiMiddleware(req, res, next) {
     if(url.pathname==='/api/financial-office/activity'&&req.method==='GET')return send(res,200,await readOfficeActivity())
     if(url.pathname==='/api/financial-office/health'){
       if(req.method!=='GET')return send(res,405,{error:'Read-only office health'})
-      return send(res,200,{application:'financial-office-viewer',version:5,readOnly:false,executionReadOnly:true,paperSimulationOnly:true,pid:process.pid,profiles:8,maxConcurrent:3,viewerRoot:path.resolve(here,'..'),officeRoot:path.resolve(process.env.BOT_CROSSING_OFFICE_ROOT||path.join(here,'../../crypto-research-lab/projects/crypto-swarm-2026-10-15/office'))})
+      return send(res,200,{application:'financial-office-viewer',version:6,readOnly:false,executionReadOnly:true,paperSimulationOnly:true,pid:process.pid,profiles:8,maxConcurrent:3,viewerRoot:path.resolve(here,'..'),officeRoot:path.resolve(process.env.BOT_CROSSING_OFFICE_ROOT||path.join(here,'../../crypto-research-lab/projects/crypto-swarm-2026-10-15/office'))})
     }
     if(url.pathname==='/api/financial-office/paper-bank'){
       res.setHeader('Cache-Control','no-store')

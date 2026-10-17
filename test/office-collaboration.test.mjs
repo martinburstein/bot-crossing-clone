@@ -3,10 +3,19 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {readOfficeActivity} from '../server/financial-office.mjs';
+import {readOfficeActivity,readOfficeHistory} from '../server/financial-office.mjs';
+import {createHash} from 'node:crypto';
 import {withOfficeActivity,financialOfficeResponse} from '../src/office/profiles.js';
 const ids=['michael-burry','steve-eisman','ben-hockett'];
 const fixture=()=>({schemaVersion:1,kind:'coordinator-observed-collaboration',observedAt:Date.now(),agents:ids.map(profileId=>({profileId,status:'running',task:'Synthetic test only'}))});
+
+test('restored coordinator evidence notes remain readable without admitting unknown kinds',async()=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'office-history-restore-'));
+ const entries=[{id:'restored-evidence-note',speaker:'office',kind:'coordinator-reviewed-evidence',text:'Synthetic attributed research note.',sources:['research/report.md']}];
+ const put=async()=>fs.writeFile(path.join(root,'history.json'),JSON.stringify({schemaVersion:1,entries,digest:createHash('sha256').update(JSON.stringify(entries)).digest('hex')}));
+ await put();assert.equal((await readOfficeHistory({root})).available,true);
+ entries[0].kind='unknown-evidence-kind';await put();assert.equal((await readOfficeHistory({root})).available,false);
+});
 test('collaboration observations project three real-status slots and expire closed',async()=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'office-collab-test-')),root=path.join(dir,'office');
  await fs.mkdir(path.join(dir,'.local'));const file=path.join(dir,'.local/office-activity.json');

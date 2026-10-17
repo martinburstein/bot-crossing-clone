@@ -27,7 +27,7 @@ export async function readOfficeHistory({root=process.env.BOT_CROSSING_OFFICE_RO
     const digest=createHash('sha256').update(JSON.stringify(value.entries)).digest('hex');
     if(value.schemaVersion!==1||digest!==value.digest||!Array.isArray(value.entries)||value.entries.length>2000)throw Error('History integrity mismatch');
     const entries=value.entries.slice(-160).map(e=>{
-      if(!/^[a-z0-9-]+$/.test(e.id??'')||typeof e.text!=='string'||e.text.length>700||!Array.isArray(e.sources)||!['source-note','research-question','project-decision','accepted-contribution','coordinator-qualification','coordinator-source-check','coordinator-session-closeout','supplemental-reviewed-report-summary','coordinator-source-qualification','coordinator-source-correction','coordinator-source-follow-up','coordinator-data-qualification','coordinator-source-freshness-check'].includes(e.kind))throw Error('Invalid history entry');
+      if(!/^[a-z0-9-]+$/.test(e.id??'')||typeof e.text!=='string'||e.text.length>700||!Array.isArray(e.sources)||!['source-note','research-question','project-decision','accepted-contribution','coordinator-qualification','coordinator-source-check','coordinator-session-closeout','supplemental-reviewed-report-summary','coordinator-source-qualification','coordinator-source-correction','coordinator-source-follow-up','coordinator-data-qualification','coordinator-source-freshness-check','coordinator-reviewed-evidence'].includes(e.kind))throw Error('Invalid history entry');
       return {id:e.id,speaker:String(e.speaker??'office').slice(0,80),kind:e.kind,text:e.text,sources:e.sources.slice(0,8),at:e.at,
         origin:e.origin,acceptedTaskId:e.acceptedTaskId??null,submissionDigest:e.submissionDigest??null};
     });
