@@ -16,6 +16,14 @@ export const OFFICE_PROFILES = Object.freeze([
 export const OFFICE_BY_ID=Object.freeze(Object.fromEntries(OFFICE_PROFILES.map(p=>[p.id,p])));
 export const OFFICE_SCENE='financial-office';
 
+export function withOfficeActivity(response,activity,now=Date.now()){
+  if(activity?.terminal&&(response.threads??[]).some(t=>t.running))return response;
+  if(!activity?.available)return activity?.reason==='invalid'?{...response,threads:[],worksite:{stale:true},officeActivity:{stale:true}}:response;
+  const fresh=activity.fresh&&Number.isFinite(activity.observedAt)&&activity.observedAt<=now+5000&&(activity.terminal||now-activity.observedAt<=60000);
+  const slots=['melchior','balthasar','casper'];
+  return {...response,scannedAt:now,threads:fresh?activity.agents.map((a,i)=>({runId:'crypto-swarm-2026-10-15',officeProfileId:a.profileId,taskTitle:a.task,taskId:a.profileId,shellId:`collaboration-${i+1}`,running:a.status==='running',assignmentState:a.status==='running'?'running':'idle',clusterId:slots[i],workerBackend:'codex-collaboration-observed'})):[],worksite:{stale:!fresh},officeActivity:{stale:!fresh,terminal:activity.terminal,completedProfiles:activity.agents.filter(a=>a.status==='completed').map(a=>a.profileId),observedAt:activity.observedAt,kind:activity.kind}};
+}
+
 export function profileForThread(thread){
   if(OFFICE_BY_ID[thread?.officeProfileId])return OFFICE_BY_ID[thread.officeProfileId];
   return OFFICE_PROFILES.find(p=>thread?.taskId===p.id||String(thread?.taskTitle??'').startsWith(`${p.name} [simulation]`))??null;

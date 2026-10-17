@@ -20,6 +20,7 @@ export function mountPaperBank(root,controller,{focusBank,focusProfile}){
   return {el,open(){el.open=true;},update(){
     const state=controller.state;if(!state){el.querySelector('.paper-bank-counts').textContent=controller.error??'Reading saved paper capital…';return;}
     const summary=bankSummary(state);el.querySelector('summary strong').textContent=money(summary.available);el.querySelector('summary small').textContent=`${137-summary.allocated} available / 137 bricks · $1,000 each`;
+    if(state.study){const q=state.study;const fresh=Date.now()-Date.parse(q.updatedAt)<15000;el.querySelector('summary small').textContent=`${q.completed}/${q.total} experiments · ${q.status==='complete'?'complete':fresh?q.status:'status stale'} · ${fresh?q.activeWorkers:0}/3 compute workers`;}
     el.querySelector('.paper-bank-counts').textContent=`${summary.atBank} in bank · ${summary.carried} being carried · ${summary.atDesks} on desks`;
     const error=el.querySelector('.paper-bank-error');error.textContent=controller.error??'';
     const list=el.querySelector('.paper-bank-jobs');list.replaceChildren();

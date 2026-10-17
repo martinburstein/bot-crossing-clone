@@ -26,7 +26,7 @@ import {
 import { hideProject, hiddenCatalog, unhideProject } from './game/hidden-projects.js'
 import {standbyMagiThreads} from './game/magi-world.js'
 import {canonicalCampusResponse} from './world/canonical-campus.js'
-import {financialOfficeResponse} from './office/profiles.js'
+import {financialOfficeResponse,withOfficeActivity} from './office/profiles.js'
 import {mountFinancialOffice} from './ui/financial-office.js'
 import {MagiPanel} from './ui/magi-panel.js'
 import {mountDisplayToggle} from './ui/display-toggle.js'
@@ -799,7 +799,8 @@ async function poll() {
   if (polling) return
   polling = true
   try {
-    const response = await fetchThreads(MAGI_VIEW)
+    let response = await fetchThreads(MAGI_VIEW).catch(error=>{if(!OFFICE_VIEW)throw error;return {threads:[],worksite:{stale:true}}})
+    if(OFFICE_VIEW)try{const activityResponse=await fetch('/api/financial-office/activity',{cache:'no-store'});if(activityResponse.ok)response=withOfficeActivity(response,await activityResponse.json())}catch{response={...response,threads:[],worksite:{stale:true},officeActivity:{stale:true}}}
     if(OFFICE_VIEW)try{const historyResponse=await fetch('/api/financial-office/history',{cache:'no-store'});if(historyResponse.ok)officeHistory=await historyResponse.json()}catch{/* Keep the last attributed history on a transient disconnect. */}
     const res = OFFICE_VIEW ? financialOfficeResponse(response,officeHistory) : CANON_CAMPUS ? canonicalCampusResponse(response) : response
     colony.setWorksiteProjection(res.worksite || {})

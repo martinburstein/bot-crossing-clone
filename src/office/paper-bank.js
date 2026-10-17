@@ -12,7 +12,9 @@ export function validatePaperBank(s){
   for(const j of s.jobs){
     check(/^[a-zA-Z0-9-]{1,80}$/.test(j.id)&&OFFICE_BY_ID[j.profileId],'Invalid simulation identity');
     check(Number.isInteger(j.amount)&&j.amount>=1000&&j.amount<=137000&&j.amount%1000===0,'Use whole $1,000 bricks');
-    check(Number.isFinite(j.returnPct)&&j.returnPct>=-100&&j.returnPct<=1000,'Assumed total return must be between -100% and 1000%');
+    check(j.allowDeficit===undefined||typeof j.allowDeficit==='boolean','Invalid deficit flag');
+    check(Number.isFinite(j.returnPct)&&j.returnPct>=(j.allowDeficit?-1000:-100)&&j.returnPct<=1000,'Assumed total return is outside the permitted paper range');
+    if(j.managedStudy!==undefined)check(typeof j.managedStudy==='string'&&/^[a-zA-Z0-9-]{1,80}$/.test(j.managedStudy),'Invalid study identity');
     check(typeof j.idea==='string'&&j.idea.trim().length>0&&j.idea.length<=180,'Name this simulation');
     check(['collecting','carrying','running','complete','returning','carrying-back','closed'].includes(j.stage),'Invalid simulation stage');
     check(j.bricks.length===j.amount/1000&&new Set(j.bricks).size===j.bricks.length&&j.bricks.every(id=>Number.isInteger(id)&&id>=0&&id<137),'Invalid allocation');
@@ -26,6 +28,7 @@ export function validatePaperBank(s){
     if(['running','complete'].includes(j.stage))check(j.delivered.length===j.bricks.length&&j.holding===null,'Scenario cannot run before delivery');
     if(j.stage==='closed')check(j.returned.length===j.bricks.length,'Bricks must return before closing');
   }
+  if(s.study){const q=s.study;check(/^[a-zA-Z0-9-]{1,80}$/.test(q.id)&&Number.isInteger(q.total)&&q.total>0&&Number.isInteger(q.completed)&&q.completed>=0&&q.completed<=q.total,'Invalid study progress');check(Number.isInteger(q.activeWorkers)&&q.activeWorkers>=0&&q.activeWorkers<=3,'At most three computational workers');check(['preparing','computing','displaying','complete','error'].includes(q.status)&&typeof q.updatedAt==='string','Invalid study state');}
   for(const b of s.bricks){if(b.owner===null)check(b.place==='bank','Unowned brick outside bank');else check(s.jobs.some(j=>j.id===b.owner&&j.stage!=='closed'&&j.bricks.includes(b.id)&&!j.returned.includes(b.id)),'Orphaned brick');}
   return s;
 }
@@ -39,7 +42,18 @@ export function applyBankAction(original,action){
     check(Number.isInteger(action.amount)&&action.amount>=1000&&action.amount%1000===0,'Minimum $1,000; use whole $1,000 bricks');
     const free=s.bricks.filter(b=>b.owner===null);check(action.amount<=free.length*1000,'Not enough unallocated bricks');
     const j={id:action.id,profileId:action.profileId,amount:action.amount,returnPct:action.returnPct,idea:String(action.idea??'').trim(),source:String(action.source??'').slice(0,240),stage:'collecting',bricks:free.slice(0,action.amount/1000).map(b=>b.id),delivered:[],returned:[],holding:null,result:null};
+    if(action.managedStudy!==undefined)j.managedStudy=action.managedStudy;
+    if(action.allowDeficit!==undefined)j.allowDeficit=action.allowDeficit;
     for(const id of j.bricks)s.bricks[id].owner=j.id;s.jobs.push(j);
+  }else if(type==='study-progress'){
+    s.study={id:action.id,total:action.total,completed:action.completed,activeWorkers:action.activeWorkers,status:action.status,updatedAt:action.updatedAt};
+  }else if(type==='study-pending'||type==='study-result'){
+    const j=s.jobs.find(j=>j.id===action.id);check(j&&j.managedStudy===action.studyId,'Wrong managed study allocation');
+    check(['running','complete'].includes(j.stage),'Deliver study capital before computing');
+    check(typeof action.idea==='string'&&action.idea.length<=180,'Bounded experiment label required');
+    j.idea=action.idea;j.source=String(action.source??'').slice(0,240);
+    if(type==='study-pending'){j.stage='running';j.result=null;j.returnPct=0;}
+    else{j.returnPct=action.returnPct;j.result=scenarioResult(j.amount,j.returnPct);j.stage='complete';}
   }else{
     const j=s.jobs.find(j=>j.id===action.id);check(j,'Unknown simulation');
     if(type==='pickup'){check(j.stage==='collecting','Not ready to collect');const id=j.bricks.find(id=>!j.delivered.includes(id));check(id!==undefined,'Nothing to collect');j.holding=id;s.bricks[id].place='carried';j.stage='carrying';}

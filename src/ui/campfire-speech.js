@@ -39,8 +39,11 @@ export class CampfireSpeech {
     if(projection?.sceneLayout==='financial-office'){
       const entries=projection.office?.history?.entries??[]
       const discussion=entries.filter(e=>e.kind==='accepted-contribution'&&e.acceptedTaskId?.startsWith('camp-'))
+      // Keep accepted work in the ledger, but let the newest authored research notes
+      // and session closeout lead ambient playback instead of freezing on old camp entries.
+      const currentNotes=entries.filter(e=>e.kind!=='accepted-contribution').slice(-12)
       const findings=entries.filter(e=>e.kind==='accepted-contribution')
-      const program=discussion.length?discussion:findings.length?findings:entries
+      const program=currentNotes.length?currentNotes:discussion.length?discussion:findings.length?findings:entries
       const entry=program[Math.floor(elapsed/11)%Math.max(1,program.length)]
       if(!entry||!worksite?.camp?.group){this.layer.hidden=true;return}
       this.layer.classList.remove('unit-conversation');this.layer.classList.add('office-oral-history')

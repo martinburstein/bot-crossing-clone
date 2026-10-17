@@ -15,7 +15,7 @@ export class PaperBankController{
     for(const job of this.state.jobs.filter(j=>!['closed','complete'].includes(j.stage))){
       const stage=this.stages.get(job.id);if(stage?.name!==job.stage){this.stages.set(job.id,{name:job.stage,at:elapsed});continue;}
       let type=null;
-      if(job.stage==='running'){if(elapsed-stage.at>=4)type='finish';}
+      if(job.stage==='running'){if(!job.managedStudy&&elapsed-stage.at>=4)type='finish';}
       else{
         const agent=agents.find(a=>a.thread.officeProfileId===job.profileId),goal=agent&&world?.paperBank?.target(agent.thread)?.position;
         if(!agent||!goal||Math.hypot(agent.pos.x-goal.x,agent.pos.z-goal.z)>.7||elapsed-stage.at<.8)continue;
