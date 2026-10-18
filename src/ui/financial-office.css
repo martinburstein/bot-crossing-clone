@@ -37,6 +37,7 @@ body.financial-office .hud .side{display:none!important}
 body.financial-office.display-menus-hidden .hud>:not(.rail),
 body.financial-office.display-menus-hidden .financial-office-hud,
 body.financial-office.display-menus-hidden .office-paper-panel,
+body.financial-office.display-menus-hidden .office-crash-lab,
 body.financial-office.display-menus-hidden .campfire-speech,
 body.financial-office.display-menus-hidden .mission-panel,
 body.financial-office.display-menus-hidden .swarm-panel,

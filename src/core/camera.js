@@ -67,6 +67,8 @@ export class CameraRig {
     this.idleFor = 0
     this.interacting = false
     this.enabled = true
+    this.intentVersion = 0
+    this.cinematic = false
     /** Google Earth's auto-rotate: a slow continuous sweep around whatever is centred. */
     this.orbiting = false
     /** 0..1 share of ORBIT_RATE currently being applied — see `update`. */
@@ -272,6 +274,7 @@ export class CameraRig {
 
   /** Glide the view to a world point without yanking it — used when you pick an astronaut. */
   focus(point, { distance, elevated = false } = {}) {
+    this.intentVersion++
     this.desiredTarget.copy(point)
     this.desiredTarget.y = elevated ? point.y : 0
     this._clampTarget()
@@ -281,6 +284,7 @@ export class CameraRig {
   }
 
   resetView() {
+    this.intentVersion++
     this.orbiting = false
     this.desiredTarget.set(0, 0, 0)
     this.desiredDistance = 62
@@ -296,6 +300,7 @@ export class CameraRig {
    * would otherwise pull the heading straight back to a corner it just left.
    */
   setOrbit(on) {
+    this.intentVersion++
     this.orbiting = on
     // Switching it on deliberately should start the ramp now rather than after the pause
     // that follows a drag — the blend still eases it in from a standstill.
@@ -350,7 +355,7 @@ export class CameraRig {
 
     // Rest back to isometric: after a beat of no input the heading walks to the nearest
     // clean 45° and the tilt returns to the iso angle. Position and zoom are left alone.
-    if (!this.orbiting && this.settings.get('autoFrame') && this.idleFor > 2.2 && !this.interacting) {
+    if (!this.cinematic && !this.orbiting && this.settings.get('autoFrame') && this.idleFor > 2.2 && !this.interacting) {
       const ease = Math.min(1.4, (this.idleFor - 2.2) * 0.7)
       this.desiredAzimuth = damp(this.desiredAzimuth, this._nearestIso(), ease, dt)
       this.desiredPolar = damp(this.desiredPolar, this.restPolar??ISO_POLAR, ease, dt)

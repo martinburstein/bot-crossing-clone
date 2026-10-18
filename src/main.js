@@ -3,6 +3,8 @@ import './ui/styles.css'
 import { DEFAULT_PRESET, Settings, hasStoredSettings } from './core/settings.js'
 import { Engine } from './core/engine.js'
 import { CameraRig } from './core/camera.js'
+import { IdleDirector, mountIdleDirector } from './core/idle-director.js'
+import { mountCrashLab } from './ui/crash-lab.js'
 import {measureAutoFocus} from './core/auto-focus.js'
 import { Colony, STATUS_LABEL, STATUS_ORDER, statusFor, transcriptProgress } from './game/colony.js'
 import { Hud } from './ui/hud.js'
@@ -78,6 +80,31 @@ if(MAGI_VIEW)document.body.classList.add('magi-world')
 const engine = new Engine(settings).mount(app)
 const rig = new CameraRig(engine.camera, engine.canvas, settings)
 const colony = new Colony(engine.scene, settings, engine.camera, engine.renderer)
+let idleCameraEnabled = true
+try { idleCameraEnabled = localStorage.getItem('botcrossing.idle-camera.enabled') !== 'false' } catch {}
+const idleDirector = new IdleDirector(rig, {
+  office: OFFICE_VIEW,
+  enabled: idleCameraEnabled,
+  subjects: () => colony.astronauts.agents,
+  blocked: () => document.hidden || Boolean(REPLAY_RUN) ||
+    Boolean(document.activeElement?.closest?.('input,textarea,select,[contenteditable="true"]')),
+})
+mountIdleDirector(idleDirector)
+window.idleCamera = Object.freeze({ snapshot: () => idleDirector.snapshot(),
+  start: () => idleDirector.start(), stop: () => idleDirector.setEnabled(false),
+  enable: () => idleDirector.setEnabled(true) })
+const cinematicButton = document.createElement('button')
+cinematicButton.type = 'button'
+cinematicButton.className = 'idle-camera-toggle'
+cinematicButton.title = 'Idle cinematic camera after 30 seconds. Click to start or stop; I toggles. Any input gives control back.'
+cinematicButton.style.cssText = 'position:fixed;bottom:16px;right:16px;z-index:70;border:1px solid #b4bdab77;border-radius:18px;background:#142b2be8;color:#e4e9db;padding:7px 13px;font:11px system-ui;cursor:pointer'
+cinematicButton.addEventListener('click', () => {
+  const on = idleDirector.setEnabled(!idleDirector.enabled)
+  if (on) idleDirector.start()
+  try { localStorage.setItem('botcrossing.idle-camera.enabled', String(idleDirector.enabled)) } catch {}
+})
+app.append(cinematicButton)
+let cinematicLabel = ''
 const craneLab=MAGI_VIEW&&!REPLAY_RUN&&!OFFICE_VIEW?createCraneLab(engine.scene):null
 let lastCraneFrameAt=performance.now()
 const cranePanel=craneLab?mountCraneLab(app,craneLab,{focus:p=>{rig.desiredAzimuth=0;rig.desiredPolar=.95;rig.restPolar=.95;rig.focus(new THREE.Vector3(p.x,38,p.z),{distance:195,elevated:true})},home:()=>frameSwarm()}):null
@@ -353,6 +380,8 @@ const officePanel=OFFICE_VIEW?mountFinancialOffice(app,{
   focusCampus:()=>{officeFollowProfile=null;frameSwarm()},
 }):null
 if(OFFICE_VIEW){paperBankPanel=mountPaperBank(app,paperBank,{focusBank:focusPaperBank,focusProfile:focusOfficeProfile});void paperBank.refresh()}
+const crashLab = OFFICE_VIEW ? mountCrashLab(app,{closeBank:()=>{if(paperBankPanel)paperBankPanel.el.open=false}}) : null
+if (crashLab && paperBankPanel) paperBankPanel.el.addEventListener('toggle',()=>{if(paperBankPanel.el.open)crashLab.el.open=false})
 if(OFFICE_VIEW)window.financialOffice=Object.freeze({snapshot:()=>({...(colony.worksite?.snapshot?.()??{}),bank:colony.worksite?.paperBank?.snapshot(),characters:colony.astronauts.agents.map(a=>({id:a.thread.officeProfileId,name:a.thread.shellName,suit:a.thread.officeStyle?.style,position:a.pos.toArray(),activity:a.magiActivity,running:a.thread.running,carrier:a.thread.carrierWorkerId})),history:{digest:officeHistory?.digest,entries:officeHistory?.totalEntries}}),office:()=>officeFocus(new THREE.Vector3(0,3,0),125),camp:()=>officeFocus(new THREE.Vector3(0,7,-49),125),bank:focusPaperBank,campus:()=>frameSwarm(),simulate:request=>paperBank.action({...request,type:'start',id:request.id??`sim-${crypto.randomUUID()}`})})
 if (MAGI_VIEW){const display=mountDisplayToggle(app,{office:OFFICE_VIEW});if(OFFICE_VIEW){hud.toggleUi=force=>{display.setHidden(force===undefined?!display.isHidden():!force);return !display.isHidden()};const rail=hud.el.querySelector('.rail');rail.setAttribute('aria-label','Left toolbox');for(const [title,text,action]of [['Cash bank and paper simulations','$',()=>{display.setHidden(false);paperBankPanel.open();focusPaperBank()}],['Settings','⚙',()=>{display.setHidden(false);hud.toggleSettings(true)}]]){const b=document.createElement('button');b.type='button';b.className='btn icon';b.title=title;b.setAttribute('aria-label',title);b.textContent=text;b.onclick=action;rail.append(b);}}}
 if (MAGI_VIEW && new URLSearchParams(location.search).get('dual') === '1') mountTokenHud(app)
@@ -928,7 +957,18 @@ settings.onChange((changed, scope) => {
 let autoFocusAt=-Infinity
 engine.add({
   update(dt, elapsed) {
+    idleDirector.update(dt)
+    if (idleDirector.active) officeFollowProfile = null
     if(officeFollowProfile){if(rig.interacting)officeFollowProfile=null;else{const a=colony.agentFor(`office:${officeFollowProfile}`);if(a)rig.desiredTarget.set(a.pos.x,a.pos.y+1,a.pos.z)}}
+    const nextCinematicLabel = settings.get('reducedMotion') ? 'Cinematic · reduced motion' :
+      idleDirector.active ? `Cinematic · ${idleDirector.shot?.kind ?? 'floating'}` :
+      idleDirector.enabled ? 'Cinematic · auto' : 'Cinematic · off'
+    if (nextCinematicLabel !== cinematicLabel) {
+      cinematicLabel = nextCinematicLabel
+      cinematicButton.textContent = cinematicLabel
+      cinematicButton.dataset.active = String(idleDirector.active)
+      cinematicButton.setAttribute('aria-pressed', String(idleDirector.enabled))
+    }
     rig.update(dt)
     colony.update(dt, elapsed, rig.target)
     paperBank?.tick(elapsed,colony.worksite,colony.astronauts.agents)
