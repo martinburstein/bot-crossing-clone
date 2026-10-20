@@ -21,6 +21,14 @@ if(!Number.isInteger(port)||port<1024||port>65535)throw Error('Invalid office po
 const officeRoot=path.resolve(process.env.BOT_CROSSING_OFFICE_ROOT||path.join(desktop,'crypto-research-lab/projects/crypto-swarm-2026-10-15/office'));
 await fs.access(path.join(officeRoot,'history.json'));
 await fs.access(path.join(root,'dist/index.html')).catch(()=>{throw Error('Build the viewer first: npm ci --ignore-scripts && npm run build');});
+const hudSettingsFile=path.join(root,'data/dual-view.json');
+let hudSettings={};
+try{hudSettings=JSON.parse(await fs.readFile(hudSettingsFile,'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
+const chatId=process.env.CODEX_THREAD_ID||hudSettings.chatId;
+if(/^[a-f0-9-]{36}$/i.test(chatId||'')){
+  await fs.mkdir(path.dirname(hudSettingsFile),{recursive:true});
+  await fs.writeFile(hudSettingsFile,JSON.stringify({chatId,counterRoot:path.join(desktop,'Token Counter')},null,2)+'\n',{mode:0o600});
+}
 const url=new URL(`http://127.0.0.1:${port}/`);
 for(const [k,v]of Object.entries(spec.right.query))url.searchParams.set(k,v);
 url.searchParams.set('swarm','1');url.searchParams.set('magi','1');
