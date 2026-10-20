@@ -1,3 +1,5 @@
+Shared office animation library: read docs/OFFICE-ANIMATIONS.md. The canonical rig contains thirteen additional clips; /animations/ previews all eleven catalogue entries. The standalone anonymous office is backed up on branch office-demo. Preserve project-specific live task state when binding motions.
+
 Mac financial-office handoff: read docs/FINANCIAL-OFFICE-MAC.md. The named big-crypto-short launcher supports macOS without swarm-protocol; private research and saved state stay in the sibling private research repository. Presentation only, no automatic worker execution.
 
 Named saved versions (latest Martin instruction): "Start up Dual View for The Big Crypto Short" runs `node tools/named-dual-view.mjs big-crypto-short`; "Start up Dual View for Waveshare Arm" runs `node tools/named-dual-view.mjs waveshare-arm`. These explicit phrases supersede the generic launch routing below. Keep the office copy and the original canon separate. Presentation only; no worker/model or hardware startup. Read DUAL-VIEW-VERSIONS.json and visuals/financial-office/LAUNCH-VERSIONS.md.
