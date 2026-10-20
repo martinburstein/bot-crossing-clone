@@ -979,11 +979,11 @@ engine.add({
     cranePanel?.update(elapsed)
     if(MAGI_VIEW&&engine.scene.fog){engine.scene.fog.near=rig.distance+45;engine.scene.fog.far=rig.distance+320}
     magiPanel?.tick(elapsed)
-    if(settings.get('autoFocus')&&elapsed-autoFocusAt>=.5){
+    if(settings.get('autoFocus')&&settings.get('tiltShift')&&elapsed-autoFocusAt>=.5){
       const life=colony.astronauts.magiLife
-      engine.setAutoFocus(measureAutoFocus(engine.camera,[colony.plotGroup,colony.worksite?.group,colony.worksite?.freeScene?.group,life.hangar?.group,...(life.hangar?.bays??[]).map(b=>b.model),...Array.from(life.fleet.values(),f=>f.model),craneLab?.group,colony.astronauts.group],rig.distance))
+      engine.setAutoFocus(measureAutoFocus(engine.camera,[colony.plotGroup,colony.worksite?.group,colony.worksite?.officeGroup,colony.worksite?.campusGroup,colony.worksite?.freeScene?.group,life.hangar?.group,...(life.hangar?.bays??[]).map(b=>b.model),...Array.from(life.fleet.values(),f=>f.model),craneLab?.group,colony.astronauts.group],rig.distance))
       autoFocusAt=elapsed
-    }else if(!settings.get('autoFocus'))engine.setAutoFocus(null)
+    }else if(!settings.get('autoFocus')||!settings.get('tiltShift'))engine.setAutoFocus(null)
     // Manual focus follows the orbit target; Auto Focus fits the visible objects.
     engine.setFocusDistance(rig.distance)
 

@@ -174,7 +174,7 @@ export class Hud {
         (v) => `${Math.round(v * 100)}%`,
         '100% is your display’s own resolution, retina included.'
       ),
-      this._toggle('Adaptive quality', 'autoQuality', 'Quietly drops render scale if frames get expensive.'),
+      this._toggle('Adaptive quality', 'autoQuality', 'Drops render scale if frames get expensive. Paused while Auto Focus preserves sharpness.'),
       this._slider('Scatter', 'scatterDensity', 0, 1, 0.05, (v) => `${Math.round(v * 100)}%`),
       this._slider('Max crew', 'maxAgents', 10, 200, 10, (v) => String(v)),
       this._toggle('Stars', 'stars')
