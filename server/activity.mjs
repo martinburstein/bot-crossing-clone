@@ -1,10 +1,10 @@
 // Canonical read-only adapter; include child agents as well as regular chats.
 process.env.BOT_CROSSING_INCLUDE_SUBAGENTS = '1';
 const {default: codex} = await import('./harnesses/codex.mjs');
-export function createSeats(bindings=[]){
+export function createSeats(bindings=[],excludedIds=[]){
  const seats=Array(8).fill(null);
  return function project(threads){
-  const active=threads.filter(t=>t.running&&!t.archived).sort((a,b)=>b.lastActivityAt-a.lastActivityAt||a.id.localeCompare(b.id));
+  const active=threads.filter(t=>t.running&&!t.archived&&!excludedIds.includes(t.id)).sort((a,b)=>b.lastActivityAt-a.lastActivityAt||a.id.localeCompare(b.id));
   const ids=new Set(active.map(t=>t.id));
   for(let i=0;i<8;i++)if(!ids.has(seats[i]))seats[i]=null;
   for(const binding of bindings){
@@ -19,7 +19,8 @@ export function createSeats(bindings=[]){
 }
 let bindings=[];
 try{const value=JSON.parse(process.env.OFFICE_DEMO_SEAT_BINDINGS||'[]');if(Array.isArray(value))bindings=value;}catch{}
-const project=createSeats(bindings);
+const excludedIds=(process.env.OFFICE_DEMO_EXCLUDE_IDS||'').split(',').filter(Boolean);
+const project=createSeats(bindings,excludedIds);
 let cached=null,pending=null;
 export async function activity(){
  if(cached&&Date.now()-cached.observedAt<1500)return cached;

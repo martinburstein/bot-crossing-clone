@@ -21,6 +21,8 @@ test('a requested character receives the bound active agent without duplicate se
  const result=project([{id:'lilac-job',running:true,lastActivityAt:1},{id:'other',running:true,lastActivityAt:2}]);
  assert.equal(result.seats[4].working,true);assert.equal(result.seats.filter(s=>s.working).length,2);
  assert.equal(project([{id:'other',running:true,lastActivityAt:2}]).seats[4].working,false);
+ const workersOnly=createSeats([{index:4,id:'lilac-job'}],['coordinator']);
+ assert.equal(workersOnly([{id:'coordinator',running:true},{id:'lilac-job',running:true}]).active,1);
 });
 test('every route position reaches its desk then stands and resumes without jumping',()=>{
  for(const p of PROFILES)for(let offset=0;offset<180;offset+=5){

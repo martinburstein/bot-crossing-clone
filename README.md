@@ -47,3 +47,5 @@ This is the `office-demo` branch of `martinburstein/bot-crossing-clone`. Keep it
 Run `node --test test/activity.test.mjs` for lifecycle detection, anonymous desk assignment, overflow, and continuous aisle return/stand transitions across all eight office routes. The canonical Codex adapter and filesystem helper were copied from Bot Crossing commit ee0d35f.
 
 A specific character can be assigned locally by setting `OFFICE_DEMO_SEAT_BINDINGS` to a JSON array of `{index, id}` pairs before starting the server. Index 4 is lilac; IDs use the canonical `codex:` prefix. Bindings stay server-side and affect only active tasks. Never commit or publish personal session IDs.
+
+To show only research workers, `OFFICE_DEMO_EXCLUDE_IDS` accepts a comma-separated list of coordinator session IDs to omit from desk assignment and the working count. These values are local runtime configuration, not part of this backup.
