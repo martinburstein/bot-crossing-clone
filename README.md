@@ -703,3 +703,8 @@ Everything else you see — the shaders, the terrain, the sky, the ship, the cre
 faces, the plot decks and their kerbs — is drawn by this project and is MIT along with the code.
 
 Not affiliated with Anthropic, OpenAI, Google, or any of the other harness vendors listed above.
+
+
+## Office animation library
+
+The shared rig includes ten office gestures and sitting/typing transitions. Open `/animations/` on the running viewer to inspect them. See [Office animations](docs/OFFICE-ANIMATIONS.md) for clip keys, the Mac update steps, and the standalone `office-demo` branch.

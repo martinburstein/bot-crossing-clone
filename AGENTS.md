@@ -1,3 +1,5 @@
+Shared office animation library: read docs/OFFICE-ANIMATIONS.md. The canonical rig contains thirteen additional clips; /animations/ previews all eleven catalogue entries. The standalone anonymous office is backed up on branch office-demo. Preserve project-specific live task state when binding motions.
+
 # Bot Crossing: visual layer
 
 Swarm tactics and authoritative state live in ../Swarm, outside this clone.
