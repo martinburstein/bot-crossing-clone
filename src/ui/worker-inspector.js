@@ -58,7 +58,7 @@ export class WorkerInspector {
         const note=document.createElement('p');note.textContent=value;
         const paint=()=>{button.textContent=this.thoughtExpanded?'Close desk note':'Read desk note';button.setAttribute('aria-expanded',String(!!this.thoughtExpanded));note.hidden=!this.thoughtExpanded;};
         button.onclick=()=>{this.thoughtExpanded=!this.thoughtExpanded;paint();this.onResize();};paint();
-        const caption=document.createElement('small');caption.textContent='Saved character flavor';dd.replaceChildren(button,note,caption);
+        const caption=document.createElement('small');caption.textContent='Desk quip · display flavor, not private reasoning';dd.replaceChildren(button,note,caption);
       });return;
     }
     const nodes=rows.flatMap(([key,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;dd.textContent=value;return [dt,dd]});

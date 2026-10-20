@@ -36,3 +36,17 @@ test('collaboration observations project three real-status slots and expire clos
  assert.equal(withOfficeActivity(original,{available:false,reason:'invalid'}).worksite.stale,true);
  // Keep the small temporary test fixture for inspection; no recursive deletion.
 });
+
+test('a completed task becomes one short related desk quip and persists through a later running observation',async()=>{
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'office-completion-quip-')),root=path.join(dir,'office');
+ await fs.mkdir(path.join(dir,'.local'));const file=path.join(dir,'.local/office-activity.json');
+ const completed=fixture();completed.agents.forEach(a=>a.status='completed');completed.agents[0].task='BTCS wallet address provenance review';
+ await fs.writeFile(file,JSON.stringify(completed));
+ let projected=financialOfficeResponse(withOfficeActivity({threads:[],scannedAt:Date.now(),worksite:{stale:false}},await readOfficeActivity({root})));
+ let burry=projected.threads.find(t=>t.officeProfileId==='michael-burry');
+ assert.match(burry.officeThought,/wallet|provenance/i);assert.equal(burry.officeThought.includes('\n'),false);assert.ok(burry.officeThought.length<120);assert.equal(burry.officeThoughtKind,'completion-quip');
+ const running=fixture();running.agents[0].lastCompletedTask=completed.agents[0].task;await fs.writeFile(file,JSON.stringify(running));
+ projected=financialOfficeResponse(withOfficeActivity({threads:[],scannedAt:Date.now(),worksite:{stale:false}},await readOfficeActivity({root})));
+ burry=projected.threads.find(t=>t.officeProfileId==='michael-burry');assert.match(burry.officeThought,/wallet|provenance/i);
+ running.agents[0].lastCompletedTask='x'.repeat(251);await fs.writeFile(file,JSON.stringify(running));assert.equal((await readOfficeActivity({root})).reason,'invalid');
+});
