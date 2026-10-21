@@ -22,18 +22,21 @@ export function memorialSymbolKey(input) {
 
 export function assessMemorialLegibility(input,{size=96}={}) {
   const coverage=new Uint16Array(size*size);let samples=0;
+  let strokeMask=null;
   const paint=(x,y,r)=>{
     const minX=Math.max(0,Math.floor(x-r)),maxX=Math.min(size-1,Math.ceil(x+r));
     const minY=Math.max(0,Math.floor(y-r)),maxY=Math.min(size-1,Math.ceil(y+r));
-    for(let py=minY;py<=maxY;py++)for(let px=minX;px<=maxX;px++)if((px-x)**2+(py-y)**2<=r*r)coverage[py*size+px]++;
+    for(let py=minY;py<=maxY;py++)for(let px=minX;px<=maxX;px++)if((px-x)**2+(py-y)**2<=r*r)strokeMask[py*size+px]=1;
   };
   for(const stroke of input.strokes??[]){
+    strokeMask=new Uint8Array(size*size);
     const r=Math.max(.75,stroke.width*size/2),points=stroke.points;
     for(let i=0;i<points.length;i++){
       const [x,y]=points[i],previous=points[Math.max(0,i-1)];
       const dx=(x-previous[0])*size,dy=(y-previous[1])*size,steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)*1.5));
       for(let step=0;step<=steps;step++){const t=step/steps;paint((previous[0]+(x-previous[0])*t)*size,(previous[1]+(y-previous[1])*t)*size,r);samples++;}
     }
+    for(let pixel=0;pixel<strokeMask.length;pixel++)coverage[pixel]+=strokeMask[pixel];
   }
   let painted=0,stacked=0;for(const n of coverage){if(n){painted++;if(n>1)stacked++;}}
   const occupiedRatio=painted/(size*size),stackedRatio=painted?stacked/painted:0;
