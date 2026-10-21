@@ -2,15 +2,31 @@
   "schemaVersion": 1,
   "name": "Dual View — canonical Waveshare campus",
   "status": "current-canon",
-  "adoptedOn": "2026-10-15",
+  "adoptedOn": "2026-10-21",
   "screen": "primary-working-area",
   "gapPixels": 4,
-  "left": {"application": "existing-caller", "width": "half", "height": "full"},
-  "right": {"application": "bot-crossing", "width": "half", "height": "full", "query": {"dual": "1", "presentation": "1"}},
+  "left": {
+    "application": "existing-caller",
+    "width": "half",
+    "height": "full"
+  },
+  "right": {
+    "application": "bot-crossing",
+    "width": "half",
+    "height": "full",
+    "query": {
+      "dual": "1",
+      "presentation": "1"
+    }
+  },
   "campus": {
     "geometry": "src/world/free-campus-scene.js",
     "layout": "src/world/free-campus-layout.js",
-    "supercomputers": {"balthasar": "above camp", "casper": "left of camp", "melchior": "right of camp"},
+    "supercomputers": {
+      "balthasar": "above camp",
+      "casper": "left of camp",
+      "melchior": "right of camp"
+    },
     "computerFootprint": 28,
     "visibleResidents": 17,
     "memoryPods": 15,
@@ -24,5 +40,6 @@
   "hardwareFeed": false,
   "modelCalls": 0,
   "workerDispatch": false,
-  "projectState": "Reuse the selected project. Geometry is shared; histories, tasks and worker execution remain project-specific."
+  "projectState": "Reuse the selected project. Geometry is shared; histories, tasks and worker execution remain project-specific.",
+  "structuresRegistry": "CANON-STRUCTURES.json"
 }

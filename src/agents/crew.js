@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {OFFICE_CLIPS,isOfficePose,applyOfficeAnimation} from './office-animations.js'
+import {memorialPoseAngles} from './memorial-poses.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 
@@ -70,6 +71,11 @@ const CLIP = {
   drive: {name:'Sit_Floor_Idle',loop:true,pose:'drive',duration:3},
   carryWalk: {name:'Walking_A',loop:true,pose:'carry'},
   carryIdle: {name:'Idle_A',loop:true,pose:'carry'},
+  sprayPickup:{name:'Idle_A',loop:false,pose:'memorial-pickup',duration:2.8},
+  sprayPaint:{name:'Idle_A',loop:false,pose:'memorial-spray',duration:5.5},
+  sprayPutback:{name:'Idle_A',loop:false,pose:'memorial-putback',duration:2.8},
+  sprayCarry:{name:'Walking_A',loop:true,pose:'memorial-carry'},
+  sprayHold:{name:'Idle_A',loop:true,pose:'memorial-carry'},
 }
 
 const CREW_URL = `${import.meta.env.BASE_URL}assets/crew.glb`
@@ -283,6 +289,7 @@ function applyCampPose(bones,pose,time) {
     bone.quaternion.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(x,y,z)))
   }
   const wave=Math.sin(time*Math.PI/2),sip=.5-.5*Math.cos(time*Math.PI/2)
+  for(const [name,x,y,z] of memorialPoseAngles(pose,time))rotate(name,x,y,z)
   if(pose==='talk') {rotate('head',.05*wave,.16*wave);rotate('upperarmr',-.35-.13*wave,0,.22);rotate('lowerarmr',-.55,0,.12*wave);rotate('chest',0,.06*wave)}
   if(pose==='read') {rotate('head',.12+.06*Math.sin(time*Math.PI*2/5),.16*Math.sin(time*Math.PI*2/5));rotate('upperarml',-.45);rotate('lowerarml',-.75)}
   if(pose==='snack') {rotate('upperarmr',-.55-.38*sip,0,.12);rotate('lowerarmr',-1.15-.42*sip);rotate('head',.08*sip);rotate('handr',0,0,.1*sip)}

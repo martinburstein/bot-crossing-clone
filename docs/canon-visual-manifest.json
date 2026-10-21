@@ -1,29 +1,29 @@
 {
   "schemaVersion": 1,
-  "createdAt": "2026-10-15T17:12:01.848Z",
-  "description": "Shared current Waveshare visual canon; source only, no personal runtime or model sessions.",
+  "createdAt": "2026-10-21T07:24:31.938Z",
+  "description": "Current shared campus canon including Frontera de las Almas; October 15 manifest archived separately.",
   "validation": {
     "fullViewerTests": {
-      "passed": 199,
+      "passed": 242,
+      "failed": 0
+    },
+    "focusedTests": {
+      "passed": 21,
       "failed": 0
     },
     "productionBuild": "passed",
-    "dualView": {
-      "equalHalves": true,
-      "modelCalls": 0,
-      "workerDispatch": false
-    }
+    "browser": "Temporary glyph and freehand ceremonies completed; clickable story card verified; no real iteration consumed"
   },
   "files": [
     {
       "path": "CANON-VISUAL.json",
-      "bytes": 1137,
-      "sha256": "074f339b3fa810119a838b64785fda1ebfbd8ca237fa2be965abc1afaffb0c0b"
+      "bytes": 1264,
+      "sha256": "6e8bccb6d3f44abc4be3cd5bc8d2819ee1e960301f951f044fb9a28487aad1ee"
     },
     {
       "path": "src/world/free-campus-scene.js",
-      "bytes": 13556,
-      "sha256": "b72e4ff4fdb7fef3a1d52943813b53eaf31f90419b10556c39002c0d8c4f8ff3"
+      "bytes": 14063,
+      "sha256": "35ab5a97bb130f8f5c3d53ff8cd2273d271f9dd5827a362c787e97357fad2000"
     },
     {
       "path": "src/world/free-campus-layout.js",
@@ -32,8 +32,8 @@
     },
     {
       "path": "src/world/canonical-campus.js",
-      "bytes": 2853,
-      "sha256": "7bb7409b2c44f6996dc14b70fa6c9244b26f611a8c085822fd9a3b6f14a5d8fc"
+      "bytes": 3108,
+      "sha256": "798f348ff3e7c6fd00daab5a75e3fa36eac2cb1c84b19af964e7861d755c75f5"
     },
     {
       "path": "src/world/crane-lab.js",
@@ -52,8 +52,38 @@
     },
     {
       "path": "skills/launch-dual-view/SKILL.md",
-      "bytes": 1345,
-      "sha256": "839228e6e6c1e8f0a2065af9b86fd4fce6c82d1523b3f82fe83698e33e6e81bd"
+      "bytes": 1627,
+      "sha256": "55cfa1e26e301d40f1a7c0cb6659be7646b48c600f226d2a1b0cd6feb86038fd"
+    },
+    {
+      "path": "CANON-STRUCTURES.json",
+      "bytes": 674,
+      "sha256": "8dc360b4cce148b13bd8ed7300f4d885f774d48329a4d6aa7ecef16dfb153458"
+    },
+    {
+      "path": "src/world/frontera-layout.js",
+      "bytes": 3737,
+      "sha256": "a365a9ff33f456988d6db001271a90ca5be431c878107ea4bd4543dc356079f0"
+    },
+    {
+      "path": "src/world/memorial-wall.js",
+      "bytes": 11678,
+      "sha256": "b92262855921f7ade4b6bd60651a921c995a9702f23df36c37ce9b165ba2f540"
+    },
+    {
+      "path": "src/office/memorial.js",
+      "bytes": 3048,
+      "sha256": "e90ce28966f1eb73554e8d398b064979053d202ec180d4957aec66ac9a14e58b"
+    },
+    {
+      "path": "src/office/memorial-ceremony.js",
+      "bytes": 3044,
+      "sha256": "4109ed468b8dc6491cefd14e5b2b3c85ed58258d0bfc69cea1828273f4b3c4d0"
+    },
+    {
+      "path": "src/agents/memorial-poses.js",
+      "bytes": 1092,
+      "sha256": "3b41b178d3ee5ed7ffd8cc128f41391e2abcf54aadb082bc0a6952ff7761c914"
     }
   ]
 }

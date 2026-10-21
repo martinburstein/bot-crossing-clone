@@ -1,5 +1,6 @@
 import {createRoArmWorksite} from './roarm-worksite.js'
 import {createFreeCampusScene} from './free-campus-scene.js'
+import {createMemorialWall} from './memorial-wall.js'
 
 // One shared visual canon. Generic projects reuse the existing Waveshare campus
 // geometry; the protocol and its fifteen real worker identities stay untouched.
@@ -26,6 +27,7 @@ export function canonicalCampusResponse(value) {
 export function createCanonicalCampus(scene) {
   const base=createRoArmWorksite(scene)
   const campus=createFreeCampusScene(scene,base)
+  const memorial=createMemorialWall(scene)
   const scenery=value=>({stale:value.stale!==false,executorSlots:value.displaySlots??[],campus:{dispatchMode:'free-15-3A',mode:'awake',free:{chargingRoleIds:[],history:[]}}})
   function update(value={}) {
     base.update(value)
@@ -34,9 +36,9 @@ export function createCanonicalCampus(scene) {
   }
   update()
   return {...base,profile:'canonical-campus',campusGroup:campus.group,cores:campus.cores,pods:campus.pods,
-    target(thread,elapsed,agent){return campus.target({...thread,roleId:thread.displayRoleId},elapsed,agent)},
-    update,animate:(elapsed,agents)=>campus.animate(elapsed,agents),
-    surfaceHeight:campus.surfaceHeight,clearings:campus.clearings,obstacles:campus.obstacles,
+    memorial,target(thread,elapsed,agent){return memorial.target(thread)??campus.target({...thread,roleId:thread.displayRoleId},elapsed,agent)},
+    update,animate:(elapsed,agents)=>{campus.animate(elapsed,agents);memorial.animate(elapsed,agents)},
+    surfaceHeight:campus.surfaceHeight,clearings:()=>[...campus.clearings(),...memorial.clearings()],obstacles:()=>[...campus.obstacles(),...memorial.obstacles()],
     updateObservation(){return {state:'disabled',reason:'Presentation-only campus has no hardware feed.'}},
-    dispose(){campus.dispose();base.dispose()}}
+    dispose(){memorial.dispose();campus.dispose();base.dispose()}}
 }

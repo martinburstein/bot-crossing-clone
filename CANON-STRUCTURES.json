@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "structures": [{
+    "id": "frontera-de-las-almas",
+    "name": "Frontera de las Almas",
+    "status": "canonical",
+    "adoptedOn": "2026-10-21",
+    "geometry": "src/world/memorial-wall.js",
+    "layout": "src/world/frontera-layout.js",
+    "scenes": ["financial-office", "canonical-campus"],
+    "height": 9.5,
+    "soulUnit": {"width": 1, "height": 1, "placement": "free within each wall section; no overlaps"},
+    "openings": 4,
+    "palette": "classic-paint-28",
+    "animation": "approach, pickup, carry, spray, return, putback",
+    "archive": "project-owned; never a public shared biography store",
+    "executionAuthority": false
+  }]
+}

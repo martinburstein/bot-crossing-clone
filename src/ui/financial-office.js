@@ -1,14 +1,15 @@
 import {OFFICE_PROFILES} from '../office/profiles.js';
 import './financial-office.css';
 
-export function mountFinancialOffice(root,{focusProfile,focusOffice,focusCamp,focusCampus,toggleActionCam}){
+export function mountFinancialOffice(root,{focusProfile,focusOffice,focusCamp,focusCampus,focusMemorial,toggleActionCam}){
   const el=document.createElement('section');el.className='financial-office-hud';el.setAttribute('aria-label','Financial research office');
   el.innerHTML=`<header class="office-masthead"><span>CRYPTO RESEARCH LAB</span><h1>The Big Short</h1><p>Eight perspectives. One research floor.</p></header>
     <div class="office-execution" role="status"><i></i><span>3 MAGI computers · ready</span><small>8 characters / up to 3 real turns</small></div>
-    <nav class="office-camera" aria-label="Office camera"><button data-view="office">Office floor</button><button data-view="camp">Campfire</button><button data-view="campus">Whole campus</button><button data-view="action" aria-pressed="false" title="Automatic trailing shots of the characters. Camera controls pause it; shots resume after 10 seconds idle.">Action cam</button><span class="office-camera-subject" aria-live="polite"></span></nav>
+    <nav class="office-camera" aria-label="Office camera"><button data-view="office">Office floor</button><button data-view="camp">Campfire</button><button data-view="campus">Whole campus</button><button data-view="memorial">Memorial wall</button><button data-view="action" aria-pressed="false" title="Automatic trailing shots of the characters. Camera controls pause it; shots resume after 10 seconds idle.">Action cam</button><span class="office-camera-subject" aria-live="polite"></span></nav>
     <div class="office-roster" aria-label="Eight research simulations"></div>
     <details class="office-ledger"><summary>Campfire ledger <span></span></summary><div class="office-ledger-body"></div></details>`;
   root.append(el);
+  el.querySelector('[data-view="memorial"]').onclick=focusMemorial;
   el.querySelector('[data-view="office"]').onclick=focusOffice;el.querySelector('[data-view="camp"]').onclick=focusCamp;el.querySelector('[data-view="campus"]').onclick=focusCampus;
   const actionButton=el.querySelector('[data-view="action"]'),cameraSubject=el.querySelector('.office-camera-subject');
   actionButton.onclick=toggleActionCam;

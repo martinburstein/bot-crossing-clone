@@ -9,7 +9,6 @@ tools/dual-view.mjs -text
 tools/dual-view-layout.ps1 -text
 skills/launch-dual-view/SKILL.md -text
 visuals/financial-office/canon-source.json -text
-
 # Keep the portable animation manifest verifiable across Windows and macOS.
 /src/agents/office-animations.js text eol=lf
 /src/agents/idle-poses.js text eol=lf
@@ -27,3 +26,10 @@ visuals/financial-office/canon-source.json -text
 /OFFICE-ANIMATIONS.json text eol=lf
 /tools/check-office-animations.mjs text eol=lf
 /docs/OFFICE-ANIMATIONS.md text eol=lf
+visuals/canon-archive/** -text
+CANON-STRUCTURES.json -text whitespace=cr-at-eol
+src/world/frontera-layout.js -text whitespace=cr-at-eol
+src/world/memorial-wall.js -text whitespace=cr-at-eol
+src/office/memorial.js -text whitespace=cr-at-eol
+src/office/memorial-ceremony.js -text whitespace=cr-at-eol
+src/agents/memorial-poses.js -text whitespace=cr-at-eol

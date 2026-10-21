@@ -31,6 +31,9 @@ import {standbyMagiThreads} from './game/magi-world.js'
 import {canonicalCampusResponse} from './world/canonical-campus.js'
 import {financialOfficeResponse,withOfficeActivity} from './office/profiles.js'
 import {mountFinancialOffice} from './ui/financial-office.js'
+import {mountMemorial} from './ui/memorial.js'
+import {MEMORIAL} from './office/memorial.js'
+import {memorialPoint} from './world/frontera-layout.js'
 import {MagiPanel} from './ui/magi-panel.js'
 import {mountDisplayToggle} from './ui/display-toggle.js'
 import {PaperBankController} from './office/paper-bank-controller.js'
@@ -95,6 +98,7 @@ const idleDirector = new IdleDirector(rig, {
   subjects: () => colony.astronauts.agents,
   blocked: () => document.hidden || Boolean(REPLAY_RUN) ||
     Boolean(actionCamera?.enabled) ||
+    Boolean(document.querySelector('.memorial-panel:not([hidden])')) ||
     Boolean(document.activeElement?.closest?.('input,textarea,select,[contenteditable="true"]')),
 })
 mountIdleDirector(idleDirector)
@@ -103,15 +107,15 @@ window.idleCamera = Object.freeze({ snapshot: () => idleDirector.snapshot(),
   enable: () => idleDirector.setEnabled(true) })
 const cinematicButton = document.createElement('button')
 cinematicButton.type = 'button'
-cinematicButton.className = 'idle-camera-toggle'
-cinematicButton.title = 'Idle cinematic camera after 30 seconds. Click to start or stop; I toggles. Any input gives control back.'
-cinematicButton.style.cssText = 'position:fixed;bottom:16px;right:16px;z-index:70;border:1px solid #b4bdab77;border-radius:18px;background:#142b2be8;color:#e4e9db;padding:7px 13px;font:11px system-ui;cursor:pointer'
+cinematicButton.className = 'btn icon idle-camera-toggle'
+cinematicButton.id = 'btn-cinematic'
+cinematicButton.setAttribute('aria-label', 'Cinematic mode')
+cinematicButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="12" height="11" rx="2"/><path d="m15 11 6-3v9l-6-3Z"/><circle cx="7" cy="4" r="2"/><circle cx="13" cy="4" r="2"/></svg>'
 cinematicButton.addEventListener('click', () => {
   const on = idleDirector.setEnabled(!idleDirector.enabled)
-  if (on) idleDirector.start()
+  if (on) {memorialPanel?.close();idleDirector.start()}
   try { localStorage.setItem('botcrossing.idle-camera.enabled', String(idleDirector.enabled)) } catch {}
 })
-app.append(cinematicButton)
 let cinematicLabel = ''
 const craneLab=MAGI_VIEW&&!REPLAY_RUN&&!OFFICE_VIEW?createCraneLab(engine.scene):null
 let lastCraneFrameAt=performance.now()
@@ -139,7 +143,7 @@ let framedSwarmRun = null
 function frameSwarm() {
   actionCamera?.interrupt()
   rig.resetView()
-  if(OFFICE_VIEW){rig.restAzimuths=[0,Math.PI/2,Math.PI,Math.PI*1.5];rig.restPolar=.92;rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.maxDistance=420;rig.worldLimit=220;rig.focus(new THREE.Vector3(0,8,-29),{distance:180,elevated:true});return}
+  if(OFFICE_VIEW){rig.restAzimuths=[0,Math.PI/2,Math.PI,Math.PI*1.5];rig.restPolar=.92;rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.maxDistance=520;rig.worldLimit=280;rig.focus(new THREE.Vector3(0,5,-35),{distance:255,elevated:true});return}
   const radius=Math.max(25,...colony.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+8)))
   rig.maxDistance=Math.max(150,radius*4)*MAP_LINEAR_SCALE
   rig.worldLimit=Math.max(82,radius+20)*MAP_LINEAR_SCALE
@@ -374,6 +378,7 @@ const actions = {
 }
 
 const hud = new Hud(app, settings, actions)
+hud.el.querySelector('.rail').append(cinematicButton)
 const campfireSpeech = MAGI_VIEW ? new CampfireSpeech(app) : null
 let officeHistory=null
 let officeCouncilFramed=false
@@ -381,13 +386,30 @@ let officeFollowProfile=null
 const officeFocus=(point,distance)=>{actionCamera?.interrupt();rig.setOrbit(false);hud.setOrbit(false);officeFollowProfile=null;rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.restPolar=.92;rig.focus(point,{distance,elevated:true})}
 const focusOfficeProfile=id=>{const agent=colony.agentFor(`office:${id}`);if(agent){officeFocus(new THREE.Vector3(agent.pos.x,agent.pos.y+1,agent.pos.z),17);rig.desiredAzimuth=agent.yaw+.65;rig.desiredPolar=rig.restPolar=.66;officeFollowProfile=id}}
 const focusPaperBank=()=>officeFocus(new THREE.Vector3(49,2,2),37)
+const memorialFraming=width=>{const h=engine.viewport.h,w=engine.viewport.w,tan=Math.tan(THREE.MathUtils.degToRad(engine.camera.fov)/2);const distance=Math.max(width*2, width*h/(2*tan*Math.max(200,w-430)));return {distance,shift:130*2*distance*tan/h};}
+let memorialFollowing=false
+const focusMemorial=()=>{memorialFollowing=false;const f=memorialFraming(150);officeFocus(new THREE.Vector3(f.shift,4,-34),f.distance);rig.desiredAzimuth=0;rig.desiredPolar=rig.restPolar=.63;rig.orbiting=false;}
+const focusMemorialPaint=()=>{memorialFollowing=false;const f=memorialFraming(7);officeFocus(new THREE.Vector3(MEMORIAL.crate.x,1.1,MEMORIAL.crate.z-f.shift),f.distance);rig.desiredAzimuth=Math.PI/2;rig.desiredPolar=rig.restPolar=1.0;}
+const focusMemorialSymbol=entry=>{memorialFollowing=false;const p=memorialPoint(entry.placement),f=memorialFraming(4);officeFocus(new THREE.Vector3(p.x+p.nz*f.shift,p.y,p.z-p.nx*f.shift),f.distance);rig.desiredAzimuth=p.angle;rig.desiredPolar=rig.restPolar=1.45;}
+const focusPaintingStage=s=>{
+  if(!memorialFollowing||!s)return;
+  const j=colony.worksite?.memorial?.ceremony.job;
+  if(!j){memorialFollowing=false;officeFollowProfile=null;return}
+  const a=colony.agentFor(j.agentId);if(!a)return;
+  if(['approach','carry','return'].includes(s.stage)){const f=memorialFraming(8);officeFocus(new THREE.Vector3(a.pos.x,a.pos.y+1,a.pos.z),f.distance);rig.desiredAzimuth=Math.PI/2;rig.desiredPolar=rig.restPolar=1.1;officeFollowProfile=a.thread.officeProfileId;}
+  else if(s.stage==='spray'){const p=memorialPoint(j.entry.placement),f=memorialFraming(11);officeFocus(new THREE.Vector3(p.x+p.nz*f.shift,3.3,p.z-p.nx*f.shift),f.distance);rig.desiredAzimuth=p.angle;rig.desiredPolar=rig.restPolar=1.36;}
+  else{const f=memorialFraming(8);officeFocus(new THREE.Vector3(MEMORIAL.crate.x+1,1.2,MEMORIAL.crate.z-f.shift),f.distance);rig.desiredAzimuth=Math.PI/2;rig.desiredPolar=rig.restPolar=1.1;}
+}
+const watchPainting=()=>{memorialFollowing=true;focusPaintingStage(colony.worksite?.memorial?.ceremony.snapshot())}
+const memorialPanel=OFFICE_VIEW?mountMemorial(app,{world:()=>colony.worksite?.memorial,focusWall:focusMemorial,focusPaint:focusMemorialPaint,focusSymbol:focusMemorialSymbol,watchPainting,onStage:focusPaintingStage}):null
 let paperBankPanel=null
 const paperBank=OFFICE_VIEW?new PaperBankController({onChange:()=>paperBankPanel?.update()}):null
 const officePanel=OFFICE_VIEW?mountFinancialOffice(app,{
   focusProfile:focusOfficeProfile,
-  focusOffice:()=>officeFocus(new THREE.Vector3(10,3,2),150),
-  focusCamp:()=>officeFocus(new THREE.Vector3(0,7,-49),125),
-  focusCampus:()=>{officeFollowProfile=null;frameSwarm()},
+  focusOffice:()=>{memorialPanel.close();officeFocus(new THREE.Vector3(10,3,2),150)},
+  focusCamp:()=>{memorialPanel.close();officeFocus(new THREE.Vector3(0,7,-49),125)},
+  focusCampus:()=>{memorialPanel.close();officeFollowProfile=null;frameSwarm()},
+  focusMemorial:()=>memorialPanel.open(),
   toggleActionCam:()=>{const on=!actionCamera.enabled;officeFollowProfile=null;actionCamera.setEnabled(on);settings.set('officeActionCam',on);if(on){rig.setOrbit(false);hud.setOrbit(false)}},
 }):null
 if(OFFICE_VIEW){paperBankPanel=mountPaperBank(app,paperBank,{focusBank:focusPaperBank,focusProfile:focusOfficeProfile});void paperBank.refresh()}
@@ -396,6 +418,10 @@ if (crashLab && paperBankPanel) paperBankPanel.el.addEventListener('toggle',()=>
 if(OFFICE_VIEW)window.financialOffice=Object.freeze({snapshot:()=>({...(colony.worksite?.snapshot?.()??{}),bank:colony.worksite?.paperBank?.snapshot(),characters:colony.astronauts.agents.map(a=>({id:a.thread.officeProfileId,name:a.thread.shellName,suit:a.thread.officeStyle?.style,position:a.pos.toArray(),activity:a.magiActivity,running:a.thread.running,carrier:a.thread.carrierWorkerId})),history:{digest:officeHistory?.digest,entries:officeHistory?.totalEntries}}),office:()=>officeFocus(new THREE.Vector3(0,3,0),125),camp:()=>officeFocus(new THREE.Vector3(0,7,-49),125),bank:focusPaperBank,campus:()=>frameSwarm(),simulate:request=>paperBank.action({...request,type:'start',id:request.id??`sim-${crypto.randomUUID()}`})})
 if (MAGI_VIEW){const display=mountDisplayToggle(app,{office:OFFICE_VIEW});if(OFFICE_VIEW){hud.toggleUi=force=>{display.setHidden(force===undefined?!display.isHidden():!force);return !display.isHidden()};const rail=hud.el.querySelector('.rail');rail.setAttribute('aria-label','Left toolbox');for(const [title,text,action]of [['Cash bank and paper simulations','$',()=>{display.setHidden(false);paperBankPanel.open();focusPaperBank()}],['Settings','⚙',()=>{display.setHidden(false);hud.toggleSettings(true)}]]){const b=document.createElement('button');b.type='button';b.className='btn icon';b.title=title;b.setAttribute('aria-label',title);b.textContent=text;b.onclick=action;rail.append(b);}}}
 if (MAGI_VIEW && new URLSearchParams(location.search).get('dual') === '1') mountTokenHud(app)
+if(OFFICE_VIEW){
+  window.agentMemorial=Object.freeze({open:()=>memorialPanel.open(),test:()=>memorialPanel.test(),refresh:()=>memorialPanel.refresh(),snapshot:()=>colony.worksite?.memorial?.snapshot()});
+  const b=document.createElement('button');b.type='button';b.className='btn icon';b.title='Agent memorial wall';b.setAttribute('aria-label',b.title);b.textContent='▥';b.onclick=()=>memorialPanel.open();hud.el.querySelector('.rail').append(b);
+}
 const mission = new MissionPanel(app, id => select(id, { fly: true }))
 const swarm = new SwarmPanel(app, id => select(id, { fly: true }))
 const magiPanel = MAGI_VIEW&&!PRESENTATION_ONLY ? new MagiPanel(app,colony,id=>select(id,{fly:true}),clusterId=>{
@@ -585,8 +611,9 @@ engine.canvas.addEventListener('pointermove', (e) => {
   // Pointing at a quiet plot is what makes its name appear.
   const plot = plotUnder(e, p)
   colony.setHoveredPlot(plot)
-  engine.canvas.style.cursor = colony.astronauts.magiLife.pickHangar(engine.camera,p.x,p.y) || messageBoards.pick(engine.camera,p.x,p.y) || agent || plot ? 'pointer' : 'grab'
+  engine.canvas.style.cursor = colony.worksite?.memorial?.pick(engine.camera,p.x,p.y) || colony.astronauts.magiLife.pickHangar(engine.camera,p.x,p.y) || messageBoards.pick(engine.camera,p.x,p.y) || agent || plot ? 'pointer' : 'grab'
 })
+for(const event of ['pointerdown','wheel'])engine.canvas.addEventListener(event,()=>{memorialFollowing=false;officeFollowProfile=null},{passive:true})
 
 /**
  * The zone under the cursor: its name plate first, then the deck itself. The plate is
@@ -609,6 +636,8 @@ function plotUnder(e, p) {
 engine.canvas.addEventListener('pointerup', (e) => {
   if (e.button !== 0 || !rig.wasClick) return
   const p = ndc(e)
+  const memorialHit=colony.worksite?.memorial?.pick(engine.camera,p.x,p.y)
+  if(memorialHit){memorialPanel?.pick(memorialHit);return}
   const agent = colony.pick(p.x, p.y, p.aspect)
   if(agent?.mounted){select(agent.id,{});return}
   if(magiPanel&&colony.astronauts.magiLife.pickHangar(engine.camera,p.x,p.y)){magiPanel.openHangar();return}
@@ -847,6 +876,7 @@ async function poll() {
     if(MAGI_VIEW&&res.mode==='magi'&&!REPLAY_RUN&&!OFFICE_VIEW)try{localStorage.setItem('botcrossing.15-3A.lastProjection',JSON.stringify(res.threads))}catch{/* Storage is optional. */}
     applyThreads(res.threads || [])
     officePanel?.update(res)
+    if(memorialPanel)void memorialPanel.refresh()
     if(OFFICE_VIEW&&res.worksite?.office?.council&&!officeCouncilFramed){officeCouncilFramed=true;if(new URLSearchParams(location.search).get('view')==='office')officeFocus(new THREE.Vector3(10,3,2),150);else officeFocus(new THREE.Vector3(0,7,-49),95)}
     const shells = (res.threads || []).filter(t=>t.isShell)
     colony.astronauts.setAlignmentLights(null)
@@ -976,7 +1006,7 @@ engine.add({
       idleDirector.enabled ? 'Cinematic · auto' : 'Cinematic · off'
     if (nextCinematicLabel !== cinematicLabel) {
       cinematicLabel = nextCinematicLabel
-      cinematicButton.textContent = cinematicLabel
+      cinematicButton.title = `${cinematicLabel}. Click to turn ${idleDirector.enabled?'off':'on'}; I toggles. Any input gives control back.`
       cinematicButton.dataset.active = String(idleDirector.active)
       cinematicButton.setAttribute('aria-pressed', String(idleDirector.enabled))
     }
@@ -988,6 +1018,7 @@ engine.add({
     rig.update(dt)
     paperBank?.tick(elapsed,colony.worksite,colony.astronauts.agents)
     colony.worksite?.animate?.(elapsed,colony.astronauts.agents)
+    memorialPanel?.tick()
     campfireSpeech?.update(colony.astronauts.agents, colony.worksite, colony.worksiteProjection, engine.camera, engine.viewport, elapsed)
     armPreview?.update(dt)
     const craneFrameAt=performance.now();craneLab?.update(Math.max(0,(craneFrameAt-lastCraneFrameAt)/1000),elapsed);lastCraneFrameAt=craneFrameAt
