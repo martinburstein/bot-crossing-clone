@@ -37,9 +37,9 @@ export function mountMemorial(root,{world,focusWall,focusPaint,focusSymbol,watch
   function show(entry){
     selectedEntry=entry;el.querySelector('[data-action="inspect"]').hidden=false;
     card.replaceChildren();card.hidden=false;
-    const name=document.createElement('h3');name.textContent=entry.agent;card.append(name);
+    const name=document.createElement('h3');name.textContent=entry.preview?'Test symbol':`Iteration ${entry.iteration}`;card.append(name);
     const dl=document.createElement('dl');
-    for(const [label,text] of [['Iteration',entry.preview?'TEST · not assigned':String(entry.iteration)],['Duration',`${new Date(entry.startedAt).toLocaleString()} — ${new Date(entry.endedAt).toLocaleString()}`],['Task',entry.task],['Symbol',entry.symbol],['Explanation',entry.explanation]]){
+    for(const [label,text] of [['Research lane',entry.agent],['Duration',`${new Date(entry.startedAt).toLocaleString()} — ${new Date(entry.endedAt).toLocaleString()}`],['Task',entry.task],['Symbol',entry.symbol],['Explanation',entry.explanation]]){
       const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=text;dl.append(dt,dd);
     }card.append(dl);
   }
@@ -50,7 +50,7 @@ export function mountMemorial(root,{world,focusWall,focusPaint,focusSymbol,watch
     el.querySelector('[data-action="prev"]').disabled=page===0;el.querySelector('[data-action="next"]').disabled=page>=pages-1;
     const list=el.querySelector('.memorial-list');list.replaceChildren();
     for(const entry of archive.entries.slice(page*100,(page+1)*100)){
-      const b=document.createElement('button');b.textContent=`${entry.iteration} · ${entry.agent} · ${entry.symbol}`;b.onclick=()=>show(entry);list.append(b);
+      const b=document.createElement('button');b.textContent=`Iteration ${entry.iteration}`;b.onclick=()=>show(entry);list.append(b);
     }
   }
   function sync(){const w=world();if(!w)return;if(w!==lastWorld){lastWorld=w;w.update(archive.entries);}}

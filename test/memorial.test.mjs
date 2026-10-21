@@ -43,14 +43,16 @@ test('canonical border has moderate height, curved corners, four open entrances 
   const camera=new THREE.PerspectiveCamera(45,1,.1,500);camera.position.set(-57,.8,15.79);camera.lookAt(-63.45,.8,15.79);camera.updateMatrixWorld();assert.ok(wall.pick(camera,0,0)?.paint);
   wall.dispose();assert.equal(scene.children.length,0);
 });
-test('one-unit symbols have stable organic positions, cannot overlap, and support at least 1250 souls',()=>{
+test('one-unit symbols cluster outward, cannot overlap, and support at least 1250 souls',()=>{
   const placements=[];
   for(let i=1;i<=1250;i++){const p=choosePlacement(i,placements);checkPlacement(p,placements);placements.push(p);}
-  assert.equal(new Set(placements.map(p=>p.segmentId)).size,FRONTERA_SEGMENTS.length);
+  assert.ok(new Set(placements.map(p=>p.segmentId)).size>1);
   assert.deepEqual(choosePlacement(501,placements.slice(0,500)),placements[500]);
   assert.throws(()=>checkPlacement(placements[0],placements),/overlaps/);
   assert.throws(()=>checkPlacement({...placements[0],y:9.4}),/inside/);
-  assert.ok(placements.slice(1).some(p=>Math.abs(p.u-Math.round(p.u))>.1));
+  assert.ok(placements.slice(0,4).every(p=>p.segmentId==='west-garden'));
+  const first=memorialPoint(placements[0],0),fourth=memorialPoint(placements[3],0),hundredth=memorialPoint(placements[99],0);
+  assert.ok(Math.hypot(fourth.x-first.x,fourth.y-first.y,fourth.z-first.z)<Math.hypot(hundredth.x-first.x,hundredth.y-first.y,hundredth.z-first.z));
 });
 test('new border and paint box preserve routes from all eight desks and around every entrance',()=>{
   const world=createFinancialOffice(new THREE.Scene()),nav=new Navigation({half:170,maxExpansions:30000});nav.rebuild(world.obstacles());

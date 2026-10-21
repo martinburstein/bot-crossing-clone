@@ -28,16 +28,28 @@ export function checkPlacement(p,others=[]){
   if(others.some(o=>o.segmentId===p.segmentId&&Math.abs(o.u-p.u)<FRONTERA.soulUnit+FRONTERA.spacing&&Math.abs(o.y-p.y)<FRONTERA.soulUnit+FRONTERA.spacing))throw Error('Soul unit overlaps an existing symbol');
   return {segmentId:p.segmentId,u:p.u,y:p.y};
 }
+let clusteredCandidates;
 export function choosePlacement(iteration,others=[],requested){
   if(requested)return checkPlacement(requested,others);
   if(iteration===1&&!others.length)return {...FRONTERA.firstMark};
-  let seed=(iteration*2654435761)>>>0;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const edge=FRONTERA.margin+FRONTERA.soulUnit/2;
-  for(let attempt=0;attempt<20000;attempt++){
-    let distance=random()*FRONTERA_LENGTH;let s=lines[lines.length-1];for(const candidate of lines){distance-=candidate.length;if(distance<=0){s=candidate;break;}}
-    const p={segmentId:s.id,u:edge+random()*(s.length-2*edge),y:edge+random()*(FRONTERA.height-2*edge)};
-    try{return checkPlacement(p,others);}catch{/* Choose another free position; no visible grid. */}
+  const step=FRONTERA.soulUnit+FRONTERA.spacing,anchor=memorialPoint(FRONTERA.firstMark,0),candidates=[];
+  // Fill outward from the first soul instead of scattering marks around the entire border.
+  // Rows are staggered and remain a placement detail; the wall still exposes no visible grid.
+  if(!clusteredCandidates){
+    for(const s of lines){
+      let row=0;
+      for(let y=edge;y<=FRONTERA.height-edge+1e-9;y+=step,row++){
+        const offset=(row%2)*step/2;
+        for(let u=edge+offset;u<=s.length-edge+1e-9;u+=step){
+          const p={segmentId:s.id,u,y},point=memorialPoint(p,0);
+          candidates.push({p,distance:(point.x-anchor.x)**2+(point.y-anchor.y)**2+(point.z-anchor.z)**2});
+        }
+      }
+    }
+    clusteredCandidates=candidates.sort((a,b)=>a.distance-b.distance||a.p.segmentId.localeCompare(b.p.segmentId)||a.p.y-b.p.y||a.p.u-b.p.u).map(({p})=>p);
   }
+  for(const p of clusteredCandidates)try{return checkPlacement(p,others);}catch{/* Keep expanding from the shared cluster. */}
   throw Error('No free soul unit found; preserve the archive and extend the canonical border');
 }
 export const fronteraObstacles=()=>lines.map(s=>({x:(s.ax+s.bx)/2,z:(s.az+s.bz)/2,width:s.length+.15,depth:FRONTERA.depth+.2,angle:Math.atan2(-s.dz,s.dx),worksite:'frontera-wall',office:true}));
