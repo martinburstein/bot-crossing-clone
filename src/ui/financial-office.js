@@ -1,14 +1,15 @@
 import {OFFICE_PROFILES} from '../office/profiles.js';
 import './financial-office.css';
 
-export function mountFinancialOffice(root,{focusProfile,focusOffice,focusCamp,focusCampus}){
+export function mountFinancialOffice(root,{focusProfile,focusOffice,focusCamp,focusCampus,focusMemorial}){
   const el=document.createElement('section');el.className='financial-office-hud';el.setAttribute('aria-label','Financial research office');
   el.innerHTML=`<header class="office-masthead"><span>CRYPTO RESEARCH LAB</span><h1>The Big Short</h1><p>Eight perspectives. One research floor.</p></header>
     <div class="office-execution" role="status"><i></i><span>3 MAGI computers · ready</span><small>8 characters / up to 3 real turns</small></div>
-    <nav class="office-camera" aria-label="Office camera"><button data-view="office">Office floor</button><button data-view="camp">Campfire</button><button data-view="campus">Whole campus</button></nav>
+    <nav class="office-camera" aria-label="Office camera"><button data-view="office">Office floor</button><button data-view="camp">Campfire</button><button data-view="campus">Whole campus</button><button data-view="memorial">Memorial wall</button></nav>
     <div class="office-roster" aria-label="Eight research simulations"></div>
     <details class="office-ledger"><summary>Campfire ledger <span></span></summary><div class="office-ledger-body"></div></details>`;
   root.append(el);
+  el.querySelector('[data-view="memorial"]').onclick=focusMemorial;
   el.querySelector('[data-view="office"]').onclick=focusOffice;el.querySelector('[data-view="camp"]').onclick=focusCamp;el.querySelector('[data-view="campus"]').onclick=focusCampus;
   const buttons=new Map();
   for(const p of OFFICE_PROFILES){const b=document.createElement('button');b.type='button';b.className='office-person';b.style.setProperty('--suit',`#${p.color.toString(16).padStart(6,'0')}`);b.innerHTML='<i></i><span></span><small>OFF DUTY</small>';b.querySelector('span').textContent=p.short;b.title=`${p.name} · ${p.role}\n${p.style}\nResearch simulation`;b.onclick=()=>focusProfile(p.id);el.querySelector('.office-roster').append(b);buttons.set(p.id,b);}

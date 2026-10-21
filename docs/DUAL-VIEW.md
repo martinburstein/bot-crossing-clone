@@ -1,7 +1,8 @@
 # Canonical Dual View
 
 `CANON-VISUAL.json` is the current visual canon, adopted from the latest Waveshare
-campus on October 15, 2026. It belongs here in Bot Crossing and applies across
+campus on October 15, 2026, with Frontera de las Almas added October 21 through
+`CANON-STRUCTURES.json`. It belongs here in Bot Crossing and applies across
 projects. Project tasks and histories remain in Swarm; the visual is shared.
 
 Say **Launch Dual View**, run `node tools/dual-view.mjs`, or open

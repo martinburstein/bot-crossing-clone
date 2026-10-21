@@ -93,6 +93,9 @@ test('office history fails closed on checksum tampering and the original canon b
     entries[0].text='Tampered';await fs.writeFile(path.join(root,'history.json'),JSON.stringify({schemaVersion:1,entries,digest}));
     assert.equal((await readOfficeHistory({root})).available,false);
     const canon=await fs.readFile(new URL('../CANON-VISUAL.json',import.meta.url)),copy=await fs.readFile(new URL('../visuals/financial-office/canon-source.json',import.meta.url));
-    assert.deepEqual(copy,canon);assert.equal(createHash('sha256').update(canon).digest('hex'),'074f339b3fa810119a838b64785fda1ebfbd8ca237fa2be965abc1afaffb0c0b');
+    const spec=JSON.parse(await fs.readFile(new URL('../FINANCIAL-OFFICE.json',import.meta.url),'utf8'));
+    assert.deepEqual(copy,canon);assert.equal(createHash('sha256').update(canon).digest('hex'),spec.basedOn.sha256);
+    const prior=await fs.readFile(new URL('../visuals/canon-archive/CANON-VISUAL-2026-10-15.json',import.meta.url));
+    assert.equal(createHash('sha256').update(prior).digest('hex'),'074f339b3fa810119a838b64785fda1ebfbd8ca237fa2be965abc1afaffb0c0b');
   }finally{await fs.rm(root,{recursive:true,force:true});}
 });

@@ -5,6 +5,7 @@ import {createFreeCampusScene} from './free-campus-scene.js';
 import {FREE_CAMPUS as L,FREE_CAMPUS_SEATS} from './free-campus-layout.js';
 import {OFFICE_PROFILES,OFFICE_BY_ID} from '../office/profiles.js';
 import {createPaperBank,BANK_POSITION} from './paper-bank.js';
+import {createMemorialWall} from './memorial-wall.js';
 
 // Editable sibling of the canon: reuse exact civic geometry, never mutate its definitions.
 export function createFinancialOffice(scene){
@@ -63,6 +64,7 @@ export function createFinancialOffice(scene){
   label('THE BIG SHORT','CRYPTO RESEARCH LAB   /   OPEN-AIR OFFICE',27,5.8,group,0,.83,24.4,{flat:true,size:100});
   label('ORAL HISTORY','EVIDENCE  →  QUESTIONS  →  NEXT MOVES',11,2.2,group,0,1,-32,{flat:true,size:67});
   const paperBank=createPaperBank(group,{label});
+  const memorial=createMemorialWall(group);
   const unitSlots=Object.fromEntries(['melchior','balthasar','casper'].map(id=>[id,new THREE.Vector3(L[id].x,0,L[id].z+17.5)]));
   const campGroup=civic.group.getObjectByName('free-campus-common');
   let data={};
@@ -75,6 +77,7 @@ export function createFinancialOffice(scene){
     for(const desk of desks){const active=slots.some(s=>s.status==='running'&&s.roleId===desk.userData.profileId);desk.userData.active=active;}
   }
   function target(thread,elapsed=0){
+    const paintTarget=memorial.target(thread);if(paintTarget)return paintTarget;
     const p=OFFICE_BY_ID[thread.officeProfileId];if(!p)return null;
     const vec=v=>new THREE.Vector3(v.x,0,v.z);
     const cashTarget=paperBank.target(thread);if(cashTarget)return cashTarget;
@@ -95,6 +98,7 @@ export function createFinancialOffice(scene){
   }
   const rect=(x,z,width,depth,worksite,angle=0)=>({x,z,width,depth,angle,worksite,office:true});
   const obstacles=()=>[
+    ...memorial.obstacles(),
     ...['melchior','balthasar','casper'].map(id=>rect(L[id].x,L[id].z,29.4,29.4,'magi-monument',L[id].angle)),
     {x:0,z:L.camp.z,r:2.9,worksite:'hearth',office:true},
     {...BANK_POSITION,r:5.7,worksite:'paper-bank',office:true},
@@ -107,11 +111,11 @@ export function createFinancialOffice(scene){
   const surfaceHeight=(x,z)=>Math.hypot(x,z-L.camp.z)<14?.9:Math.abs(x)<=34.5&&z>=-24.5&&z<=28.5?.67:Math.abs(x)<3.5&&z>-34&&z<-24?.85:null;
   update({});
   return {...base,profile:'financial-office',officeGroup:group,campusGroup:civic.group,cores:civic.cores,desks,
-    camp:{...base.camp,group:campGroup},target,update,surfaceHeight,paperBank,
-    clearings:()=>[{x:0,z:2,r:49},{x:0,z:-49,r:16},{...BANK_POSITION,r:10},...['melchior','balthasar','casper'].map(id=>({...L[id],r:22}))],
-    obstacles,animate:(elapsed,agents)=>{civic.animate(elapsed,agents);paperBank.animate(elapsed,agents);},
+    camp:{...base.camp,group:campGroup},target,update,surfaceHeight,paperBank,memorial,
+    clearings:()=>[...memorial.clearings(),{x:0,z:2,r:49},{x:0,z:-49,r:16},{...BANK_POSITION,r:10},...['melchior','balthasar','casper'].map(id=>({...L[id],r:22}))],
+    obstacles,animate:(elapsed,agents)=>{civic.animate(elapsed,agents);paperBank.animate(elapsed,agents);memorial.animate(elapsed,agents);},
     updateObservation:()=>({state:'disabled',reason:'Financial office has no hardware feed.'}),
     snapshot:()=>({scene:'financial-office',desks:desks.length,profiles:OFFICE_PROFILES.map(p=>({id:p.id,name:p.name,style:p.style,desk:p.desk})),camp:{...L.camp},units:['melchior','balthasar','casper'].map(id=>({id,x:L[id].x,z:L[id].z})),active:data.office?.active??0,hangar:false,crane:false}),
-    dispose(){paperBank.dispose();base.dispose();civic.dispose();group.removeFromParent();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());},
+    dispose(){memorial.dispose();paperBank.dispose();base.dispose();civic.dispose();group.removeFromParent();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());},
   };
 }

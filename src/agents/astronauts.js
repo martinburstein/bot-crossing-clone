@@ -1059,7 +1059,7 @@ export class Astronauts {
       const target=this._steerTarget(agent,this._wp)
       agent.site=site
       const direction=this._v.set(target.x-agent.pos.x,0,target.z-agent.pos.z)
-      this._walk(agent,direction,distance,dt,agent.magiActivity?.startsWith('cash-')?1.75:agent.isCampusCamper ? .38 : .7)
+      this._walk(agent,direction,distance,dt,agent.magiActivity?.startsWith('cash-')?1.75:agent.magiActivity?.startsWith('memorial-')?1.15:agent.isCampusCamper ? .38 : .7)
       // A long approach can exhaust A*'s search budget, leaving a direct fallback
       // aimed through a hangar wall. Retry locally once the pilot reaches it.
       agent.magiStuck=(agent.blocked||agent.groundSpeed<.03)?(agent.magiStuck||0)+dt:0
@@ -1244,6 +1244,8 @@ export class Astronauts {
     let key
     if (agent.mounted) key = agent.magiActivity==='pilot-rest'?'sit':'drive'
     else if (agent.state === 'spawning') key = 'spawn'
+    else if(agent.memorialPose&&['pickup','spray','putback'].includes(agent.memorialPose.stage)&&agent.magiSettled)key={pickup:'sprayPickup',spray:'sprayPaint',putback:'sprayPutback'}[agent.memorialPose.stage]
+    else if(agent.memorialPose?.holding)key=speed>.12?'sprayCarry':'sprayHold'
     else if(agent.magiActivity==='cash-carry')key=speed>.12?'carryWalk':'carryIdle'
     else if (speed > 0.12) key = speed > WALK_SPEED * 1.25 ? 'run' : 'walk'
       else if ((agent.magiActivity === 'pilot-rest' || agent.magiActivity === 'symbiosis-handoff') && agent.magiSettled) key = 'sit'
@@ -1282,8 +1284,9 @@ export class Astronauts {
     if (!clip) return
 
     // Stride rate follows the ground, everything else runs at its authored speed.
-    const rate = key === 'walk' || key === 'run' || key==='carryWalk' ? THREE.MathUtils.clamp(speed / WALK_SPEED, 0.4, 2.1) : 1
+    const rate = key === 'walk' || key === 'run' || key==='carryWalk' || key==='sprayCarry' ? THREE.MathUtils.clamp(speed / WALK_SPEED, 0.4, 2.1) : 1
     agent.clipTime += dt * anim * rate
+    if(['sprayPickup','sprayPaint','sprayPutback'].includes(key))agent.clipTime=agent.memorialPose.time
 
     if (key === 'sitDown' && agent.clipTime >= clip.duration) {
       agent.clipKey = 'sit'
@@ -1370,6 +1373,11 @@ export class Astronauts {
           agent.officeSuit.update(root,headBone,bone)
         }
 
+        if(agent.memorialPose){
+          attachMatrixAt(rig,agent.frame,this.handSlot,bone)
+          agent.memorialHandMatrix??=new THREE.Matrix4()
+          agent.memorialHandMatrix.multiplyMatrices(root,bone)
+        }
         // The hammer only exists while a thread is running, so it gets its own instance
         // counter — an unused slot in the middle of an instanced mesh still draws.
         if(agent.clipKey==='snack') {

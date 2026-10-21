@@ -37,7 +37,8 @@
     "desks": 8,
     "hangar": false,
     "lander": false,
-    "campfire": "Same geometry and position as canon"
+    "campfire": "Same geometry and position as canon",
+    "memorial": "frontera-de-las-almas"
   },
   "tokenCounter": "embedded-read-only-hud",
   "standaloneMagiUi": false,
@@ -49,7 +50,7 @@
   "projectState": "Reuse the selected project. Geometry is shared; histories, tasks and worker execution remain project-specific.",
   "basedOn": {
     "file": "CANON-VISUAL.json",
-    "sha256": "074f339b3fa810119a838b64785fda1ebfbd8ca237fa2be965abc1afaffb0c0b",
+    "sha256": "6e8bccb6d3f44abc4be3cd5bc8d2819ee1e960301f951f044fb9a28487aad1ee",
     "preservedCopy": "visuals/financial-office/canon-source.json"
   },
   "settingsNamespace": "botcrossing.financial-office.settings.v1",
