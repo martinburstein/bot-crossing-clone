@@ -14,11 +14,14 @@ Open **Memorial wall** in the office camera controls, or the permanent left tool
 **Paint box** focuses the supplies. **Try a symbol** accepts typed glyphs and
 multicolor freehand strokes. **Paint test symbol** starts a temporary ceremony;
 **Remove test** clears it. Reloading clears previews. Tests never consume an iteration.
-Click a saved symbol for its agent, iteration, duration, task, symbol and explanation.
+Click a saved `Iteration N` entry for its research lane, duration, task, symbol and explanation.
 The archive list provides keyboard access. Every symbol occupies a 1 × 1 office
-unit canvas, with free placement and no visible grid. Existing marks never move.
-The placement check rejects overlap and out-of-bounds positions. A seeded test
-places 1,250 distinct units; this is verified capacity, not a count of real agents.
+unit canvas, with no visible grid. Marks fill outward from Iteration 1's shared
+area and expand to more distant wall space only as nearer space fills. Explicitly
+stored placements remain stable; a deliberate project migration may regroup old
+marks without changing their iteration or content. The placement check rejects
+overlap and out-of-bounds positions. A deterministic test places 1,250 distinct
+units; this is verified capacity, not a count of real agents.
 Ledger pagination does not hide physical marks. If space runs out, append fails
 without altering history, and the canonical border must be extended deliberately.
 
@@ -35,13 +38,24 @@ New saved entries arriving while the office is open queue their ceremonies.
 Loading an existing archive renders its marks immediately without replaying history.
 The generic campus gets the same blank structure; it does not read the crypto archive.
 
-## Final task before session retirement
+## Canonical Crypto Research Lab completion cycle
 
-The retiring agent chooses its own symbol and explanation, after completing its
-last task and saving its handoff. The agent or coordinator explicitly writes a
-JSON entry and runs `node tools/memorial.mjs <entry-file.json>` from the viewer root.
-This records a memorial only: it does not retire, erase, dispatch, or refresh agents.
+The Crypto Research Lab runs strict three-agent waves. Each Luna agent works a
+distinct area. When one agent reaches freshly observed terminal completion, the
+coordinator validates its artifacts and uses that agent's chosen symbol and
+explanation to write a JSON entry. Run `node tools/memorial.mjs <entry-file.json>`
+from the viewer root immediately; the bot then performs the wall ceremony. The
+finished slot waits. After all three validated agents have painted one symbol each,
+the entire wave meets at the campfire to synthesize results and choose the next
+three agents and areas. No single slot is reused early.
+
+The project ledger automatically assigns the next sequential public name,
+`Iteration N + 1`; callers never supply or rename the iteration number. This
+records a memorial only: it does not erase, dispatch, refresh, or prove execution.
 There is no automatic token threshold or synthetic reconstruction of older agents.
+The research project's authorization, allowance, and stop rules control whether a
+next wave may start. Other projects retain explicit retirement/completion semantics
+unless their own canon adopts this loop.
 
 Required input:
 
@@ -64,6 +78,10 @@ Use a glyph, arbitrary drawing strokes, or both. Stroke points use normalized
 canvas coordinates (0–1, top-left origin). Width is 0.002–0.12 of canvas width.
 Colors come from `src/office/memorial.js`. The rendering uses no remote imagery or
 executable SVG. No prescribed meaning, role icon or symbol taxonomy is required.
+
+Use a unique task-completion ID for `sessionId`, even when a reusable Luna carrier
+returns in a later wave. Identical retries remain idempotent; a different payload
+for the same completion ID fails closed.
 
 The private project owns `office/memorials.json`, alongside its existing history.
 `BOT_CROSSING_OFFICE_ROOT` selects another private office. Iterations are assigned
