@@ -153,6 +153,7 @@ const DEFAULTS = {
   // Behaviour
   autoQuality: true, // drop render scale when frames get expensive
   autoFrame: false, // ease the camera back to isometric when you stop dragging; opt-in
+  officeActionCam: false, // idle cinematic shots of the financial office
   showFps: false,
   showLabels: true,
   reducedMotion: false,

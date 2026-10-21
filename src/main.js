@@ -3,6 +3,7 @@ import './ui/styles.css'
 import { DEFAULT_PRESET, Settings, hasStoredSettings } from './core/settings.js'
 import { Engine } from './core/engine.js'
 import { CameraRig } from './core/camera.js'
+import { ActionCamera } from './core/action-camera.js'
 import {measureAutoFocus} from './core/auto-focus.js'
 import { Colony, STATUS_LABEL, STATUS_ORDER, statusFor, transcriptProgress } from './game/colony.js'
 import { Hud } from './ui/hud.js'
@@ -77,6 +78,12 @@ if(MAGI_VIEW)document.body.classList.add('magi-world')
 
 const engine = new Engine(settings).mount(app)
 const rig = new CameraRig(engine.camera, engine.canvas, settings)
+const actionCamera = OFFICE_VIEW ? new ActionCamera(rig) : null
+actionCamera?.setEnabled(settings.get('officeActionCam'))
+const interruptActionCamera = () => actionCamera?.interrupt()
+engine.canvas.addEventListener('pointerdown', interruptActionCamera)
+engine.canvas.addEventListener('wheel', interruptActionCamera, { passive: true })
+window.addEventListener('keydown', interruptActionCamera)
 const colony = new Colony(engine.scene, settings, engine.camera, engine.renderer)
 const craneLab=MAGI_VIEW&&!REPLAY_RUN&&!OFFICE_VIEW?createCraneLab(engine.scene):null
 let lastCraneFrameAt=performance.now()
@@ -102,6 +109,7 @@ let selectedId = null
 let selectedProject = null
 let framedSwarmRun = null
 function frameSwarm() {
+  actionCamera?.interrupt()
   rig.resetView()
   if(OFFICE_VIEW){rig.restAzimuths=[0,Math.PI/2,Math.PI,Math.PI*1.5];rig.restPolar=.92;rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.maxDistance=420;rig.worldLimit=220;rig.focus(new THREE.Vector3(0,8,-29),{distance:180,elevated:true});return}
   const radius=Math.max(25,...colony.plotOrder.flatMap(p=>p.localCenters.map(c=>Math.hypot(p.center.x+c.x,p.center.z+c.z)+8)))
@@ -145,6 +153,7 @@ const actions = {
 
   /** Google Earth's auto-rotate: a slow sweep around whatever is centred. */
   toggleOrbit: () => {
+    if(actionCamera){actionCamera.setEnabled(false);settings.set('officeActionCam',false);officeFollowProfile=null}
     const on = rig.toggleOrbit()
     hud.hint(on ? 'Orbit mode on — drag or press O to stop' : 'Orbit mode off')
     return on
@@ -341,7 +350,7 @@ const campfireSpeech = MAGI_VIEW ? new CampfireSpeech(app) : null
 let officeHistory=null
 let officeCouncilFramed=false
 let officeFollowProfile=null
-const officeFocus=(point,distance)=>{officeFollowProfile=null;rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.restPolar=.92;rig.focus(point,{distance,elevated:true})}
+const officeFocus=(point,distance)=>{actionCamera?.interrupt();rig.setOrbit(false);hud.setOrbit(false);officeFollowProfile=null;rig.desiredAzimuth=0;rig.desiredPolar=.92;rig.restPolar=.92;rig.focus(point,{distance,elevated:true})}
 const focusOfficeProfile=id=>{const agent=colony.agentFor(`office:${id}`);if(agent){officeFocus(new THREE.Vector3(agent.pos.x,agent.pos.y+1,agent.pos.z),17);rig.desiredAzimuth=agent.yaw+.65;rig.desiredPolar=rig.restPolar=.66;officeFollowProfile=id}}
 const focusPaperBank=()=>officeFocus(new THREE.Vector3(49,2,2),37)
 let paperBankPanel=null
@@ -351,6 +360,7 @@ const officePanel=OFFICE_VIEW?mountFinancialOffice(app,{
   focusOffice:()=>officeFocus(new THREE.Vector3(10,3,2),150),
   focusCamp:()=>officeFocus(new THREE.Vector3(0,7,-49),125),
   focusCampus:()=>{officeFollowProfile=null;frameSwarm()},
+  toggleActionCam:()=>{const on=!actionCamera.enabled;officeFollowProfile=null;actionCamera.setEnabled(on);settings.set('officeActionCam',on);if(on){rig.setOrbit(false);hud.setOrbit(false)}},
 }):null
 if(OFFICE_VIEW){paperBankPanel=mountPaperBank(app,paperBank,{focusBank:focusPaperBank,focusProfile:focusOfficeProfile});void paperBank.refresh()}
 if(OFFICE_VIEW)window.financialOffice=Object.freeze({snapshot:()=>({...(colony.worksite?.snapshot?.()??{}),bank:colony.worksite?.paperBank?.snapshot(),characters:colony.astronauts.agents.map(a=>({id:a.thread.officeProfileId,name:a.thread.shellName,suit:a.thread.officeStyle?.style,position:a.pos.toArray(),activity:a.magiActivity,running:a.thread.running,carrier:a.thread.carrierWorkerId})),history:{digest:officeHistory?.digest,entries:officeHistory?.totalEntries}}),office:()=>officeFocus(new THREE.Vector3(0,3,0),125),camp:()=>officeFocus(new THREE.Vector3(0,7,-49),125),bank:focusPaperBank,campus:()=>frameSwarm(),simulate:request=>paperBank.action({...request,type:'start',id:request.id??`sim-${crypto.randomUUID()}`})})
@@ -929,8 +939,12 @@ let autoFocusAt=-Infinity
 engine.add({
   update(dt, elapsed) {
     if(officeFollowProfile){if(rig.interacting)officeFollowProfile=null;else{const a=colony.agentFor(`office:${officeFollowProfile}`);if(a)rig.desiredTarget.set(a.pos.x,a.pos.y+1,a.pos.z)}}
-    rig.update(dt)
     colony.update(dt, elapsed, rig.target)
+    actionCamera?.update(dt,colony.astronauts.agents.filter(a=>a.thread.officeProfileId))
+    if(actionCamera?.enabled)officePanel?.setCamera(colony.agentFor(actionCamera.subjectId)?.thread.officeProfileId,rig.following,true)
+    else officePanel?.setCamera(officeFollowProfile,false,false)
+    if(rig.following)officeFollowProfile=null
+    rig.update(dt)
     paperBank?.tick(elapsed,colony.worksite,colony.astronauts.agents)
     colony.worksite?.animate?.(elapsed,colony.astronauts.agents)
     campfireSpeech?.update(colony.astronauts.agents, colony.worksite, colony.worksiteProjection, engine.camera, engine.viewport, elapsed)
@@ -939,11 +953,11 @@ engine.add({
     cranePanel?.update(elapsed)
     if(MAGI_VIEW&&engine.scene.fog){engine.scene.fog.near=rig.distance+45;engine.scene.fog.far=rig.distance+320}
     magiPanel?.tick(elapsed)
-    if(settings.get('autoFocus')&&elapsed-autoFocusAt>=.5){
+    if(settings.get('autoFocus')&&settings.get('tiltShift')&&elapsed-autoFocusAt>=.5){
       const life=colony.astronauts.magiLife
-      engine.setAutoFocus(measureAutoFocus(engine.camera,[colony.plotGroup,colony.worksite?.group,colony.worksite?.freeScene?.group,life.hangar?.group,...(life.hangar?.bays??[]).map(b=>b.model),...Array.from(life.fleet.values(),f=>f.model),craneLab?.group,colony.astronauts.group],rig.distance))
+      engine.setAutoFocus(measureAutoFocus(engine.camera,[colony.plotGroup,colony.worksite?.group,colony.worksite?.officeGroup,colony.worksite?.campusGroup,colony.worksite?.freeScene?.group,life.hangar?.group,...(life.hangar?.bays??[]).map(b=>b.model),...Array.from(life.fleet.values(),f=>f.model),craneLab?.group,colony.astronauts.group],rig.distance))
       autoFocusAt=elapsed
-    }else if(!settings.get('autoFocus'))engine.setAutoFocus(null)
+    }else if(!settings.get('autoFocus')||!settings.get('tiltShift'))engine.setAutoFocus(null)
     // Manual focus follows the orbit target; Auto Focus fits the visible objects.
     engine.setFocusDistance(rig.distance)
 

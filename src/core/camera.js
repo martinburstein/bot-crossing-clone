@@ -71,6 +71,7 @@ export class CameraRig {
     this.orbiting = false
     /** 0..1 share of ORBIT_RATE currently being applied — see `update`. */
     this.orbitBlend = 0
+    this._followSubject = null
     /** Set by the picker when a drag started on something clickable, so it does not pan. */
     this.suppressed = false
 
@@ -125,6 +126,7 @@ export class CameraRig {
 
   _pointerDown(e) {
     if (!this.enabled) return
+    this.stopFollowing()
     this._pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
     this._moved = 0
     this._zoom = null
@@ -231,6 +233,7 @@ export class CameraRig {
 
   _wheel(e) {
     if (!this.enabled) return
+    this.stopFollowing()
     e.preventDefault()
     // Trackpads report tiny per-event deltas and mice report ~100, so both are normalised
     // to the same felt zoom step. A pinch on a trackpad arrives as ctrl+wheel.
@@ -272,6 +275,7 @@ export class CameraRig {
 
   /** Glide the view to a world point without yanking it — used when you pick an astronaut. */
   focus(point, { distance, elevated = false } = {}) {
+    this.stopFollowing()
     this.desiredTarget.copy(point)
     this.desiredTarget.y = elevated ? point.y : 0
     this._clampTarget()
@@ -281,6 +285,7 @@ export class CameraRig {
   }
 
   resetView() {
+    this.stopFollowing()
     this.orbiting = false
     this.desiredTarget.set(0, 0, 0)
     this.desiredDistance = 62
@@ -296,6 +301,7 @@ export class CameraRig {
    * would otherwise pull the heading straight back to a corner it just left.
    */
   setOrbit(on) {
+    if (on) this.stopFollowing()
     this.orbiting = on
     // Switching it on deliberately should start the ramp now rather than after the pause
     // that follows a drag — the blend still eases it in from a standstill.
@@ -305,6 +311,39 @@ export class CameraRig {
 
   toggleOrbit() {
     return this.setOrbit(!this.orbiting)
+  }
+
+  /** A continuous over-the-shoulder shot; resolve the current body each frame. */
+  followSubject(resolveSubject, { distance = 14, side = 0, polar = 1.05 } = {}) {
+    if (!resolveSubject?.()) return false
+    this._followSubject = resolveSubject
+    this._followShot = { distance, side, polar }
+    this.setOrbit(false)
+    this._zoom = null
+    this._shake = 0
+    return true
+  }
+
+  get following() { return Boolean(this._followSubject) }
+
+  stopFollowing() {
+    this._followSubject = null
+  }
+
+  _updateFollow(dt) {
+    const subject = this._followSubject?.()
+    if (!subject?.pos || !Number.isFinite(subject.yaw)) {
+      this.stopFollowing()
+      return
+    }
+    const yaw = subject.yaw
+    // Look a little ahead, from above and behind the character's forward axis.
+    this.desiredTarget.set(subject.pos.x + Math.sin(yaw) * 1.2, subject.pos.y + 1.4, subject.pos.z + Math.cos(yaw) * 1.2)
+    const behind = yaw + Math.PI + this._followShot.side
+    const delta = Math.atan2(Math.sin(behind - this.desiredAzimuth), Math.cos(behind - this.desiredAzimuth))
+    this.desiredAzimuth = damp(this.desiredAzimuth, this.desiredAzimuth + delta, 3, dt)
+    this.desiredPolar = this._followShot.polar
+    this.desiredDistance = this._followShot.distance
   }
 
   /** A small camera kick, for a rocket landing or a launch. */
@@ -334,6 +373,7 @@ export class CameraRig {
 
   update(dt) {
     if (!this.interacting) this.idleFor += dt
+    if (this.following) this._updateFollow(dt)
 
     // The sweep yields while you are working the camera and eases back in a couple of
     // seconds after you let go. Cutting it in and out at full rate reads as a glitch — and
@@ -350,7 +390,7 @@ export class CameraRig {
 
     // Rest back to isometric: after a beat of no input the heading walks to the nearest
     // clean 45° and the tilt returns to the iso angle. Position and zoom are left alone.
-    if (!this.orbiting && this.settings.get('autoFrame') && this.idleFor > 2.2 && !this.interacting) {
+    if (!this.following && !this.orbiting && this.settings.get('autoFrame') && this.idleFor > 2.2 && !this.interacting) {
       const ease = Math.min(1.4, (this.idleFor - 2.2) * 0.7)
       this.desiredAzimuth = damp(this.desiredAzimuth, this._nearestIso(), ease, dt)
       this.desiredPolar = damp(this.desiredPolar, this.restPolar??ISO_POLAR, ease, dt)

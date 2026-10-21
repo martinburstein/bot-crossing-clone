@@ -26,20 +26,20 @@ on run argv
       set position of window 1 to leftPosition
     end tell
   end tell
-  tell application "Safari"
+  tell application "Google Chrome"
     activate
     set officeWindow to missing value
     repeat with candidate in windows
       try
-        if URL of current tab of candidate is targetURL then
+        if URL of active tab of candidate is targetURL then
           set officeWindow to contents of candidate
           exit repeat
         end if
       end try
     end repeat
     if officeWindow is missing value then
-      make new document with properties {URL:targetURL}
-      set officeWindow to front window
+      set officeWindow to make new window
+      set URL of active tab of officeWindow to targetURL
     end if
     set bounds of officeWindow to {item 1 of rightPosition, y, (item 1 of rightPosition) + halfWidth, y + h}
   end tell
@@ -48,7 +48,7 @@ on run argv
     set actualPosition to position of window 1
     set actualSize to size of window 1
   end tell
-  tell application "Safari" to set actualBounds to bounds of officeWindow
+  tell application "Google Chrome" to set actualBounds to bounds of officeWindow
   return "{\"left\":{\"position\":" & my pairJSON(actualPosition) & ",\"size\":" & my pairJSON(actualSize) & "},\"right\":{\"position\":" & my pairJSON({item 1 of actualBounds, item 2 of actualBounds}) & ",\"size\":" & my pairJSON({(item 3 of actualBounds) - (item 1 of actualBounds), (item 4 of actualBounds) - (item 2 of actualBounds)}) & "},\"target\":{\"leftPosition\":" & my pairJSON(leftPosition) & ",\"rightPosition\":" & my pairJSON(rightPosition) & ",\"size\":" & my pairJSON(paneSize) & "}}"
 end run
 `;
@@ -65,9 +65,11 @@ export function openMacOffice(url, {callerName=process.env.BOT_CROSSING_CALLER_A
   const parsed=new URL(url);
   if(parsed.protocol!=='http:'||parsed.hostname!=='127.0.0.1')throw Error('Office must use a loopback HTTP URL.');
   if(!callerName||callerName.length>100||/[\r\n\0]/.test(callerName))throw Error('Invalid caller app name.');
+  // Open the office even when macOS has not granted window-positioning permission.
+  execFileSync('/usr/bin/open',['-a','Google Chrome',parsed.href],{timeout:10000});
   try {
     const layout=JSON.parse(execFileSync('/usr/bin/osascript',['-e',macOfficeScript,parsed.href,callerName],{encoding:'utf8',timeout:30000}));
-    return {...layout,platform:'darwin',browser:'Safari',verified:verifyMacLayout(layout),
+    return {...layout,platform:'darwin',browser:'Google Chrome',verified:verifyMacLayout(layout),
       note:'Primary-display equal panes; readback may differ if an app enforces minimum window dimensions.'};
   } catch(error) {
     throw Error('Mac layout failed. Allow the invoking app under macOS Privacy & Security > Automation and Accessibility, then rerun. The local viewer remains available. '+(error.stderr?.toString().trim()||error.message));

@@ -16,10 +16,13 @@ The office no longer requires a sibling `swarm-protocol` checkout. An already co
 protocol can provide optional read-only telemetry; launching the office does not start it.
 Missing Token Counter telemetry remains unavailable rather than being fabricated.
 
-On Mac, the launcher reuses or opens a Safari office window on the right and positions the
+On Mac, the launcher opens the office in Google Chrome by default, reuses or opens a
+Chrome office window on the right, and positions the
 already open caller app on the left. The caller defaults to `Codex`; set
 `BOT_CROSSING_CALLER_APP` only when the visible caller has a different process name.
 The OS may require Automation and Accessibility permission for the invoking app.
+The office opens in Chrome before positioning is attempted, so it remains available
+if window positioning times out or permissions are missing.
 The launcher reads window positions/sizes back and reports `layout.verified`; minimum
 window sizes or a small screen can prevent equal halves. This Mac UI path must be checked
 on the target Mac; Windows tests cannot establish that its OS permissions are granted.

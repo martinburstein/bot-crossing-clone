@@ -247,7 +247,10 @@ export class Engine {
     // (`position: absolute; inset: 0`), because a hand-written width is a second opinion
     // about how big the canvas is — and the moment the two disagree, the scene is drawn to
     // one rectangle while every panel is positioned against the other.
-    this.renderer.setSize(bw, bh, false)
+    // Writing even unchanged canvas dimensions clears the WebGL drawing buffer.
+    if (this.canvas.width !== bw || this.canvas.height !== bh) {
+      this.renderer.setSize(bw, bh, false)
+    }
     this.composer?.setSize(bw, bh)
     this.tiltShift?.setSize(bw, bh)
     this.tiltShift?.setCamera(this.camera)
@@ -317,6 +320,10 @@ export class Engine {
 
     for (const u of this.updaters) u.update?.(dt, this.elapsed)
 
+    // Resizing clears the canvas. Adjust before drawing so the browser never
+    // presents an empty buffer between this frame and the next animation tick.
+    if (this.settings.get('autoQuality') && !this.settings.get('autoFocus')) this._governQuality()
+
     this.renderer.info.reset()
     if (this.composer && (this.settings.get('bloom') || this.settings.get('antialias') || this.settings.get('tiltShift'))) {
       this._syncDepthTexture()
@@ -326,7 +333,6 @@ export class Engine {
     }
 
     this.perf.sample(dt, this.renderer.info)
-    if (this.settings.get('autoQuality')) this._governQuality()
   }
 
   /**
@@ -393,7 +399,7 @@ export class Engine {
       this.renderer.setSize(bw, bh, false)
       this.composer?.setSize(bw, bh)
       this.tiltShift?.setSize(bw, bh)
-    this.tiltShift?.setCamera(this.camera)
+      this.tiltShift?.setCamera(this.camera)
       this.viewport = { ...this.viewport, bw, bh, scale: next }
       this.autoScaled = next < ceiling - 0.01
     }
