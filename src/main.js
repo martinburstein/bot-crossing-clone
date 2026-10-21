@@ -99,15 +99,15 @@ window.idleCamera = Object.freeze({ snapshot: () => idleDirector.snapshot(),
   enable: () => idleDirector.setEnabled(true) })
 const cinematicButton = document.createElement('button')
 cinematicButton.type = 'button'
-cinematicButton.className = 'idle-camera-toggle'
-cinematicButton.title = 'Idle cinematic camera after 30 seconds. Click to start or stop; I toggles. Any input gives control back.'
-cinematicButton.style.cssText = 'position:fixed;bottom:16px;right:16px;z-index:70;border:1px solid #b4bdab77;border-radius:18px;background:#142b2be8;color:#e4e9db;padding:7px 13px;font:11px system-ui;cursor:pointer'
+cinematicButton.className = 'btn icon idle-camera-toggle'
+cinematicButton.id = 'btn-cinematic'
+cinematicButton.setAttribute('aria-label', 'Cinematic mode')
+cinematicButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="12" height="11" rx="2"/><path d="m15 11 6-3v9l-6-3Z"/><circle cx="7" cy="4" r="2"/><circle cx="13" cy="4" r="2"/></svg>'
 cinematicButton.addEventListener('click', () => {
   const on = idleDirector.setEnabled(!idleDirector.enabled)
-  if (on) idleDirector.start()
+  if (on) {memorialPanel?.close();idleDirector.start()}
   try { localStorage.setItem('botcrossing.idle-camera.enabled', String(idleDirector.enabled)) } catch {}
 })
-app.append(cinematicButton)
 let cinematicLabel = ''
 const craneLab=MAGI_VIEW&&!REPLAY_RUN&&!OFFICE_VIEW?createCraneLab(engine.scene):null
 let lastCraneFrameAt=performance.now()
@@ -368,6 +368,7 @@ const actions = {
 }
 
 const hud = new Hud(app, settings, actions)
+hud.el.querySelector('.rail').append(cinematicButton)
 const campfireSpeech = MAGI_VIEW ? new CampfireSpeech(app) : null
 let officeHistory=null
 let officeCouncilFramed=false
@@ -994,7 +995,7 @@ engine.add({
       idleDirector.enabled ? 'Cinematic · auto' : 'Cinematic · off'
     if (nextCinematicLabel !== cinematicLabel) {
       cinematicLabel = nextCinematicLabel
-      cinematicButton.textContent = cinematicLabel
+      cinematicButton.title = `${cinematicLabel}. Click to turn ${idleDirector.enabled?'off':'on'}; I toggles. Any input gives control back.`
       cinematicButton.dataset.active = String(idleDirector.active)
       cinematicButton.setAttribute('aria-pressed', String(idleDirector.enabled))
     }
