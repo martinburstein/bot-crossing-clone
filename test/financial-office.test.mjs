@@ -25,7 +25,7 @@ test('office meshes are renderable; eight desks replace the hexes and civic posi
     const core=world.cores[id];assert.deepEqual(core.position.toArray(),[FREE_CAMPUS[id].x,0,FREE_CAMPUS[id].z]);
     assert.equal(core.rotation.y,FREE_CAMPUS[id].angle);assert.equal(core.visible,true);
   }
-  assert.equal(world.board.position.x,FREE_CAMPUS.board.x);assert.equal(world.board.position.z,FREE_CAMPUS.board.z);
+  assert.equal(world.board.parent,null);assert.equal(world.board.getObjectByName('bounty-board-readable-face'),undefined);
   for(const c of world.campusGroup.children)if(c.visible)assert.ok(c.name==='free-campus-common'||c.name.startsWith('campus-supercomputer-'),c.name);
   assert.equal(world.snapshot().hangar,false);assert.equal(world.snapshot().crane,false);world.dispose();
 });

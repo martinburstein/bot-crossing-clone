@@ -10,6 +10,8 @@ export const ROARM_WORKSITE = Object.freeze({
   sharedCamp: Object.freeze({x:0,z:-38}),
   hangar: Object.freeze({x:-46,z:-22}),
   ship: Object.freeze({x:48,z:-30}),
+  // Kept as a compatibility coordinate for saved camera/layout data only.
+  // The inactive bounty board itself is no longer rendered or routed.
   board: Object.freeze({x:-22,z:22}),
 })
 export const ROARM_LAYOUT = ROARM_WORKSITE
@@ -123,62 +125,11 @@ export function createRoArmWorksite(scene,{sharpLabels=false}={}) {
     talk:new THREE.Vector3(0,0,2.2),tinker:new THREE.Vector3(-2.8,0,1.5),
     board:new THREE.Vector3(0,0,-2.8),console:new THREE.Vector3(0,0,-2.8),snack:new THREE.Vector3(2.8,0,1.5),
   }
-  // Distinctive service board, readable as a large shared landmark. Browser
-  // labels show live bounty/reward counts; userData retains the exact projection
-  // for headless tests and hosts without canvas support.
-  const board=new THREE.Group();board.name='blocker-bounty-board';board.position.set(ROARM_WORKSITE.board.x,0,ROARM_WORKSITE.board.z);group.add(board)
-  const boardDeck=slabHex(0,0,10,.34,.52,'dark',board);boardDeck.name='bounty-board-deck-surface';surfaceRecords.push({x:ROARM_WORKSITE.board.x,z:ROARM_WORKSITE.board.z,radius:10,height:.6})
-  box(0,3.6,0,15,6.2,.9,'dark',board)
-  for(const x of [-7.25,7.25]) beam([x,.7,0],[x,7,0],.25,'orange',6,board)
-  box(0,6.75,.52,15.5,.48,.25,'orange',board)
-  box(0,.55,.52,15.5,.42,.25,'orange',board)
-  const boardCanvas=labelCanvas(1200,520,(ctx,w,h)=>{
-    ctx.fillStyle='#263943';ctx.fillRect(0,0,w,h)
-    ctx.fillStyle='#e99a46';ctx.fillRect(0,0,w,86)
-    ctx.fillStyle='#fff6e9';ctx.font='bold 60px sans-serif';ctx.textAlign='left';ctx.fillText('BLOCKER BOUNTIES',34,63)
-    ctx.fillStyle='#f0e8dc';ctx.font='bold 36px sans-serif';ctx.fillText('Waiting for live worksite data',36,160)
-    ctx.font='30px sans-serif';ctx.fillStyle='#ace5ef';ctx.fillText('Verified acceptance earns service credit',36,220)
-    ctx.fillStyle='#b9c6c9';ctx.fillText('No blocker reported yet',36,300)
-  })
-  let boardLabel=null
-  if(boardCanvas) {
-    textureMaterials.push(boardCanvas)
-    boardLabel=new THREE.Mesh(new THREE.PlaneGeometry(13.7,sharpLabels?13.7*520/1200:5.4),boardCanvas.material)
-    boardLabel.name='bounty-board-readable-face'
-    boardLabel.position.set(0,3.8,.55);board.add(boardLabel)
-  }
-  const boardLight=box(0,7.25,.62,10,.12,.12,'cyan',board)
-  const projection={bounties:[],serviceCredits:[],stale:true,updatedAt:null}
-  function update(data={}) {
-    if(!data||typeof data!=='object') throw new TypeError('worksite update must be an object')
-    projection.bounties=Array.isArray(data.bounties)?data.bounties.filter(item=>item?.status==='open').slice():[]
-    const credits=data.serviceCredits??data.rewards
-    projection.serviceCredits=Array.isArray(credits)?credits.slice():credits&&typeof credits==='object'?Object.values(credits):[]
-    projection.stale=data.stale===undefined?true:Boolean(data.stale)
-    projection.updatedAt=data.updatedAt??null
-    const serviceCreditTotal=projection.serviceCredits.reduce((sum,item)=>sum+(Number.isFinite(item?.amount)?item.amount:0),0)
-    const latestCreditWorkerId=projection.serviceCredits.at(-1)?.workerId??null
-    board.userData.projection={bounties:projection.bounties,serviceCredits:projection.serviceCredits,serviceCreditTotal,latestCreditWorkerId,stale:projection.stale,updatedAt:projection.updatedAt}
-    boardLight.material=materials[projection.bounties.length?'orange':'cyan']
-    if(boardCanvas) {
-      const {ctx,canvas,texture}=boardCanvas
-      ctx.fillStyle='#263943';ctx.fillRect(0,0,canvas.width,canvas.height)
-      ctx.fillStyle='#e99a46';ctx.fillRect(0,0,canvas.width,86)
-      ctx.textAlign='left';ctx.fillStyle='#fff6e9';ctx.font='bold 60px sans-serif';ctx.fillText('BLOCKER BOUNTIES',34,63)
-      ctx.font='bold 38px sans-serif';ctx.fillStyle='#f0e8dc'
-      ctx.fillText(`${projection.bounties.length} open · ${serviceCreditTotal} verified credits`,36,154)
-      ctx.fillStyle=projection.stale?'#f3c36a':'#ace5ef';ctx.font='bold 22px sans-serif'
-      ctx.fillText(projection.stale?'SAVED SNAPSHOT · MAY BE STALE':'FEED UPDATED',canvas.width-380,63)
-      const entries=projection.bounties.slice(0,4)
-      ctx.font='28px sans-serif';ctx.fillStyle='#ace5ef'
-      if(!entries.length) ctx.fillText('No blocker reported yet',36,220)
-      entries.forEach((b,i)=>ctx.fillText(`${i+1}. ${String(b.description??'Reported blocker').slice(0,52)}`,36,220+i*56))
-      const reward=projection.serviceCredits.at(-1)
-      if(reward) {ctx.fillStyle='#f3c36a';ctx.fillText(`Latest credit: ${String(latestCreditWorkerId??'unknown worker')} · ${Number.isFinite(reward.amount)?reward.amount:0}`,36,492)}
-      texture.needsUpdate=true
-    }
-  }
-  update()
+  // The bounty board was display-only and had no useful active workflow. Keep an
+  // unattached compatibility object so older camera callers fail harmlessly,
+  // while the landmark, deck, posts, labels, lights, routes and collisions are gone.
+  const board=new THREE.Group();board.name='removed-bounty-board'
+  function update(data={}) {if(!data||typeof data!=='object')throw new TypeError('worksite update must be an object')}
 
   // Expand the scenic deck by connected hex stepping stones toward all four
   // named service locations; they guide the colony integration visually.
@@ -187,7 +138,6 @@ export function createRoArmWorksite(scene,{sharpLabels=false}={}) {
     [[0,-12],[0,-24],[0,-30]], // camp approach
     [[-12,-6],[-23,-12],[-34,-18]], // hangar approach
     [[12,-7],[25,-15],[37,-23]], // ship approach
-    [[-12,7],[-17,14]], // board approach
   ]) for(const [x,z] of path) {
     const p=slabHex(x,z,5.8,.1,.42,'dark');p.name='connected-worksite-walkway'
     const walkingSurface=slabHex(x,z,5.05,.34,.08,'ground');walkingSurface.name='worksite-walkway-surface';surfaceRecords.push({x,z,radius:5.05,height:.38})
@@ -231,14 +181,12 @@ export function createRoArmWorksite(scene,{sharpLabels=false}={}) {
   const clearingRecords=[
     {x:ROARM_WORKSITE.arm.x,z:ROARM_WORKSITE.arm.z,r:6,service:'central-arm'},
     {x:ROARM_WORKSITE.camp.x,z:ROARM_WORKSITE.camp.z,r:14,service:'shared-camp'},
-    {x:ROARM_WORKSITE.board.x,z:ROARM_WORKSITE.board.z,r:10,service:'bounty-board'},
     {x:ROARM_WORKSITE.hangar.x,z:ROARM_WORKSITE.hangar.z,r:13,service:'hangar-approach'},
     {x:ROARM_WORKSITE.ship.x,z:ROARM_WORKSITE.ship.z,r:13,service:'ship-approach'},
   ]
   const obstacleRecords=[
     {x:ROARM_WORKSITE.arm.x,z:ROARM_WORKSITE.arm.z,r:5.2,worksite:'arm-base'},
     ...campObstacles,
-    ...[-7.25,7.25].map(x=>({x:x+ROARM_WORKSITE.board.x,z:ROARM_WORKSITE.board.z,r:.42,worksite:'board-post'})),
   ]
   return {
     group,layout:ROARM_LAYOUT,servicePoints:ROARM_SERVICE_POINTS,

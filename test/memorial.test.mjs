@@ -5,23 +5,25 @@ import os from 'node:os';
 import path from 'node:path';
 import * as THREE from 'three';
 import {appendMemorial,readMemorials} from '../server/memorial.mjs';
-import {MEMORIAL,PAINT_COLORS,validateMemorial} from '../src/office/memorial.js';
+import {approveMemorialPreview,createMemorialPreview,requireApprovedPreview} from '../server/memorial-preview.mjs';
+import {MEMORIAL,PAINT_COLORS,assessMemorialLegibility,validateMemorial} from '../src/office/memorial.js';
 import {createMemorialWall} from '../src/world/memorial-wall.js';
 import {FRONTERA_SEGMENTS,choosePlacement,checkPlacement,memorialPoint} from '../src/world/frontera-layout.js';
-import {MemorialCeremony,CEREMONY_SECONDS} from '../src/office/memorial-ceremony.js';
+import {MemorialCeremony,CEREMONY_SECONDS,MEMORIAL_CLEARANCE} from '../src/office/memorial-ceremony.js';
 import {memorialPoseAngles} from '../src/agents/memorial-poses.js';
 import {createFinancialOffice} from '../src/world/financial-office.js';
 import {createCanonicalCampus} from '../src/world/canonical-campus.js';
 import {Navigation} from '../src/agents/navigation.js';
 import {OFFICE_PROFILES} from '../src/office/profiles.js';
-const entry=(sessionId='test-one')=>({sessionId,agent:'Synthetic test agent',startedAt:'2026-10-20T10:00:00Z',endedAt:'2026-10-20T11:00:00Z',task:'Test archive',symbol:'An open loop',explanation:'Synthetic fixture only',glyph:'◯',color:'#0080ff',strokes:[]});
+const entry=(sessionId='test-one')=>({sessionId,agent:'Synthetic test agent',startedAt:'2026-10-20T10:00:00Z',endedAt:'2026-10-20T11:00:00Z',task:'Test archive',symbol:'An open loop',explanation:'Synthetic fixture only',glyph:'',color:'#0080ff',strokes:[{color:'#0080ff',width:.025,points:[[.2,.8],[.5,.2],[.8,.8],[.2,.8]]}]});
 test('private memorial iterations persist, retries are idempotent, and conflicting retries fail',async t=>{
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'memorial-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
   assert.equal((await readMemorials({root})).nextIteration,1);
   const first=await appendMemorial(entry(),{root});assert.equal(first.iteration,1);
   assert.deepEqual(await appendMemorial(entry(),{root}),first);
   await assert.rejects(appendMemorial({...entry(),symbol:'Different'},{root}),/different memorial/);
-  assert.equal((await appendMemorial(entry('test-two'),{root})).iteration,2);
+  const second={...entry('test-two'),symbol:'A split horizon',strokes:[{color:'#ff0000',width:.03,points:[[.15,.3],[.85,.3],[.5,.75]]}]};
+  assert.equal((await appendMemorial(second,{root})).iteration,2);
   const saved=await readMemorials({root});assert.equal(saved.entries.length,2);assert.equal(saved.nextIteration,3);
   await fs.writeFile(path.join(root,'memorials.lock'),'test lock');
   await assert.rejects(appendMemorial(entry('three'),{root}),/locked/);assert.equal((await readMemorials({root})).entries.length,2);
@@ -32,6 +34,25 @@ test('bad dates, invalid geometry and corrupt sequences fail without resetting h
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'memorial-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
   await fs.writeFile(path.join(root,'memorials.json'),'{broken');
   await assert.rejects(appendMemorial(entry(),{root}));assert.equal(await fs.readFile(path.join(root,'memorials.json'),'utf8'),'{broken');
+});
+test('new memorials are image-only and unique while legacy glyphs remain readable',async t=>{
+  assert.throws(()=>validateMemorial({...entry(),glyph:'WORD',strokes:[]}),/image-only/);
+  const root=await fs.mkdtemp(path.join(os.tmpdir(),'memorial-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+  await appendMemorial(entry(),{root});
+  await assert.rejects(appendMemorial({...entry('same-name'),strokes:[{color:'#ff0000',width:.03,points:[[.1,.1],[.9,.9]]}]},{root}),/name already exists/);
+  await assert.rejects(appendMemorial({...entry('same-image'),symbol:'Different name'},{root}),/image already exists/);
+  const legacy={schemaVersion:1,nextIteration:2,entries:[{...entry('legacy'),iteration:1,symbol:'Original glyph',glyph:'✦',strokes:[]}]};
+  await fs.writeFile(path.join(root,'memorials.json'),JSON.stringify(legacy));
+  assert.equal((await readMemorials({root})).entries[0].glyph,'✦');
+});
+test('preview receipt must match and be explicitly approved before commit',async t=>{
+  const root=await fs.mkdtemp(path.join(os.tmpdir(),'memorial-preview-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+  const file=path.join(root,'entry.json'),input=entry();await fs.writeFile(file,JSON.stringify(input));
+  const preview=await createMemorialPreview(input,file,{size:128});assert.equal(preview.approved,false);assert.ok((await fs.stat(preview.image)).size>100);
+  await assert.rejects(requireApprovedPreview(input,file),/approve/);
+  await approveMemorialPreview(input,file);assert.equal((await requireApprovedPreview(input,file)).approved,true);
+  await assert.rejects(requireApprovedPreview({...input,symbol:'Changed'},file),/changed|approve/);
+  assert.ok(assessMemorialLegibility(input).occupiedRatio>0);
 });
 test('canonical border has moderate height, curved corners, four open entrances and every paint can',()=>{
   const scene=new THREE.Scene(),wall=createMemorialWall(scene);scene.updateMatrixWorld(true);
@@ -73,6 +94,15 @@ test('pickup, paint and return are distinct poses; ceremony reaches completion a
   agent.pos=c.target().position;c.update(11,agent);assert.equal(c.job.stage,'putback');c.update(14,agent);
   assert.equal(c.job,null);assert.equal(c.last.holding,false);assert.equal(c.last.stage,'complete');assert.equal(c.last.progress,1);
   assert.deepEqual(c.last.trace.map(t=>t.stage),['approach','pickup','carry','spray','return','putback','complete']);
+});
+test('painting choreography keeps fitted body, can and route clear of box and wall',()=>{
+  const c=new MemorialCeremony(),e={...entry(),placement:MEMORIAL.firstMark};c.start(e,'a',0,27);
+  assert.ok(Math.abs(c.job.approach.x-MEMORIAL.crate.x-MEMORIAL_CLEARANCE.paintBoxStandOff)<1e-9);
+  assert.ok(Math.abs(Math.hypot(c.job.mark.x-memorialPoint(e.placement,0).x,c.job.mark.z-memorialPoint(e.placement,0).z)-MEMORIAL_CLEARANCE.wallStandOff)<1e-9);
+  assert.ok(MEMORIAL_CLEARANCE.arrivalRadius<.5);
+  for(const stage of ['memorial-pickup','memorial-carry','memorial-spray','memorial-putback'])for(let i=0;i<=20;i++)for(const [,x,y,z]of memorialPoseAngles(stage,i/20*6)){
+    assert.ok([x,y,z].every(Number.isFinite));assert.ok(Math.abs(x)<1&&Math.abs(y)<.5&&Math.abs(z)<.5,`${stage} exceeds fitted clearance`);
+  }
 });
 test('ceremony yields to live work and times out if the route cannot complete',()=>{
   const c=new MemorialCeremony(),e={...entry(),placement:MEMORIAL.firstMark};c.start(e,'a',0);c.update(1,{thread:{running:true},pos:{x:0,z:0}});assert.equal(c.last.stage,'cancelled');

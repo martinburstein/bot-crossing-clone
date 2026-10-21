@@ -35,7 +35,7 @@ export const clusterWorkFront = clusterId => {
 }
 export function infrastructureCell(c) {
   const x=11.4*c.q,z=7.6*Math.sqrt(3)*(c.r+c.q/2)
-  return [ROARM_WORKSITE.arm,ROARM_WORKSITE.camp,ROARM_WORKSITE.board,ROARM_WORKSITE.hangar,ROARM_WORKSITE.ship]
+  return [ROARM_WORKSITE.arm,ROARM_WORKSITE.camp,ROARM_WORKSITE.hangar,ROARM_WORKSITE.ship]
     .some((site,i)=>Math.hypot(x-site.x,z-site.z)<[10,16,12,17,17][i])
 }
 export function tokenConstruction(shell) {
@@ -85,4 +85,3 @@ export function standbyMagiThreads() {
       assignmentRole:'idle',assignmentState:'idle',shellStatus:'Standby',dependencies:[],milestones:[],tokenUsage:null,workflow:'15-3A'}
   })
 }
-

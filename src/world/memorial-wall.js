@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {PAINT_COLORS,drawMemorial} from '../office/memorial.js';
 import {FRONTERA as L,FRONTERA_SEGMENTS,FRONTERA_LENGTH,choosePlacement,memorialPoint,fronteraObstacles,fronteraClearings} from './frontera-layout.js';
-import {MemorialCeremony,CEREMONY_SECONDS} from '../office/memorial-ceremony.js';
+import {MemorialCeremony,CEREMONY_SECONDS,MEMORIAL_CLEARANCE} from '../office/memorial-ceremony.js';
 import {sharpLabelTexture} from './label-texture.js';
 
 export function createMemorialWall(parent) {
@@ -43,8 +43,8 @@ export function createMemorialWall(parent) {
   const mistGeo=new THREE.BufferGeometry(),mistPositions=new Float32Array(64*3);mistGeo.setAttribute('position',new THREE.BufferAttribute(mistPositions,3));geometries.add(mistGeo);
   const mistMat=new THREE.PointsMaterial({color:0xffffff,size:.065,transparent:true,opacity:.55,depthWrite:false});materials.add(mistMat);
   const mist=new THREE.Points(mistGeo,mistMat);mist.name='spray-paint-mist';mist.frustumCulled=false;mist.visible=false;group.add(mist);
-  const ray=new THREE.Raycaster(),ceremony=new MemorialCeremony(),handOffset=new THREE.Matrix4().makeTranslation(0,-.12,.035).multiply(new THREE.Matrix4().makeRotationZ(Math.PI));
-  const propMatrix=new THREE.Matrix4(),handPoint=new THREE.Vector3(),cratePoint=new THREE.Vector3(),direction=new THREE.Vector3(),side=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),particle=new THREE.Vector3();
+  const ray=new THREE.Raycaster(),ceremony=new MemorialCeremony(),handOffset=new THREE.Matrix4().makeTranslation(.05,-.19,.16).multiply(new THREE.Matrix4().makeRotationZ(Math.PI));
+  const propMatrix=new THREE.Matrix4(),handPoint=new THREE.Vector3(),cratePoint=new THREE.Vector3(),nozzlePoint=new THREE.Vector3(),direction=new THREE.Vector3(),side=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),particle=new THREE.Vector3();
   let entries=[],preview=null,previewMesh=null,agents=[],elapsed=0,initialized=false,pending=[];
   const markMeshes=new Map();
   function clearMarks(){for(const o of [...marks.children]){o.material.map?.dispose();o.material.dispose();o.geometry.dispose();marks.remove(o);}markMeshes.clear();previewMesh=null;}
@@ -97,8 +97,9 @@ export function createMemorialWall(parent) {
         if(blend>0){prop.position.lerpVectors(cratePoint,handPoint,blend);prop.visible=true;cans[j.canIndex].visible=false;}
         propPaint.color.set(j.entry.color);mistMat.color.set(j.entry.color);
         if(j.stage==='spray'){
-          mist.visible=true;const aim=memorialPoint(j.entry.placement,0);direction.set(aim.x-agent.pos.x,0,aim.z-agent.pos.z).normalize();side.crossVectors(direction,up).normalize();
-          for(let i=0;i<64;i++){const travel=((now*1.6+i*.137)%1)*2.4,spread=travel*.12,phase=i*2.39996;particle.copy(prop.position).addScaledVector(direction,travel).addScaledVector(side,Math.sin(phase)*spread).addScaledVector(up,Math.cos(phase)*spread);particle.toArray(mistPositions,i*3);}
+          mist.visible=true;prop.updateMatrix();nozzlePoint.set(0,.40,0).applyMatrix4(prop.matrix);const aim=memorialPoint(j.entry.placement,0);direction.set(aim.x-nozzlePoint.x,aim.y-nozzlePoint.y,aim.z-nozzlePoint.z).normalize();side.crossVectors(direction,up).normalize();
+          const travelLimit=MEMORIAL_CLEARANCE.wallStandOff+.25;
+          for(let i=0;i<64;i++){const travel=((now*1.6+i*.137)%1)*travelLimit,spread=travel*.075,phase=i*2.39996;particle.copy(nozzlePoint).addScaledVector(direction,travel).addScaledVector(side,Math.sin(phase)*spread).addScaledVector(up,Math.cos(phase)*spread);particle.toArray(mistPositions,i*3);}
           mistGeo.attributes.position.needsUpdate=true;
         }
       }

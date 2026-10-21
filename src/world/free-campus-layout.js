@@ -1,5 +1,6 @@
 // One flat-top lattice shared by the starter plots and scenic foundations.
-// The full radius-two rosette is 19 cells: 17 resident homes, arm and bounty board.
+// The full radius-two rosette is 19 cells: 17 resident homes, the arm, and one
+// deliberately open former-service cell. The inactive bounty board is removed.
 export const CAMPUS_HEX_RADIUS=7.6
 export const campusHexPoint=({q,r})=>({x:CAMPUS_HEX_RADIUS*1.5*q,z:CAMPUS_HEX_RADIUS*Math.sqrt(3)*(r+q/2)})
 export const STARTER_ROSETTE=Object.freeze(Array.from({length:5},(_,i)=>i-2).flatMap(q=>Array.from({length:5},(_,i)=>i-2).filter(r=>Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r))<=2).map(r=>Object.freeze({q,r}))))
@@ -8,7 +9,7 @@ const ordinary=STARTER_ROSETTE.filter(c=>![pilot,camper,board,{q:0,r:0}].some(p=
 export const FREE_CAMPUS_HOMES=Object.freeze(Object.fromEntries([['w00',pilot],...ordinary.map((c,i)=>[`w${String(i+1).padStart(2,'0')}`,c]),['w16',camper]].map(([id,c])=>[id,Object.freeze(c)])))
 export const FREE_CAMPUS=Object.freeze({
   camp:Object.freeze({x:0,z:-49,radius:14}),
-  board:Object.freeze({...campusHexPoint(board),q:board.q,r:board.r}),
+  board:Object.freeze({...campusHexPoint(board),q:board.q,r:board.r}), // vacant compatibility coordinate
   balthasar:Object.freeze({x:0,z:-85,number:2,angle:0}),
   casper:Object.freeze({x:-34,z:-46,number:3,angle:Math.PI/12}),
   melchior:Object.freeze({x:34,z:-46,number:1,angle:-Math.PI/12}),

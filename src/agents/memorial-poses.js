@@ -6,12 +6,12 @@ export function memorialPoseAngles(pose,time){
     const t=pose==='memorial-pickup'?time/2.8:1-time/2.8;
     const reach=Math.sin(Math.PI*ease(Math.min(1,t/.80)));
     const hold=ease((t-.45)/.35);
-    return [['chest',.38*reach,0,0],['head',.28*reach,0,0],['upperarmr',-.70*reach-.45*hold,0,.08],['lowerarmr',-.18*reach-.70*hold,0,0],['upperarml',-.12*reach,0,-.06],['handr',0,0,.12*hold]];
+    return [['chest',.25*reach,0,0],['head',.12*reach,0,0],['upperarmr',-.58*reach-.34*hold,0,.15],['lowerarmr',-.12*reach-.54*hold,0,.10],['upperarml',-.08*reach,0,-.06],['handr',0,0,.16*hold]];
   }
   if(pose==='memorial-spray'){
     const sweep=Math.sin(time*2.8),shake=Math.sin(time*18)*.025;
-    return [['chest',.04,Math.sin(time*1.4)*.04,0],['head',.08,-.04*sweep,0],['upperarmr',-1.05+shake,.16*sweep,.08],['lowerarmr',-.35-.06*Math.cos(time*2.8),0,0],['handr',.07*sweep,0,.07],['upperarml',-.15,0,-.08]];
+    return [['chest',.02,Math.sin(time*1.4)*.025,0],['head',.04,-.025*sweep,0],['upperarmr',-.82+shake,.11*sweep,.18],['lowerarmr',-.24-.04*Math.cos(time*2.8),0,.08],['handr',.05*sweep,0,.12],['upperarml',-.10,0,-.10]];
   }
-  if(pose==='memorial-carry')return [['upperarmr',-.35,0,.10],['lowerarmr',-.85,0,0],['handr',0,0,.1]];
+  if(pose==='memorial-carry')return [['upperarmr',-.30,0,.18],['lowerarmr',-.62,0,.10],['handr',0,0,.14]];
   return [];
 }

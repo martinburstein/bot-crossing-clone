@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID} from 'node:crypto';
-import {validateMemorial} from '../src/office/memorial.js';
+import {memorialSymbolKey,memorialVisualKey,validateMemorial} from '../src/office/memorial.js';
 import {choosePlacement} from '../src/world/frontera-layout.js';
 const viewerRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const defaultRoot=()=>process.env.BOT_CROSSING_OFFICE_ROOT??path.resolve(viewerRoot,'../crypto-research-lab/projects/crypto-swarm-2026-10-15/office');
@@ -13,7 +13,7 @@ export async function readMemorials({root=defaultRoot()}={}) {
   const value=JSON.parse(raw);
   if(value.schemaVersion!==1||!Array.isArray(value.entries))throw Error('Invalid memorial archive');
   const sessions=new Set(),placements=[];let last=0;
-  for(const entry of value.entries){validateMemorial(entry);if(!Number.isSafeInteger(entry.iteration)||entry.iteration<=last||sessions.has(entry.sessionId))throw Error('Invalid memorial sequence');last=entry.iteration;sessions.add(entry.sessionId);entry.placement=choosePlacement(entry.iteration,placements,entry.placement);placements.push(entry.placement);}
+  for(const entry of value.entries){validateMemorial(entry,{allowLegacyGlyph:true});if(!Number.isSafeInteger(entry.iteration)||entry.iteration<=last||sessions.has(entry.sessionId))throw Error('Invalid memorial sequence');last=entry.iteration;sessions.add(entry.sessionId);entry.placement=choosePlacement(entry.iteration,placements,entry.placement);placements.push(entry.placement);}
   if(!Number.isSafeInteger(value.nextIteration)||value.nextIteration<=last)throw Error('Invalid next memorial iteration');
   return value;
 }
@@ -30,7 +30,10 @@ export async function appendMemorial(input,{root=defaultRoot()}={}) {
   try{
     const archive=await readMemorials({root});
     const existing=archive.entries.find(e=>e.sessionId===entry.sessionId);
-    if(existing){if(JSON.stringify(validateMemorial(existing))!==JSON.stringify(entry)||(input.placement&&JSON.stringify(input.placement)!==JSON.stringify(existing.placement)))throw Error('This session already has a different memorial');return existing;}
+    if(existing){if(JSON.stringify(validateMemorial(existing,{allowLegacyGlyph:true}))!==JSON.stringify(entry)||(input.placement&&JSON.stringify(input.placement)!==JSON.stringify(existing.placement)))throw Error('This session already has a different memorial');return existing;}
+    const symbolKey=memorialSymbolKey(entry),visualKey=memorialVisualKey(entry);
+    if(archive.entries.some(other=>memorialSymbolKey(other)===symbolKey))throw Error('Symbol name already exists; every new memorial needs an entirely new symbol');
+    if(archive.entries.some(other=>memorialVisualKey(other)===visualKey))throw Error('Symbol image already exists; every new memorial needs an entirely new image');
     if(archive.nextIteration>=Number.MAX_SAFE_INTEGER)throw Error('Memorial sequence exhausted');
     const placement=choosePlacement(archive.nextIteration,archive.entries.map(e=>e.placement),input.placement);
     const saved={iteration:archive.nextIteration,...entry,placement};

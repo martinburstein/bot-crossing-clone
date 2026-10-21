@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
+    "sharp": "^0.35.5",
     "three": "^0.185.0"
   },
   "devDependencies": {

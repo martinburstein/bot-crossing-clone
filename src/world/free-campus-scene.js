@@ -28,8 +28,9 @@ export function createFreeCampusScene(scene,base,{sharpLabels=false}={}){
     const label=mesh(new THREE.PlaneGeometry(w,h),material,x,y,z,parent);if(flat)label.rotation.x=-Math.PI/2
     draw(text,sub);label.userData.draw=draw;return label
   }
-  // Exactly two civic tiles complete the 17 resident petals. No second slab overlaps a plot.
-  for(const p of [{x:0,z:0},L.board]){hex(p.x,p.z,CAMPUS_HEX_RADIUS*.992,.025,.85,dark);hex(p.x,p.z,CAMPUS_HEX_RADIUS*.94,.47,.045,edge);hex(p.x,p.z,CAMPUS_HEX_RADIUS*.90,.50,.045,deck)}
+  // One central civic tile anchors the 17 resident petals. The former bounty-board
+  // tile stays open ground; no inactive landmark or collision remains there.
+  for(const p of [{x:0,z:0}]){hex(p.x,p.z,CAMPUS_HEX_RADIUS*.992,.025,.85,dark);hex(p.x,p.z,CAMPUS_HEX_RADIUS*.94,.47,.045,edge);hex(p.x,p.z,CAMPUS_HEX_RADIUS*.90,.50,.045,deck)}
   // Matching service pads sit on opposite lattice axes, clear of the resident rosette.
   for(const [id,p]of [['hangar',L.hangar],['lander',L.lander]]){
     const pad=new THREE.Group();pad.name=`campus-${id}-designated-pad`;pad.position.set(p.x,p.y??0,p.z);group.add(pad)
@@ -89,13 +90,10 @@ export function createFreeCampusScene(scene,base,{sharpLabels=false}={}){
   const loungePods=[]
   for(const id of ['w00','w16']){const p=campusHexPoint(FREE_CAMPUS_HOMES[id]),g=new THREE.Group();g.name=id==='w00'?'pilot-resident-lounge':'camper-resident-lounge';g.position.set(p.x,0,p.z);group.add(g);hex(0,0,3.4,.62,.28,stone,g);box(0,1.1,0,4,.5,2.6,wood,g);box(0,1.5,0,3.8,.3,2.4,id==='w00'?cream:sage,g);box(0,1.92,-1.12,4,.8,.3,wood,g);loungePods.push(g)}
   let data={},disposed=false,active=false
-  const originalChildren=new Map(base.group.children.map(o=>[o,o.visible])),oldBoard=base.board.position.clone()
-  const boardDeck=base.board.getObjectByName('bounty-board-deck-surface')
-  const originalBoardDeck=boardDeck?.visible
+  const originalChildren=new Map(base.group.children.map(o=>[o,o.visible]))
   function update(value){
     data=value??{};active=data.campus?.dispatchMode==='free-15-3A';group.visible=active
-    for(const [child,visible]of originalChildren)child.visible=active?child===base.board:visible
-    if(active){base.board.position.set(L.board.x,0,L.board.z);if(boardDeck)boardDeck.visible=false}else{base.board.position.copy(oldBoard);if(boardDeck)boardDeck.visible=originalBoardDeck}
+    for(const [child,visible]of originalChildren)child.visible=active?false:visible
     if(!active)return
     const c=data.campus
     for(const [id,core]of Object.entries(cores)){
@@ -122,9 +120,9 @@ export function createFreeCampusScene(scene,base,{sharpLabels=false}={}){
     const seat=SEATS[i],other=SEATS[(i+4)%17],p=phase<2?seat:phase===2?{x:seat.x*.52,z:L.camp.z+(seat.z-L.camp.z)*.52}:other
     return {position:vec(p),look:vec(L.camp),activity:calm&&phase<2?'pilot-rest':phase<2?'talk':'stroll'}
   }
-  const clearings=[{...L.hangar,r:16},{...L.lander,r:16},{x:0,z:0,r:9},{x:0,z:-49,r:15},{x:0,z:-85,r:21},{x:-34,z:-46,r:22},{x:34,z:-46,r:22},{...L.board,r:9},...PODS.map(p=>({...p,r:4}))]
-  const obstacles=()=>[...Object.values(L).filter(p=>p&&Number.isFinite(p.number)).map(p=>({x:p.x,z:p.z,r:15.8,worksite:'magi-monument'})),{x:0,z:-49,r:2.3,worksite:'hearth'},...PODS.flatMap(p=>[-1.9,1.9].map(x=>({x:p.x+x,z:p.z-.4,r:.42,worksite:'pod-post'}))),...[-7.25,7.25].map(x=>({x:L.board.x+x,z:L.board.z,r:.42,worksite:'board-post'}))]
-  function surfaceHeight(x,z){for(const p of [L.hangar,L.lander])if(Array.from({length:6},(_,i)=>Math.PI/6+i*Math.PI/3).every(a=>(x-p.x)*Math.cos(a)+(z-p.z)*Math.sin(a)<=(p.padRadius??L.servicePadRadius)*Math.sqrt(3)/2))return p.padHeight??.2;if(SEATS.some(p=>Math.hypot(x-p.x,z-p.z)<1.0))return 1.42;if(Math.hypot(x,z-L.camp.z)<14)return .9;const pod=PODS.find(p=>Math.hypot(x-p.x,z-p.z)<2.4);if(pod)return 1.05;if(Math.abs(x)<2.6&&z>-39.1&&z<-31.7)return .88;for(const p of [{x:0,z:0},L.board])if(Array.from({length:6},(_,i)=>Math.PI/6+i*Math.PI/3).every(a=>(x-p.x)*Math.cos(a)+(z-p.z)*Math.sin(a)<=CAMPUS_HEX_RADIUS*.992*Math.sqrt(3)/2))return .523;return null}
+  const clearings=[{...L.hangar,r:16},{...L.lander,r:16},{x:0,z:0,r:9},{x:0,z:-49,r:15},{x:0,z:-85,r:21},{x:-34,z:-46,r:22},{x:34,z:-46,r:22},...PODS.map(p=>({...p,r:4}))]
+  const obstacles=()=>[...Object.values(L).filter(p=>p&&Number.isFinite(p.number)).map(p=>({x:p.x,z:p.z,r:15.8,worksite:'magi-monument'})),{x:0,z:-49,r:2.3,worksite:'hearth'},...PODS.flatMap(p=>[-1.9,1.9].map(x=>({x:p.x+x,z:p.z-.4,r:.42,worksite:'pod-post'})))]
+  function surfaceHeight(x,z){for(const p of [L.hangar,L.lander])if(Array.from({length:6},(_,i)=>Math.PI/6+i*Math.PI/3).every(a=>(x-p.x)*Math.cos(a)+(z-p.z)*Math.sin(a)<=(p.padRadius??L.servicePadRadius)*Math.sqrt(3)/2))return p.padHeight??.2;if(SEATS.some(p=>Math.hypot(x-p.x,z-p.z)<1.0))return 1.42;if(Math.hypot(x,z-L.camp.z)<14)return .9;const pod=PODS.find(p=>Math.hypot(x-p.x,z-p.z)<2.4);if(pod)return 1.05;if(Math.abs(x)<2.6&&z>-39.1&&z<-31.7)return .88;for(const p of [{x:0,z:0}])if(Array.from({length:6},(_,i)=>Math.PI/6+i*Math.PI/3).every(a=>(x-p.x)*Math.cos(a)+(z-p.z)*Math.sin(a)<=CAMPUS_HEX_RADIUS*.992*Math.sqrt(3)/2))return .523;return null}
   return {group,cores,pods,seats,camper:loungePods[1],pilotPod:loungePods[0],charger,signals:{},target,update,animate,clearings:()=>clearings,obstacles,surfaceHeight,
     dispose(){if(disposed)return;disposed=true;group.removeFromParent();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose())}}
 }

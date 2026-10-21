@@ -12,7 +12,18 @@
     "soulUnit": {"width": 1, "height": 1, "placement": "free within each wall section; no overlaps"},
     "openings": 4,
     "palette": "classic-paint-28",
-    "animation": "approach, pickup, carry, spray, return, putback",
+    "animation": "clearance-fitted approach, pickup, carry, spray, return, putback",
+    "newMarkPolicy": {
+      "uniqueNormalizedName": true,
+      "uniqueExactStrokeImage": true,
+      "imageOnly": true,
+      "typedGlyphsOrWords": false,
+      "renderedPreviewRequired": true,
+      "explicitPreviewApprovalRequired": true,
+      "legacyMarksPreserved": true
+    },
+    "clearanceContract": "MEMORIAL_CLEARANCE in src/office/memorial-ceremony.js",
+    "removedLandmarks": ["inactive-roarm-bounty-board"],
     "archive": "project-owned; never a public shared biography store",
     "executionAuthority": false
   }]

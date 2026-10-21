@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import * as THREE from 'three'
 import {createRoArmWorksite,ROARM_LAYOUT,ROARM_SERVICE_POINTS,ROARM_IDLE_GOAL_COUNT} from '../src/world/roarm-worksite.js'
 
-test('RoArm worksite builds a bounded arm, one shared twelve-seat camp and connected landmarks',()=>{
+test('RoArm worksite builds a bounded arm and one shared twelve-seat camp without the inactive bounty board',()=>{
   const scene=new THREE.Scene(),worksite=createRoArmWorksite(scene)
   assert.equal(scene.children.includes(worksite.group),true)
   assert.equal(worksite.group.name,'roarm-worksite')
@@ -11,7 +11,9 @@ test('RoArm worksite builds a bounded arm, one shared twelve-seat camp and conne
   assert.equal(worksite.group.getObjectByName('roarm-hex-foundation')!==undefined,true)
   for(const part of ['roarm-base','roarm-upright','roarm-upper-link-left','roarm-upper-link-right','roarm-elbow','roarm-forearm-left','roarm-forearm-right','roarm-gripper-left','roarm-gripper-right'])
     assert.ok(worksite.group.getObjectByName(part),`missing arm part ${part}`)
-  assert.equal(worksite.group.children.filter(o=>o.name==='connected-worksite-walkway').length,11)
+  assert.equal(worksite.group.children.filter(o=>o.name==='connected-worksite-walkway').length,9)
+  assert.equal(worksite.group.getObjectByName('blocker-bounty-board'),undefined)
+  assert.equal(worksite.group.getObjectByName('bounty-board-readable-face'),undefined)
   assert.equal(worksite.camp.group.children.filter(o=>o.name.startsWith('camp-recharge-seat-')).length,12)
   assert.equal(worksite.camp.group.children.filter(o=>o.name.startsWith('camp-recharge-pad-')).length,12)
   assert.equal(worksite.armModel.group.visible,false)
@@ -47,38 +49,28 @@ test('RoArm worksite builds a bounded arm, one shared twelve-seat camp and conne
   }
   for(let i=0;i<worksite.camp.idleGoals.length;i++)for(let j=i+1;j<worksite.camp.idleGoals.length;j++)
     assert.ok(worksite.camp.idleGoals[i].distanceTo(worksite.camp.idleGoals[j])>=2,`idle goals ${i} and ${j} overlap`)
-  assert.equal(worksite.clearings().length,5)
-  assert.ok(worksite.obstacles().length>=16)
+  assert.equal(worksite.clearings().length,4)
+  assert.ok(worksite.obstacles().length>=14)
 
   worksite.group.updateMatrixWorld(true)
   const bounds=new THREE.Box3().setFromObject(worksite.group)
   assert.ok(bounds.min.x<=-31&&bounds.max.x>=20)
-  assert.ok(bounds.min.z<=-50&&bounds.max.z>=29)
+  assert.ok(bounds.min.z<=-50&&bounds.max.z>=12)
   assert.ok(bounds.max.y>=14&&bounds.max.y<=15)
   assert.equal(worksite.surfaceHeight(0,0),.7)
   assert.equal(worksite.surfaceHeight(0,-38),.74)
-  assert.equal(worksite.surfaceHeight(-22,22),.6)
+  assert.equal(worksite.surfaceHeight(-22,22),null)
   assert.equal(worksite.surfaceHeight(25,-15),.38)
   assert.equal(worksite.surfaceHeight(200,200),null)
   worksite.dispose()
   assert.equal(scene.children.includes(worksite.group),false)
 })
 
-test('bounty board accepts actual projection data without inventing activity',()=>{
+test('removed bounty-board projection is ignored without restoring visual state',()=>{
   const scene=new THREE.Scene(),worksite=createRoArmWorksite(scene)
-  assert.equal(worksite.board.userData.projection.bounties.length,0)
-  assert.equal(worksite.board.userData.projection.serviceCredits.length,0)
-  const bounties=[
-    {id:'b-1',description:'Repair the signal relay',status:'open'},
-    {id:'b-0',description:'Already accepted blocker',status:'solved'},
-  ],serviceCredits=[
-    {id:'r-1',workerId:'w02',amount:2},
-    {id:'r-2',workerId:'w11',amount:1},
-  ]
-  worksite.update({bounties,serviceCredits,stale:false,updatedAt:'2026-10-09T00:00:00.000Z'})
-  assert.deepEqual(worksite.board.userData.projection,{bounties:[bounties[0]],serviceCredits,serviceCreditTotal:3,latestCreditWorkerId:'w11',stale:false,updatedAt:'2026-10-09T00:00:00.000Z'})
-  bounties.push({id:'local-mutation'})
-  assert.equal(worksite.board.userData.projection.bounties.length,1)
+  assert.equal(worksite.board.parent,null)
+  worksite.update({bounties:[{id:'b-1',status:'open'}],serviceCredits:[{amount:2}]})
+  assert.deepEqual(worksite.board.userData,{})
   assert.throws(()=>worksite.update(null),/must be an object/)
   worksite.dispose()
 })

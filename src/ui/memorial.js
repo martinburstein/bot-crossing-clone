@@ -1,4 +1,4 @@
-import {PAINT_COLORS,MEMORIAL,drawMemorial} from '../office/memorial.js';
+import {PAINT_COLORS,MEMORIAL,assessMemorialLegibility,drawMemorial} from '../office/memorial.js';
 import './memorial.css';
 import {OFFICE_PROFILES} from '../office/profiles.js';
 
@@ -14,26 +14,25 @@ export function mountMemorial(root,{world,focusWall,focusPaint,focusSymbol,watch
       <p>Each symbol lives within 1 × 1 office unit. Placement is free; there is no visible grid.</p>
       <label>Painting resident<select name="actor"><option value="">Nearest available bot</option>${OFFICE_PROFILES.map(p=>`<option value="office:${p.id}">${p.name}</option>`).join('')}</select></label>
       <label>Symbol name<input name="symbol" value="A new beginning" maxlength="160"></label>
-      <label>Type a glyph, or draw below<input name="glyph" value="✦" maxlength="40"></label>
+      <p class="memorial-test-note">IMAGE ONLY · draw an entirely new symbol. Words and typed glyphs are not painted.</p>
       <div class="memorial-palette" role="group" aria-label="Classic Paint colors"></div>
       <canvas width="320" height="320" aria-label="Draw your symbol" tabindex="0"></canvas>
       <div class="memorial-actions"><button type="button" data-action="undo">Undo stroke</button><button type="button" data-action="clear">Clear drawing</button></div>
       <label>Task<input name="task" value="Try the memorial wall" maxlength="2000"></label>
       <label>Explanation<textarea name="explanation" maxlength="4000">A temporary mark to test the wall and its story card.</textarea></label>
-      <div class="memorial-actions"><button type="submit">Paint test symbol</button></div>
+      <div class="memorial-actions"><button type="submit">Preview image</button><button type="button" data-action="approve" hidden>Approve preview &amp; animate</button></div>
     </form>`;
   root.append(el);
-  let archive={entries:[],nextIteration:1},page=0,color=PAINT_COLORS[20],strokes=[],current=null,preview=null,lastWorld=null,digest='',error=null,lastStage='',selectedEntry=null;
+  let archive={entries:[],nextIteration:1},page=0,color=PAINT_COLORS[20],strokes=[],current=null,preview=null,pendingPreview=null,lastWorld=null,digest='',error=null,lastStage='',selectedEntry=null;
   const status=el.querySelector('.memorial-status'),card=el.querySelector('.memorial-card'),editor=el.querySelector('form'),canvas=editor.querySelector('canvas'),ctx=canvas.getContext('2d');
   const value=name=>editor.elements.namedItem(name).value;
-  const draft=()=>({color,glyph:value('glyph'),strokes});
+  const draft=()=>({color,glyph:'',strokes});
   function redraw(){drawMemorial(ctx,draft(),320);}
   for(const hex of PAINT_COLORS){const b=document.createElement('button');b.type='button';b.title=hex;b.setAttribute('aria-label',`Paint ${hex}`);b.style.background=hex;b.setAttribute('aria-pressed',String(hex===color));b.onclick=()=>{color=hex;for(const other of b.parentElement.children)other.setAttribute('aria-pressed',String(other===b));redraw();};el.querySelector('.memorial-palette').append(b);}
   const point=e=>{const r=canvas.getBoundingClientRect();return [Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))];};
   canvas.onpointerdown=e=>{if(e.button!==0||strokes.length>=256)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);current={color,width:.025,points:[point(e)]};strokes.push(current);redraw();};
   canvas.onpointermove=e=>{if(!current||current.points.length>=1000)return;current.points.push(point(e));redraw();};
   canvas.onpointerup=canvas.onpointercancel=()=>{current=null;};
-  editor.elements.namedItem('glyph').oninput=redraw;
   function show(entry){
     selectedEntry=entry;el.querySelector('[data-action="inspect"]').hidden=false;
     card.replaceChildren();card.hidden=false;
@@ -61,17 +60,27 @@ export function mountMemorial(root,{world,focusWall,focusPaint,focusSymbol,watch
   const actions={close,wall:focusWall,paint:focusPaint,test,
     watch:()=>watchPainting?.(),stop:()=>{world()?.stop();tick();},inspect:()=>{if(selectedEntry)focusSymbol?.(selectedEntry);},
     prev:()=>{page--;world()?.setPage(page);renderList();},next:()=>{page++;world()?.setPage(page);renderList();},
-    undo:()=>{strokes.pop();redraw();},clear:()=>{strokes=[];editor.elements.namedItem('glyph').value='';redraw();},
-    remove:()=>{preview=null;world()?.preview(null);card.hidden=true;editor.hidden=true;selectedEntry=null;el.querySelector('[data-action="inspect"]').hidden=true;tick();},
+    undo:()=>{strokes.pop();pendingPreview=null;el.querySelector('[data-action="approve"]').hidden=true;redraw();},clear:()=>{strokes=[];pendingPreview=null;el.querySelector('[data-action="approve"]').hidden=true;redraw();},
+    approve:()=>{
+      try{
+        if(!pendingPreview)throw Error('Preview the current image first');
+        const w=world();if(!w)throw Error('The campus is still loading');
+        w.preview(pendingPreview,value('actor'));preview=w.ceremony.job.entry;preview.agent=`${OFFICE_PROFILES.find(p=>`office:${p.id}`===w.ceremony.job.agentId)?.name??'Resident'} · test animation`;
+        pendingPreview=null;editor.hidden=true;show(preview);watchPainting?.();tick();
+      }catch(e){status.textContent=e.message;}
+    },
+    remove:()=>{preview=null;pendingPreview=null;world()?.preview(null);card.hidden=true;editor.hidden=true;selectedEntry=null;el.querySelector('[data-action="inspect"]').hidden=true;el.querySelector('[data-action="approve"]').hidden=true;tick();},
   };
   for(const b of el.querySelectorAll('[data-action]'))b.onclick=actions[b.dataset.action];
   editor.onsubmit=e=>{
-    e.preventDefault();if(!value('glyph').trim()&&!strokes.length){status.textContent='Draw or type a symbol first.';return;}
+    e.preventDefault();if(!strokes.length){status.textContent='Draw an image first.';return;}
     const draftEntry={...draft(),strokes:structuredClone(strokes),preview:true,agent:'Test agent',symbol:value('symbol'),task:value('task'),explanation:value('explanation'),startedAt:new Date(Date.now()-60000).toISOString(),endedAt:new Date().toISOString()};
     try{
-      const w=world();if(!w)throw Error('The campus is still loading');
-      w.preview(draftEntry,value('actor'));preview=w.ceremony.job.entry;preview.agent=`${OFFICE_PROFILES.find(p=>`office:${p.id}`===w.ceremony.job.agentId)?.name??'Resident'} · test animation`;
-      editor.hidden=true;show(preview);watchPainting?.();tick();
+      const duplicateName=archive.entries.some(entry=>entry.symbol.trim().toLocaleLowerCase('en-US')===draftEntry.symbol.trim().toLocaleLowerCase('en-US'));
+      if(duplicateName)throw Error('That symbol name already exists. Make an entirely new symbol.');
+      pendingPreview=draftEntry;show(draftEntry);const check=assessMemorialLegibility(draftEntry);
+      status.textContent=check.warnings.length?`Preview ready · ${check.warnings.join(' ')}`:'Preview ready · inspect the complete image before approving it.';
+      el.querySelector('[data-action="approve"]').hidden=false;
     }catch(e){status.textContent=e.message;}
   };
   function tick(){

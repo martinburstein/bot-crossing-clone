@@ -36,12 +36,11 @@ test('free scenery keeps 17 seats, wireless memory pods and no old wire geometry
  world.update(data);world.animate(1,agents);assert.deepEqual(world.signals,{})
  world.update({stale:true});world.animate(2,agents);assert.equal(world.freeScene.group.visible,true);assert.equal(world.campusGroup.visible,false)
  assert.equal(world.cores.melchior.userData.caption,'FEED UNAVAILABLE')
- assert.equal(world.board.position.x,FREE_CAMPUS.board.x);assert.equal(world.board.position.z,FREE_CAMPUS.board.z)
- assert.equal(world.board.getObjectByName('bounty-board-deck-surface').visible,false)
+ assert.equal(world.board.parent,null);assert.equal(world.board.getObjectByName('bounty-board-deck-surface'),undefined)
  assert.equal(world.surfaceHeight(0,0),.523)
  world.dispose()
 })
-test('starter homes and two civic cells form one complete sixfold symmetric rosette',()=>{
+test('starter homes, one civic cell and one open former-board cell preserve the rosette',()=>{
  const projects=Object.entries(FREE_CAMPUS_HOMES).map(([shellId])=>({id:shellId,shellId,worldProfile:'roarm-campus',dispatchMode:'free-15-3A',cells:1}))
  const cells=[...allocateMagiCells(projects).values()].flat().concat([{q:0,r:0},{q:0,r:-2}]),keys=new Set(cells.map(c=>`${c.q},${c.r}`))
  assert.equal(cells.length,19);assert.equal(keys.size,19);assert.equal(STARTER_ROSETTE.length,19)

@@ -53,7 +53,7 @@ test('worksite exposes shared safety geometry once for colony integration',()=>{
   assert.ok(worksite.obstacles().length>0)
   assert.ok(worksite.clearings().some(c=>c.service==='central-arm'))
   assert.ok(worksite.clearings().some(c=>c.service==='shared-camp'&&c.x===0&&c.z===-38))
-  assert.ok(worksite.clearings().some(c=>c.service==='bounty-board'&&c.x===-22&&c.z===22))
+  assert.ok(!worksite.clearings().some(c=>c.service==='bounty-board'))
   assert.deepEqual(worksite.servicePoints,ROARM_SERVICE_POINTS)
   worksite.dispose()
   assert.equal(scene.children.length,0)

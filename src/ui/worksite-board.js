@@ -41,17 +41,16 @@ function renderableCycle(c) {
 
 /** Read-only display of accepted work, proposed contracts, and camp context. */
 export class WorksiteBoard {
-  constructor(root,focus,focusArm,simulate,focusCamp){
-    this.el=node('details');this.el.className='worksite-board';this.summary=node('summary','RoArm · Bounty board')
+  constructor(root,_removedBoardFocus,focusArm,simulate,focusCamp){
+    this.el=node('details');this.el.className='worksite-board';this.summary=node('summary','RoArm · Worksite')
     this.body=node('div');this.body.className='worksite-board-body'
-    const button=node('button','Locate board');button.type='button';button.onclick=focus
     const armButton=node('button','View arm');armButton.type='button';armButton.onclick=focusArm
     const simulateButton=node('button','Simulate joints');simulateButton.type='button';simulateButton.onclick=simulate
     this.campButton=node('button','Visit camp');this.campButton.type='button';this.campButton.onclick=()=>{focusCamp?.();this.el.open=true;this.philosophyOpen=true;this.philosophy?.setAttribute('open','');this.philosophy?.scrollIntoView({block:'nearest'})};this.campButton.hidden=true
     this.status=node('p');this.list=node('div');this.cycle=node('section');this.cycle.className='symbiosis-cycle'
     this.cycleTitle=node('strong','Shared cycle');this.cycleBody=node('div');this.cycle.append(this.cycleTitle,this.cycleBody)
     this.pilot=node('p');this.sensor=node('p','Arm: waiting for measured angles');this.pair=node('p');this.roles=node('details');this.roleSummary=node('summary','15 shared roles · 225 ordered skills');this.roles.append(this.roleSummary);this.roleList=node('div');this.roles.append(this.roleList);this.roles.hidden=true
-    this.body.append(this.campButton,this.pilot,this.sensor,this.pair,this.roles,this.cycle,armButton,simulateButton,button,this.status,this.list);this.el.append(this.summary,this.body);root.append(this.el);this.update({})
+    this.body.append(this.campButton,this.pilot,this.sensor,this.pair,this.roles,this.cycle,armButton,simulateButton,this.status,this.list);this.el.append(this.summary,this.body);root.append(this.el);this.update({})
   }
   observation(data){
     if(data.state==='live')this.lastObservation=data
@@ -73,15 +72,11 @@ export class WorksiteBoard {
       this.renderCycle(symbiosisCycle,executorSlots,roleCatalog,stale)
     }
     if(profile==='roarm-campus')this.renderCampus(campus,executorSlots,stale,roleCatalog)
-    const open=bounties.filter(b=>b.status==='open')
-    this.summary.textContent=`RoArm · ${stale?'Board offline':earnedRewards.length+' rewards · '+contracts.length+' contracts'}${open.length?' · '+open.length+' blockers':''}`
+    this.summary.textContent=`RoArm · ${stale?'Worksite offline':earnedRewards.length+' rewards · '+contracts.length+' contracts'}`
     this.status.textContent=stale?'Waiting for a fresh work record.':campus?.dispatchMode==='free-15-3A'?'Choose any unit + agent file → bounded work → verified acceptance. Idle dialogue replays accepted Luna contributions.':profile==='roarm-16'?'Shared contract → choose roles → work together → Astra review → camp → next contract':profile==='roarm-campus'?'Report + proposed hat → Astra acceptance → own pod → next executor receives instructions':'Complete contract → independent review → earn wearable → leave next contract'
     this.list.replaceChildren()
     for(const reward of earnedRewards){const item=node('article');item.append(node('strong',reward.design?.name||reward.rewardDesign?.name||reward.name||'Earned wearable'),node('p',`${reward.roleId||reward.workerId?.toUpperCase()||''} · reviewed RoArm work`));this.list.append(item)}
     for(const contract of contracts){const item=node('article');item.append(node('strong',contract.title||'Next contract'),node('p',contract.objective||''),node('small',`Proposed · ${contract.predecessorWorkerId||'previous worker'} → ${contract.successorWorkerId||'next worker'}`));this.list.append(item)}
-    if(!bounties.length)this.list.append(node('p','No reported blockers.'))
-    for(const bounty of bounties){const item=node('article');item.append(node('strong',bounty.description||bounty.text||bounty.title||bounty.id),node('p',`${bounty.status||bounty.state||'open'} · ${bounty.taskId||bounty.sourceTaskId||''}`));if(bounty.solvedByWorkerId)item.append(node('small',`${bounty.solvedByWorkerId.toUpperCase()} · verified service credit`));this.list.append(item)}
-    this.list.append(node('p',`${serviceCredits.reduce((sum,c)=>sum+(Number.isFinite(c.amount)?c.amount:0),0)} verified service credits`))
   }
   renderCampus(c,slots,stale,roleCatalog=[]){
     if(this.philosophy)this.philosophyOpen=this.philosophy.open
