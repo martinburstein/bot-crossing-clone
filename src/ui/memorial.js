@@ -77,7 +77,12 @@ export function mountMemorial(root,{world,focusWall,focusPaint,focusSymbol,watch
   function tick(){
     const w=world(),j=w?.ceremony.job,s=w?.ceremony.snapshot();
     const key=s?`${s.agentId}:${s.stage}`:'';
-    if(key!==lastStage){lastStage=key;el.querySelector('.memorial-ceremony-status').textContent=s?.label??'';onStage?.(s);}
+    if(key!==lastStage){
+      lastStage=key;el.querySelector('.memorial-ceremony-status').textContent=s?.label??'';
+      if(j&&!j.entry.preview&&s.stage==='approach'){open(j.entry);watchPainting?.();}
+      onStage?.(s);
+      if(s?.stage==='complete'&&!s.preview&&selectedEntry)focusSymbol?.(selectedEntry);
+    }
     el.querySelector('[data-action="watch"]').hidden=!j;el.querySelector('[data-action="stop"]').hidden=!j;el.querySelector('[data-action="remove"]').hidden=!preview;
     editor.querySelector('[type="submit"]').disabled=!!j;
   }
