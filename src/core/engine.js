@@ -247,7 +247,7 @@ export class Engine {
     // (`position: absolute; inset: 0`), because a hand-written width is a second opinion
     // about how big the canvas is — and the moment the two disagree, the scene is drawn to
     // one rectangle while every panel is positioned against the other.
-    // Writing even unchanged canvas dimensions clears the WebGL drawing buffer.
+    // Reassigning unchanged canvas dimensions also clears the displayed frame.
     if (this.canvas.width !== bw || this.canvas.height !== bh) {
       this.renderer.setSize(bw, bh, false)
     }
@@ -320,8 +320,8 @@ export class Engine {
 
     for (const u of this.updaters) u.update?.(dt, this.elapsed)
 
-    // Resizing clears the canvas. Adjust before drawing so the browser never
-    // presents an empty buffer between this frame and the next animation tick.
+    // Auto Focus preserves the selected resolution. Otherwise resize before
+    // drawing, so a quality adjustment never presents an empty canvas.
     if (this.settings.get('autoQuality') && !this.settings.get('autoFocus')) this._governQuality()
 
     this.renderer.info.reset()

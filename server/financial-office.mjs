@@ -8,7 +8,7 @@ export async function readOfficeActivity({root=process.env.BOT_CROSSING_OFFICE_R
     const raw=await fs.readFile(path.resolve(root,'../.local/office-activity.json'),'utf8');
     if(raw.length>16000)throw Error('Activity snapshot too large');
     const v=JSON.parse(raw),ids=['michael-burry','steve-eisman','ben-hockett'];
-    if(v.schemaVersion!==1||v.kind!=='coordinator-observed-collaboration'||!Number.isFinite(v.observedAt)||v.observedAt>now+5000||!Array.isArray(v.agents)||v.agents.length!==3||new Set(v.agents.map(a=>a.profileId)).size!==3||v.agents.some(a=>!ids.includes(a.profileId)||!['running','completed','interrupted'].includes(a.status)||typeof a.task!=='string'||a.task.length>250))throw Error('Invalid activity snapshot');
+    if(v.schemaVersion!==1||v.kind!=='coordinator-observed-collaboration'||!Number.isFinite(v.observedAt)||v.observedAt>now+5000||!Array.isArray(v.agents)||v.agents.length!==3||new Set(v.agents.map(a=>a.profileId)).size!==3||v.agents.some(a=>!ids.includes(a.profileId)||!['running','completed','interrupted'].includes(a.status)||typeof a.task!=='string'||a.task.length>250||(a.lastCompletedTask!==undefined&&(typeof a.lastCompletedTask!=='string'||!a.lastCompletedTask.trim()||a.lastCompletedTask.length>250))))throw Error('Invalid activity snapshot');
     const terminal=v.agents.every(a=>a.status!=='running'),fresh=terminal||now-v.observedAt<=60000;
     return {available:true,fresh,kind:v.kind,observedAt:v.observedAt,agents:v.agents,terminal,interpretation:'Coordinator observation of actual collaboration-agent status; not native MAGI telemetry.'};
   }catch(e){return {available:false,reason:e.code==='ENOENT'?'not-configured':'invalid'};}

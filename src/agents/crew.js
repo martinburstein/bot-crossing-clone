@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import {OFFICE_CLIPS,isOfficePose,applyOfficeAnimation} from './office-animations.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 
@@ -46,6 +47,7 @@ const ATTACH = ['head', 'chest', 'hand.r']
  * holds on its last frame — which is what a sit-down or a spawn wants.
  */
 const CLIP = {
+  ...OFFICE_CLIPS,
   idle: { name: 'Idle_A', loop: true },
   idleAlt: { name: 'Idle_B', loop: true },
   walk: { name: 'Walking_A', loop: true },
@@ -174,9 +176,9 @@ function bakeClips(root, skeleton, mesh, animations) {
       continue
     }
     // A looping clip needs its wrap-around frame; a one-shot ends where it ends.
-    const duration=spec.duration || clip.duration
+    const duration=spec.duration??clip.duration
     const frames = Math.max(2, Math.round(duration * BAKE_FPS) + 1)
-    clips[key] = { start: frameCount, frames, duration, loop: spec.loop, name: spec.name,pose:spec.pose }
+    clips[key] = { start: frameCount, frames, duration, loop: spec.loop, name: spec.name, pose:spec.pose }
     frameCount += frames
   }
 
@@ -217,8 +219,11 @@ function bakeClips(root, skeleton, mesh, animations) {
       // so the frame a sit-down or a spawn *holds* would be the pose it started from, and
       // the astronaut snaps back to standing on the last frame of sitting down.
       const t = spec.loop ? raw : Math.min(raw, Math.max(0, spec.duration - 1e-3))
-      mixer.setTime(t)
-      const restore=applyCampPose(skeleton.bones,spec.pose,t)
+      const officePose=isOfficePose(spec.pose)
+      mixer.setTime(officePose?0:t)
+      const restore=officePose
+        ?applyOfficeAnimation(skeleton.bones,spec.pose,t,spec.duration)
+        :applyCampPose(skeleton.bones,spec.pose,t)
       root.updateMatrixWorld(true)
       skeleton.update()
 

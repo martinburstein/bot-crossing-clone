@@ -1,0 +1,14 @@
+{
+  "scope": "387 poses sampled at 60 Hz: 73 sit-down, 241 typing, 73 stand-up. The full office and picker share the corrected pose and furniture sources.",
+  "method": "CPU-skinned body vertices against desk/chair box and cylinder interiors; arm vertices against original helmet sphere; distal arm vertices against posed torso; minimum foot height relative to rug. Furniture-interior tolerance 0.003 scene units.",
+  "results": {
+    "samples": 387,
+    "furniture_intersections": {},
+    "forearm_hand_vertices_inside_torso": 0,
+    "minimum_arm_helmet_clearance_rig_units": 0.022352672410848484,
+    "minimum_foot_height_scene_units": 0.787910805285158,
+    "rug_top_scene_units": 0.78
+  },
+  "visual_review": "Seated typing and both transitions checked from side and reverse views in the picker.",
+  "limitations": "Sampled vertex checks and visual inspection, not proof of continuous triangle-to-triangle collision freedom."
+}

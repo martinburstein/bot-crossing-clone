@@ -9,3 +9,21 @@ tools/dual-view.mjs -text
 tools/dual-view-layout.ps1 -text
 skills/launch-dual-view/SKILL.md -text
 visuals/financial-office/canon-source.json -text
+
+# Keep the portable animation manifest verifiable across Windows and macOS.
+/src/agents/office-animations.js text eol=lf
+/src/agents/idle-poses.js text eol=lf
+/src/world/office-idle-props.js text eol=lf
+/test/office-animations.test.mjs text eol=lf
+/animations/idle-geometry-review.json text eol=lf
+/animations/index.html text eol=lf
+/animations/office.js text eol=lf
+/animations/original-heads.js text eol=lf
+/animations/preview.css text eol=lf
+/animations/preview.js text eol=lf
+/animations/profiles.js text eol=lf
+/animations/sitting-geometry-review.json text eol=lf
+/animations/suit.js text eol=lf
+/OFFICE-ANIMATIONS.json text eol=lf
+/tools/check-office-animations.mjs text eol=lf
+/docs/OFFICE-ANIMATIONS.md text eol=lf
