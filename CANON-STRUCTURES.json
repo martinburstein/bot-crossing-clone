@@ -9,7 +9,7 @@
     "layout": "src/world/frontera-layout.js",
     "scenes": ["financial-office", "canonical-campus"],
     "height": 9.5,
-    "soulUnit": {"width": 1, "height": 1, "placement": "free within each wall section; no overlaps"},
+    "soulUnit": {"width": 1, "height": 1, "placement": "dense section-by-section from Iteration 1; exhaust each section before expanding; no overlaps"},
     "openings": 4,
     "palette": "classic-paint-28",
     "animation": "clearance-fitted approach, pickup, carry, spray, return, putback",

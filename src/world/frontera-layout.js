@@ -34,20 +34,26 @@ export function choosePlacement(iteration,others=[],requested){
   if(iteration===1&&!others.length)return {...FRONTERA.firstMark};
   const edge=FRONTERA.margin+FRONTERA.soulUnit/2;
   const step=FRONTERA.soulUnit+FRONTERA.spacing,anchor=memorialPoint(FRONTERA.firstMark,0),candidates=[];
-  // Fill outward from the first soul instead of scattering marks around the entire border.
-  // Rows are staggered and remain a placement detail; the wall still exposes no visible grid.
+  // Pack the first soul's wall section completely before expanding to the next-nearest
+  // section. This keeps each visible neighborhood as dense as Iteration 1 instead of
+  // scattering marks across several geometrically nearby bends at once. Rows remain
+  // staggered and are only a placement detail; the wall exposes no visible grid.
   if(!clusteredCandidates){
     for(const s of lines){
+      const segmentAnchorDistance=Math.min(
+        (s.ax-anchor.x)**2+(FRONTERA.firstMark.y-anchor.y)**2+(s.az-anchor.z)**2,
+        (s.bx-anchor.x)**2+(FRONTERA.firstMark.y-anchor.y)**2+(s.bz-anchor.z)**2,
+      );
       let row=0;
       for(let y=edge;y<=FRONTERA.height-edge+1e-9;y+=step,row++){
         const offset=(row%2)*step/2;
         for(let u=edge+offset;u<=s.length-edge+1e-9;u+=step){
           const p={segmentId:s.id,u,y},point=memorialPoint(p,0);
-          candidates.push({p,distance:(point.x-anchor.x)**2+(point.y-anchor.y)**2+(point.z-anchor.z)**2});
+          candidates.push({p,segmentAnchorDistance,distance:(point.x-anchor.x)**2+(point.y-anchor.y)**2+(point.z-anchor.z)**2});
         }
       }
     }
-    clusteredCandidates=candidates.sort((a,b)=>a.distance-b.distance||a.p.segmentId.localeCompare(b.p.segmentId)||a.p.y-b.p.y||a.p.u-b.p.u).map(({p})=>p);
+    clusteredCandidates=candidates.sort((a,b)=>a.segmentAnchorDistance-b.segmentAnchorDistance||a.p.segmentId.localeCompare(b.p.segmentId)||a.distance-b.distance||a.p.y-b.p.y||a.p.u-b.p.u).map(({p})=>p);
   }
   for(const p of clusteredCandidates)try{return checkPlacement(p,others);}catch{/* Keep expanding from the shared cluster. */}
   throw Error('No free soul unit found; preserve the archive and extend the canonical border');

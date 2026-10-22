@@ -1,14 +1,15 @@
 {
   "schemaVersion": 1,
-  "createdAt": "2026-10-21T07:24:31.938Z",
-  "description": "Current shared campus canon including Frontera de las Almas; October 15 manifest archived separately.",
+  "createdAt": "2026-10-22T03:36:00.000Z",
+  "description": "Current shared campus canon including dense section-by-section Frontera de las Almas placement; October 15 manifest archived separately.",
   "validation": {
     "fullViewerTests": {
-      "passed": 242,
-      "failed": 0
+      "passed": 250,
+      "failed": 1,
+      "limitation": "The sole failure is the absent sibling swarm-protocol/core/symbiosis.mjs dependency."
     },
     "focusedTests": {
-      "passed": 21,
+      "passed": 12,
       "failed": 0
     },
     "productionBuild": "passed",
@@ -57,13 +58,13 @@
     },
     {
       "path": "CANON-STRUCTURES.json",
-      "bytes": 674,
-      "sha256": "8dc360b4cce148b13bd8ed7300f4d885f774d48329a4d6aa7ecef16dfb153458"
+      "bytes": 1166,
+      "sha256": "85ab7cd2f271c32d4fa126d582f6907f657eaa205934b2930160efb4f323460b"
     },
     {
       "path": "src/world/frontera-layout.js",
-      "bytes": 3737,
-      "sha256": "a365a9ff33f456988d6db001271a90ca5be431c878107ea4bd4543dc356079f0"
+      "bytes": 4668,
+      "sha256": "24d42b1763ae45075f41a241907eb1fcc7c0d66fe98432a4de59f1a46adb3a8b"
     },
     {
       "path": "src/world/memorial-wall.js",

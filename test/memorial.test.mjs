@@ -75,6 +75,15 @@ test('one-unit symbols cluster outward, cannot overlap, and support at least 125
   const first=memorialPoint(placements[0],0),fourth=memorialPoint(placements[3],0),hundredth=memorialPoint(placements[99],0);
   assert.ok(Math.hypot(fourth.x-first.x,fourth.y-first.y,fourth.z-first.z)<Math.hypot(hundredth.x-first.x,hundredth.y-first.y,hundredth.z-first.z));
 });
+test('the Iteration 1 wall section fills densely before symbols expand to another section',()=>{
+  const placements=[];
+  while(true){
+    const p=choosePlacement(placements.length+1,placements);placements.push(p);
+    if(p.segmentId!=='west-garden')break;
+  }
+  assert.ok(placements.length>140,'Iteration 1 section should hold a dense neighborhood');
+  assert.ok(placements.slice(0,-1).every(p=>p.segmentId==='west-garden'));
+});
 test('new border and paint box preserve routes from all eight desks and around every entrance',()=>{
   const world=createFinancialOffice(new THREE.Scene()),nav=new Navigation({half:170,maxExpansions:30000});nav.rebuild(world.obstacles());
   const j=new MemorialCeremony();j.start({...entry(),placement:MEMORIAL.firstMark},'a',0,27);

@@ -18,8 +18,9 @@ can start a temporary ceremony;
 **Remove test** clears it. Reloading clears previews. Tests never consume an iteration.
 Click a saved `Iteration N` entry for its research lane, duration, task, symbol and explanation.
 The archive list provides keyboard access. Every symbol occupies a 1 × 1 office
-unit canvas, with no visible grid. Marks fill outward from Iteration 1's shared
-area and expand to more distant wall space only as nearer space fills. Explicitly
+unit canvas, with no visible grid. Marks exhaust Iteration 1's wall section at
+the original dense spacing before expanding to the next-nearest wall section;
+each new section is likewise filled before another section opens. Explicitly
 stored placements remain stable; a deliberate project migration may regroup old
 marks without changing their iteration or content. The placement check rejects
 overlap and out-of-bounds positions. A deterministic test places 1,250 distinct
