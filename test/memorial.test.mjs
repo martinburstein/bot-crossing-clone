@@ -15,7 +15,30 @@ import {createFinancialOffice} from '../src/world/financial-office.js';
 import {createCanonicalCampus} from '../src/world/canonical-campus.js';
 import {Navigation} from '../src/agents/navigation.js';
 import {OFFICE_PROFILES} from '../src/office/profiles.js';
+import {Astronauts} from '../src/agents/astronauts.js';
 const entry=(sessionId='test-one')=>({sessionId,agent:'Synthetic test agent',startedAt:'2026-10-20T10:00:00Z',endedAt:'2026-10-20T11:00:00Z',task:'Test archive',symbol:'An open loop',explanation:'Synthetic fixture only',glyph:'',color:'#0080ff',strokes:[{color:'#0080ff',width:.025,points:[[.2,.8],[.5,.2],[.8,.8],[.2,.8]]}]});
+
+test('memorial walking continues through the ordinary stop radius to the ceremony gate',()=>{
+  const agent={magiGoal:{x:0,z:0},pos:{x:.5,z:0},magiActivity:'memorial-approach',vel:new THREE.Vector3()};
+  let walks=0;
+  const walker={_wp:new THREE.Vector3(),_v:new THREE.Vector3(),_steerTarget:()=>({x:0,z:0}),_walk:()=>{walks++;},_faceToward:()=>{},_settle:()=>{}};
+  Astronauts.prototype._magiRoutine.call(walker,agent,.1);
+  assert.equal(agent.magiSettled,false);assert.equal(walks,1);
+  agent.pos.x=MEMORIAL_CLEARANCE.arrivalRadius-.01;
+  Astronauts.prototype._magiRoutine.call(walker,agent,.1);
+  assert.equal(agent.magiSettled,true);
+  agent.pos.x=.5;agent.magiActivity='desk';
+  Astronauts.prototype._magiRoutine.call(walker,agent,.1);
+  assert.equal(agent.magiSettled,true);
+});
+
+test('saved ceremony replay uses its existing entry without allocating another memorial',()=>{
+  const wall=createMemorialWall(new THREE.Scene()),saved={...entry(),iteration:1,placement:MEMORIAL.firstMark};
+  wall.update([saved]);wall.animate(0,[{id:'idle',state:'idle',thread:{running:false},pos:{x:0,z:0}}]);
+  wall.replay(1);assert.equal(wall.ceremony.job.entry.iteration,1);assert.equal(wall.snapshot().entries,1);
+  assert.throws(()=>wall.replay(1),/Finish or stop/);wall.stop();
+  assert.throws(()=>wall.replay(99),/not found/);assert.equal(wall.snapshot().entries,1);wall.dispose();
+});
 test('private memorial iterations persist, retries are idempotent, and conflicting retries fail',async t=>{
   const root=await fs.mkdtemp(path.join(os.tmpdir(),'memorial-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
   assert.equal((await readMemorials({root})).nextIteration,1);

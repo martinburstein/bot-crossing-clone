@@ -108,6 +108,12 @@ export function createMemorialWall(parent) {
     }
   }
   return {group,crate,ceremony,update,preview:setPreview,target,animate,
+    replay(iteration){
+      if(ceremony.job)throw Error('Finish or stop the current painting first');
+      const entry=entries.find(e=>e.iteration===iteration);
+      if(!entry)throw Error('Saved memorial not found');
+      const result=begin(entry);rebuild();return result;
+    },
     stop(){ceremony.stop('cancelled',elapsed);rebuild();},
     setPage(){}, // Ledger pagination never removes physical marks from the border.
     pick(camera,x,y){ray.setFromCamera(new THREE.Vector2(x,y),camera);group.updateMatrixWorld(true);const hit=ray.intersectObjects(marks.children).find(h=>h.object.material.opacity>.1);if(hit)return {entry:hit.object.userData.entry};if(ray.intersectObject(crate,true).length)return {paint:true};return null;},

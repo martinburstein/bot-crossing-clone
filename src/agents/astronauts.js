@@ -8,6 +8,7 @@ import {createRoArmPilotGear} from '../world/roarm-pilot-gear.js'
 import {isCampusPilot,createCampusPilotGear} from '../world/campus-pilot-gear.js'
 import {isCampusCamper,createCampusCamperGear} from '../world/campus-camper-gear.js'
 import {createOfficeSuit,tailorOfficeMaterial} from '../world/office-suit.js'
+import {MEMORIAL_CLEARANCE} from '../office/memorial-ceremony.js'
 
 /**
  * Every astronaut in the colony, mostly drawn in seven shared draw calls.
@@ -1052,7 +1053,10 @@ export class Astronauts {
     const routeGoal=`${goal.x.toFixed(2)},${goal.z.toFixed(2)}`
     if(agent.magiRouteGoal!==routeGoal){agent.magiRouteGoal=routeGoal;agent.magiReplans=0;agent.magiStuck=0}
     const distance=Math.hypot(goal.x-agent.pos.x,goal.z-agent.pos.z)
-    agent.magiSettled=distance<.65
+    // Ceremony stages use a tighter arrival radius than ordinary desk routines.
+    // Stopping at .65 leaves the resident outside the ceremony's .42 gate forever.
+    const arrivalRadius=agent.magiActivity?.startsWith('memorial-')?MEMORIAL_CLEARANCE.arrivalRadius:.65
+    agent.magiSettled=distance<arrivalRadius
     if(!agent.magiSettled) {
       const site=agent.site
       agent.site=goal

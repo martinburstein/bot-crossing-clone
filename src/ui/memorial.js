@@ -41,6 +41,11 @@ export function mountMemorial(root,{world,focusWall,focusPaint,focusSymbol,watch
     for(const [label,text] of [['Research lane',entry.agent],['Duration',`${new Date(entry.startedAt).toLocaleString()} — ${new Date(entry.endedAt).toLocaleString()}`],['Task',entry.task],['Symbol',entry.symbol],['Explanation',entry.explanation]]){
       const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=text;dl.append(dt,dd);
     }card.append(dl);
+    if(!entry.preview){
+      const replay=document.createElement('button');replay.type='button';replay.textContent='Replay saved ceremony';
+      replay.onclick=()=>{try{world()?.replay(entry.iteration);watchPainting?.();tick();}catch(e){status.textContent=e.message;}};
+      card.append(replay);
+    }
   }
   function renderList(){
     status.textContent=error??(archive.entries.length?`${archive.entries.length} souls remembered · next iteration ${archive.nextIteration}`:'Ready for Iteration 1. A place for every soul.');

@@ -46,6 +46,10 @@ close approach or torso-crossing spray pose.
 
 New saved entries arriving while the office is open queue their ceremonies.
 Loading an existing archive renders its marks immediately without replaying history.
+If a ceremony is interrupted by a reload or an older arrival-threshold bug, select
+its saved iteration and choose **Replay saved ceremony**. This reuses that entry
+for presentation only; it does not append, rename, or allocate a memorial. Record
+the recovery separately from an uninterrupted automatic ceremony.
 The generic campus gets the same blank structure; it does not read the crypto archive.
 
 ## Canonical Crypto Research Lab completion cycle
