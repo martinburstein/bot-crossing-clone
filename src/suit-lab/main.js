@@ -3,7 +3,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 import {createFreeCampusScene} from '../world/free-campus-scene.js'
 import {createMemorialWall} from '../world/memorial-wall.js'
 import {TEAM,UNITS,assignRole,releaseRole,replaceDefinition} from './team.js'
-import {createResearcher} from './researcher.js'
+import {createResearchTeam} from './researcher.js'
 import './style.css'
 
 const app=document.querySelector('#app')
@@ -41,7 +41,8 @@ fetch('/api/financial-office/memorials').then(r=>r.ok?r.json():null).then(d=>{if
 let seed=317;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}
 const blades=new THREE.InstancedMesh(new THREE.ConeGeometry(.09,.6,3),new THREE.MeshStandardMaterial({color:0x6d914c,roughness:1}),1600);const dummy=new THREE.Object3D()
 for(let i=0;i<1600;i++){let x,z;do{x=(random()-.5)*145;z=(random()-.5)*135-8}while(Math.abs(x)<42&&z>-49&&z<37);dummy.position.set(x,.1,z);dummy.rotation.y=random()*Math.PI;dummy.scale.setScalar(.6+random());dummy.updateMatrix();blades.setMatrixAt(i,dummy.matrix)}scene.add(blades)
-const crew=TEAM.map(createResearcher);crew.forEach(a=>scene.add(a.root))
+const researchTeam=await createResearchTeam(scene,TEAM)
+const crew=researchTeam.residents;crew.forEach(a=>scene.add(a.root))
 const campHomes=TEAM.map((_,i)=>{const angle=i/15*Math.PI*2;return new THREE.Vector3(Math.sin(angle)*15.8,0,12+Math.cos(angle)*12.8)})
 const labels=crew.map(a=>{const el=document.createElement('button');el.className='resident-label';el.textContent=a.profile.name;el.style.setProperty('--role-color',a.profile.color);el.onclick=()=>select(a.profile.id);stage.append(el);return el})
 function select(id){selected=id;renderUi()}
@@ -60,9 +61,9 @@ function renderUi(){
 document.querySelector('#role-file').onchange=async event=>{const f=event.target.files[0];if(!f)return;const id=selected;try{if(f.size>65536)throw Error('Choose a role file under 64 KiB');definitions=replaceDefinition(definitions,id,await f.text());save();renderUi();notify(`${TEAM.find(p=>p.id===id).name} has a new role file. Nothing was executed.`)}catch(e){notify(e.message)}event.target.value=''}
 Promise.all(TEAM.map(async p=>{if(definitions[p.id])return;try{const r=await fetch(p.file);if(!r.ok)throw Error('Missing role file');const text=await r.text();if(!definitions[p.id])definitions=replaceDefinition(definitions,p.id,text)}catch{definitions=replaceDefinition(definitions,p.id,`# ${p.role}\n${p.focus}\nPresentation only; await an explicit research assignment.`)}})).then(()=>renderUi())
 renderUi()
-const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();let down=null
+const pickPoint=new THREE.Vector3();let down=null
 renderer.domElement.addEventListener('pointerdown',e=>down={x:e.clientX,y:e.clientY})
-renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>6)return;const rect=stage.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);ray.setFromCamera(pointer,camera);const hit=ray.intersectObjects(crew.map(a=>a.root),true)[0];if(hit){let o=hit.object;while(o&&!o.userData.roleId)o=o.parent;if(o)select(o.userData.roleId)}})
+renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>6)return;const rect=stage.getBoundingClientRect();let nearest=null,best=22;for(const a of crew){pickPoint.copy(a.root.position).y+=3.8;pickPoint.project(camera);if(Math.abs(pickPoint.z)>1)continue;const distance=Math.hypot((pickPoint.x*.5+.5)*rect.width-(e.clientX-rect.left),(-pickPoint.y*.5+.5)*rect.height-(e.clientY-rect.top));if(distance<best){best=distance;nearest=a}}if(nearest)select(nearest.profile.id)})
 function resize(){const w=stage.clientWidth,h=stage.clientHeight,aspect=w/h;camera.left=-61*aspect;camera.right=61*aspect;camera.top=61;camera.bottom=-61;camera.updateProjectionMatrix();renderer.setSize(w,h)}
 new ResizeObserver(resize).observe(stage);resize()
 const clock=new THREE.Clock(),point=new THREE.Vector3();const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -71,11 +72,11 @@ function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDel
   if(!a.initialized){a.root.position.copy(campHomes[i]);a.initialized=true}
   const distance=Math.hypot(a.target.x-a.root.position.x,a.target.z-a.root.position.z),moving=distance>.12
   if(moving){const direction=a.target.clone().sub(a.root.position);direction.y=0;direction.normalize();a.root.position.addScaledVector(direction,Math.min(distance,dt*5));const yaw=Math.atan2(direction.x,direction.z);a.root.rotation.y+=Math.atan2(Math.sin(yaw-a.root.rotation.y),Math.cos(yaw-a.root.rotation.y))*Math.min(1,dt*7)}else{const look=unit?new THREE.Vector3(unitPositions[unit][0],0,unitPositions[unit][1]):new THREE.Vector3(0,0,12);const yaw=Math.atan2(look.x-a.root.position.x,look.z-a.root.position.z);a.root.rotation.y+=Math.atan2(Math.sin(yaw-a.root.rotation.y),Math.cos(yaw-a.root.rotation.y))*Math.min(1,dt*2)}
-  if(!reduced)a.animate(t,moving,!!unit);a.halo.material.opacity=(a.profile.id===selected ? .85 : .18)
+  a.animate(t,moving,!!unit,dt,reduced);a.halo.material.opacity=(a.profile.id===selected ? .85 : .18)
   point.copy(a.root.position).y+=5.6;point.project(camera);const x=(point.x*.5+.5)*stage.clientWidth,y=(-point.y*.5+.5)*stage.clientHeight;labels[i].style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;labels[i].hidden=(a.profile.id!==selected&&!unit)||point.z>1||point.z< -1;labels[i].classList.toggle('active',a.profile.id===selected)
  })
  const flame=camp.getObjectByName('campfire');if(flame&&!reduced)flame.scale.set(1.7,2.2+Math.sin(t*4)*.15,1.7)
  for(const core of Object.values(campus.cores))for(const [i,lamp]of core.userData.lamps.entries())lamp.scale.x=.8+Math.sin(t*.8+i)*.15
- controls.update();renderer.render(scene,camera)
+ researchTeam.flush(t);controls.update();renderer.render(scene,camera)
 }
 animate()

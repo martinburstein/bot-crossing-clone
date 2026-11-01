@@ -34,8 +34,10 @@ need an ordinary HTTP server; Vite is not needed to execute the built page.
 
 ## The 15/3 distinction
 
-There are **15 visual residents**, each with a different suit colour, name,
-specialty and equipment silhouette. There are **three preview assignment slots**:
+There are **15 visual residents** using the same Bot Crossing bots as the main
+campus: shared body rig, helmet, animated screen face, backpack, antenna and
+animation clips. Each retains its own suit colour, name and specialty. There
+are **three preview assignment slots**:
 Melchior, Balthasar and Casper. Choose any resident and click Hire on an open unit.
 The resident walks there; Release returns them to the camp. A fourth simultaneous
 assignment and duplicate assignment of one resident are rejected.
@@ -67,7 +69,8 @@ the scene. The completed AURA study records and automation are outside this samp
 
 - `suit-lab/index.html`: dedicated entry point.
 - `src/suit-lab/main.js`: scene composition, camera, interaction and local state.
-- `src/suit-lab/researcher.js`: fifteen original procedural chibi astronauts.
+- `src/suit-lab/researcher.js`: local preview adapter for the shared Bot Crossing
+  `Astronauts` renderer and `loadCrew()` rig; no duplicated character geometry.
 - `src/suit-lab/team.js`: catalogue and pure assignment/replacement rules.
 - `src/suit-lab/style.css`: responsive interface; no remote fonts.
 - `tools/kestrel-lab.mjs`: standalone local launcher and optional Windows Dual View.
