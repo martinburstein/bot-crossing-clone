@@ -18,10 +18,10 @@ export async function createResearchTeam(scene,profiles) {
   const halo=new THREE.Mesh(new THREE.TorusGeometry(1.63,.055,6,40),new THREE.MeshBasicMaterial({color:profile.color,transparent:true,opacity:.6}))
   halo.rotation.x=-Math.PI/2;halo.position.y=.035;root.add(halo)
   return {root,profile,halo,index,target:new THREE.Vector3(),
-   animate(t,moving,assigned,dt,reduced){
+   animate(t,moving,assigned,dt,reduced,activity='board'){
     agent.pos.copy(root.position);agent.yaw=root.rotation.y
     agent.groundSpeed=moving?5/agent.scale:0
-    agent.magiActivity=assigned?'board':null;agent.magiSettled=!moving
+    agent.magiActivity=assigned?'board':activity;agent.magiSettled=!moving
     bots._animate(agent,dt,reduced?0:1)
     if(!reduced)bots._face(agent,dt)
    }}

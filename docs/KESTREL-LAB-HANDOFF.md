@@ -5,6 +5,32 @@ the three original MAGI supercomputers, the campfire/common and Frontera wall.
 The crane, ships, pads, memory pods, pilot/camper bodies and other campus scenery
 are omitted in this view. The normal campus and financial office remain separate.
 
+The roofless miniature workshop has one shared suit in its assembly cradle,
+surrounded by nine fabrication and test bays. The original Bot Crossing bots
+work at specialty benches and take turns visiting the shared suit along the
+aisles. The hearth remains outside the workshop for campfire reviews.
+
+## Workshop and testing tour
+
+Use **Lab tour** or click an instrument to inspect a bay. The catalogue covers:
+
+- Suit assembly, helmet/pack integration and joint fixtures.
+- Pressure, vacuum, seam leakage and seal cycling.
+- Hot/cold thermal-vacuum equipment, solar lamps and cooling loops.
+- Shielded radiation beamline scenery, material cassettes and detectors.
+- Fiber/textile/laminate fabrication, printing, microscopy and failure coupons.
+- Oxygen, ventilation, CO₂ removal, humidity and breathing-loop fixtures.
+- Moon/Mars body-weight support, walking, joint effort and tool tasks.
+- Enclosed dust/abrasion equipment, impact and puncture specimens.
+- Fit, glove/boot tasks, repair, sensor calibration and electronics.
+
+Each bay has an eight-second **Preview cycle**: a visual equipment animation
+with bounded progress, no fabricated measurements, no pass/fail result and no
+hardware/model dispatch. These are fictional facilities in the sample; their
+presence is not evidence of physical test capability or validated engineering.
+Selecting another bay cancels the prior sequence. **Overview** returns to the
+whole workshop; Escape or the close button returns to the existing hiring UI.
+
 ## Pick this up
 
 Branch: `codex/kestrel-grasslands-lab` in
@@ -71,6 +97,10 @@ the scene. The completed AURA study records and automation are outside this samp
 - `src/suit-lab/main.js`: scene composition, camera, interaction and local state.
 - `src/suit-lab/researcher.js`: local preview adapter for the shared Bot Crossing
   `Astronauts` renderer and `loadCrew()` rig; no duplicated character geometry.
+- `src/suit-lab/workshop.js`: roofless laboratory, shared prototype and equipment
+  animations. The displayed prototype is a concept mannequin, not the bot model.
+- `src/suit-lab/facilities.js`: nine bays, equipment catalogue, fifteen operator
+  positions and bounded visual-preview timing.
 - `src/suit-lab/team.js`: catalogue and pure assignment/replacement rules.
 - `src/suit-lab/style.css`: responsive interface; no remote fonts.
 - `tools/kestrel-lab.mjs`: standalone local launcher and optional Windows Dual View.
@@ -88,6 +118,7 @@ browser storage are committed. Without a local archive the wall remains empty.
 
 Run `node --test test/suit-lab.test.mjs` and `npm run build`. Visual/UI verification
 should cover the grassland scene, all three visible computers,15 residents,
-select/hire/release across all three units and local role-file replacement.
+select/hire/release across all three units and local role-file replacement,
+the laboratory tour, camera focus, equipment cycles and their terminal state.
 Respects reduced motion. Actual mobility/survivability of a spacesuit is not
 demonstrated by this miniature scene.
