@@ -44,11 +44,9 @@ export function createWorkshop(scene){
  box(82,.65,69,cream,-11,-.05,0)
  box(79,.12,66,mat('#c9d4c3'),-11,.32,0)
  for(const x of [-50,28]){
-  box(.65,2.1,68,sage,x,1.4,0)
   for(const z of [-32,5,32]){box(.55,11,.55,cream,x,5.5,z);box(.8,.25,.8,gold,x,11.1,z)}
   box(.65,.65,65,sage,x,11,0)
  }
- box(79,2.2,.65,sage,-11,1.5,-33)
  box(79,.65,.65,sage,-11,11,-33)
  for(const x of [-11,11])box(.5,11,.5,cream,x,5.5,-33)
  label('KESTREL','SHARED SUIT WORKSHOP',23,-13,8,-32.5)

@@ -3,10 +3,14 @@ import assert from 'node:assert/strict'
 import {TEAM,UNITS,assignRole,releaseRole,replaceDefinition} from '../src/suit-lab/team.js'
 import {readFile} from 'node:fs/promises'
 import {FACILITIES,WORKPLACES,previewPhase} from '../src/suit-lab/facilities.js'
+import {UNIFORM} from '../src/suit-lab/uniforms.js'
 
 test('15 distinct visual roles have complete portable definition files',async()=>{
  assert.equal(TEAM.length,15)
- for(const key of ['id','name','role','color'])assert.equal(new Set(TEAM.map(p=>p[key])).size,15)
+ for(const key of ['id','name','role'])assert.equal(new Set(TEAM.map(p=>p[key])).size,15)
+ assert.equal(new Set(TEAM.map(p=>p.suitColor)).size,1)
+ assert.ok(TEAM.every(p=>p.suitColor===UNIFORM.suit&&p.title.startsWith('Head of ')))
+ assert.equal(new Set(TEAM.map(p=>JSON.stringify(p.coat))).size,15)
  for(const p of TEAM){const file=await readFile(new URL(`../public${p.file}`,import.meta.url),'utf8');assert.ok(file.includes(p.role));assert.ok(file.includes(p.focus))}
 })
 test('three units support any three distinct residents and reject a fourth or duplicate',()=>{

@@ -1,7 +1,8 @@
 # Kestrel Field Lab
 
-A small, interactive grasslands view of the spacesuit research team. It retains
-the three original MAGI supercomputers, the campfire/common and Frontera wall.
+A small, interactive floating grass island for the spacesuit research team. It
+retains the three original MAGI supercomputers and campfire/common. There is no
+perimeter wall. New Kestrel signatures are procedural flowers.
 The crane, ships, pads, memory pods, pilot/camper bodies and other campus scenery
 are omitted in this view. The normal campus and financial office remain separate.
 
@@ -9,6 +10,31 @@ The roofless miniature workshop has one shared suit in its assembly cradle,
 surrounded by nine fabrication and test bays. The original Bot Crossing bots
 work at specialty benches and take turns visiting the shared suit along the
 aisles. The hearth remains outside the workshop for campfire reviews.
+
+Read [KESTREL-RENEWAL.md](KESTREL-RENEWAL.md) for the user's five-stage ritual:
+three working, nine idle/context bodies and three planting, followed by fresh
+agents inhabiting the same bodies. The Garden panel provides an explicit,
+browser-only preview with no real execution.
+
+## Shared Bot Crossing engine and uniforms
+
+The lab directly instantiates the main app's `Engine`, `Settings` and
+`CameraRig` from `src/core/`. That engine owns the perspective camera, renderer,
+postprocessing, canvas resize and animation loop. Do not add a second renderer,
+orthographic camera, OrbitControls or separate requestAnimationFrame loop here.
+The lab is scenery and UI hosted by the existing engine.
+
+Camera gestures are the standard Bot Crossing gestures: left-drag pans;
+right/middle-drag or Shift/Ctrl-drag rotates and tilts; wheel/pinch zooms at the
+cursor. Drags never select a bot or focus an instrument. Overview, equipment
+focus and View uniform use the shared camera rig's focus state, so subsequent
+manual navigation takes over normally.
+
+All fifteen department heads wear the same ivory helmet, slate undersuit,
+white lab coat and brass chief insignia. Coats differ in cut, length, collar,
+pocket layout and specialty details. The coats share the original bot body's
+skin weights and animation texture; faces, helmets and base rigs remain the
+original Bot Crossing characters. **View uniform** focuses the selected head.
 
 ## Workshop and testing tour
 
@@ -62,7 +88,7 @@ need an ordinary HTTP server; Vite is not needed to execute the built page.
 
 There are **15 visual residents** using the same Bot Crossing bots as the main
 campus: shared body rig, helmet, animated screen face, backpack, antenna and
-animation clips. Each retains its own suit colour, name and specialty. There
+animation clips. Each retains its own name, specialty and director coat. There
 are **three preview assignment slots**:
 Melchior, Balthasar and Casper. Choose any resident and click Hire on an open unit.
 The resident walks there; Release returns them to the camp. A fourth simultaneous
@@ -95,6 +121,11 @@ the scene. The completed AURA study records and automation are outside this samp
 
 - `suit-lab/index.html`: dedicated entry point.
 - `src/suit-lab/main.js`: scene composition, camera, interaction and local state.
+- `src/suit-lab/runtime.js`: thin adapter to the actual shared Engine, Settings
+  and CameraRig; named camera destinations only.
+- `src/suit-lab/island.js`: finite floating turf, cliff underside and clouds.
+- `src/suit-lab/flowers.js`: unique code-built signature flowers; no image assets.
+- `src/suit-lab/renewal.js`: five-stage visual lifecycle and replay-checked state.
 - `src/suit-lab/researcher.js`: local preview adapter for the shared Bot Crossing
   `Astronauts` renderer and `loadCrew()` rig; no duplicated character geometry.
 - `src/suit-lab/workshop.js`: roofless laboratory, shared prototype and equipment
@@ -102,6 +133,8 @@ the scene. The completed AURA study records and automation are outside this samp
 - `src/suit-lab/facilities.js`: nine bays, equipment catalogue, fifteen operator
   positions and bounded visual-preview timing.
 - `src/suit-lab/team.js`: catalogue and pure assignment/replacement rules.
+- `src/suit-lab/uniforms.js`: common uniform palette and fifteen coat recipes.
+- `src/suit-lab/lab-coats.js`: animated coat overlays on the original body rig.
 - `src/suit-lab/style.css`: responsive interface; no remote fonts.
 - `tools/kestrel-lab.mjs`: standalone local launcher and optional Windows Dual View.
 - `test/suit-lab.test.mjs`: role-file completeness, three-slot limits, uniqueness,
@@ -109,16 +142,17 @@ the scene. The completed AURA study records and automation are outside this samp
 
 The retained computer/hearth geometry comes from `createFreeCampusScene`; this
 view filters its local group without changing the shared implementation. The
-Frontera wall is reused with view-local scaling. Existing locally available marks
-are fetched from the read-only memorial endpoint, with no append/paint calls.
+Frontera wall and old archives remain in the canonical campus and financial
+office. The island does not import the wall or read/write its memorial endpoint.
 No memorial records, private research, screenshots, tokens, runtime state or
-browser storage are committed. Without a local archive the wall remains empty.
+browser storage are committed. A new garden starts with no invented signatures.
 
 ## Verification
 
-Run `node --test test/suit-lab.test.mjs` and `npm run build`. Visual/UI verification
+Run `node --test test/suit-lab*.test.mjs` and `npm run build`. Visual/UI verification
 should cover the grassland scene, all three visible computers,15 residents,
 select/hire/release across all three units and local role-file replacement,
-the laboratory tour, camera focus, equipment cycles and their terminal state.
+the laboratory tour, camera focus, equipment cycles and their terminal state,
+right-drag rotation, left-drag panning, wheel zoom and director coat closeups.
 Respects reduced motion. Actual mobility/survivability of a spacesuit is not
 demonstrated by this miniature scene.
