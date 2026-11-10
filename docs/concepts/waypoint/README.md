@@ -1,0 +1,25 @@
+# Waypoint concept art
+
+[Open the five-page concept art book](Waypoint-Concept-Art-Book.pdf).
+
+Waypoint is a lunar field survey bot with a sealed copper visor and a brisk stride. The visual brief blends Bot Crossing’s 3D movement (36%), Wobbly Life’s physical comedy (33%), and the readiness and mystery of the Mars Mission astronaut (31%).
+
+This is a design study. A future prototype can reuse colony navigation, status cues, and clip playback while giving Waypoint its own mesh, materials, rig, and motion. The book specifies the cover’s graphite mitts and a flush chest panel where the illustrations vary.
+
+References: [Bot Crossing at the branch base](https://github.com/martinburstein/bot-crossing-clone/tree/3c9781db9e69063ba24a83f6e2205585415d60a6), [Wobbly Life](https://www.rubberbandgames.com/wobbly-life/), [Mars Mission astronaut listing](https://www.choose-a-brick.com/en-global/products/mars-mission-astronaut-with-helmet-and-balaclava), [BrickLink catalog entry](https://www.bricklink.com/catalogItemInv.asp?M=mm002).
+
+## Illustration prompts
+
+The three plates were generated with the built-in image generation tool.
+
+### Cover
+
+Use case: stylized-concept. Asset: landscape 3:2 hero cover art for a premium game character art book. Paint WAYPOINT, an original small 3D field-surveyor robot for a lunar colony simulation, standing at attention on a hexagonal colony landing pad, with one foot half a step forward, an understated confident posture. Character fills about 70% of frame height, centered slightly right, framed head to boots with room to breathe. Exact character design: wide squashed-oval bone-ceramic pressure helmet with a broad smoked-copper crescent visor (blank, reflective, entirely faceless), small petrol-teal fin on rear-left helmet, high graphite accordion collar that echoes a balaclava, bone ceramic rounded pear-shaped torso with ONE diagonal persimmon-orange sash panel across chest, graphite flexible shoulder/elbow/knee joints, mitten hands, stubby teal-and-bone rocker boots, a compact teal wedge-shaped pack with a single amber pinlight. About three helmet heights tall. Clearly an original soft sculpted 3D videogame mascot with distinct silhouettes, no block toy shapes. Environment: deep blue lunar dusk, muted violet terrain, softly lit habitat silhouettes, restrained warm orange beacon glow. Serious little field scout with subtly endearing proportions. Beautiful tangible ceramic, cloth and rubber, broad clean forms readable from orbit, polished 3D art direction, dramatic yet friendly. No text, no lettering, no branding, no weapons, no watermark.
+
+### Turnaround
+
+Use case: stylized-concept. Asset: landscape 3:2 production turnaround plate for an original 3D field-surveyor robot game character, 3 equally sized full body orthographic views in a row (front, left side, back) on a warm ivory studio background. Each of three complete silhouettes is aligned on same ground plane, same scale, separated by generous gaps, a minimal shadow, centered in image. Exact character: wide squashed-oval bone-ceramic pressure helmet with a broad smoked-copper crescent visor (blank, reflective, entirely faceless), small petrol-teal fin on rear-left helmet, high graphite accordion collar like a balaclava, bone ceramic rounded pear-shaped torso with ONE diagonal persimmon-orange sash panel across chest, graphite flexible shoulder/elbow/knee joints, mitten hands, stubby teal-and-bone rocker boots, a compact teal wedge-shaped pack with a single amber pinlight. About three helmet heights tall. Same parts and colors across all angles, broad simple forms, design cohesive for a 3D character artist, graceful rounded limbs, no block toy shapes. Restrained warm-gray shadows. No captions, text, symbols, labels, grids, weapons, branding, watermark.
+
+### Motion study
+
+Use case: stylized-concept. Asset: landscape 3:2 movement and personality plate for original 3D stylized robot. Four sequential, clearly different full body poses evenly spaced left to right, all on ONE baseline against a solid warm ivory seamless studio background. Four adjacent images with room between full silhouettes, no borders: 1 marching briskly, lifted boot and counter-swinging arms 2 sudden stop, feet braced with helmet and torso comically carried forward, 3 overshoot recovery with hips counter-leaning and hands out, 4 back at attention, one mitten tapping the collar in a dignified acknowledgment. Physical weight and broad readable animated gestures, charming/goofy secondary movement without falling down. Same character exactly in all four poses: wide squashed-oval bone-ceramic pressure helmet, broad smoked-copper crescent visor entirely faceless, small petrol-teal fin on rear-left helmet, high graphite accordion collar, bone ceramic rounded pear-shaped torso, ONE diagonal persimmon-orange sash panel across chest, graphite flexible joints, mitten hands, stubby teal-and-bone rocker boots, compact teal wedge-shaped pack with single amber pinlight. About three helmet heights tall. Polished stylized 3D render, broad clean forms. No text, no grid, no arrows, no weapon, no branding, no watermark.
