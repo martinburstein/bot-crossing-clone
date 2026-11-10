@@ -1,5 +1,7 @@
 # Waypoint concept art
 
+[Current design: Waypoint Surface Scout](surface-scout/README.md) shows one standard robotic chassis for the Moon and Mars.
+
 [Open the five-page concept art book](Waypoint-Concept-Art-Book.pdf).
 
 Waypoint is a lunar field survey bot with a sealed copper visor and a brisk stride. The visual brief blends Bot Crossing’s 3D movement (36%), Wobbly Life’s physical comedy (33%), and the readiness and mystery of the Mars Mission astronaut (31%).
