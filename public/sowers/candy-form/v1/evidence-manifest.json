@@ -1,0 +1,19 @@
+{
+  "version": "v1-zero-draft-sharp-recess",
+  "status": "rejected-intermediate-evidence",
+  "files": {
+    "bud-dimensions.svg": "14b41b7e02d5d411fac1e234691ace4dd130246e19f7d6eca2e9543fb836f3b4",
+    "bud-positive-mm.stl": "7bc9ebca729510179b747561be611252310f8cac0bbfc97ea961e217f1105c67",
+    "bud-positive-preview.svg": "2cd210c2b0a4c6b21d26a327899a0ab665a7b77b809849a63cea511a48ffa4d9",
+    "generator.py": "1ced3a06768a0fa840ba95a673aedf19e04487967408a25b582223650c5a84d1",
+    "geometry-report.json": "7649268f637502c1d9f0e612d633bc13a40cda048de8ad3457e3a1e9dfac1f1e",
+    "manufacturing.md": "12390c9349947f26551e66cc4418c1cb25efa1596c267dc28f0f16ecbae397c2",
+    "scout-dimensions.svg": "58e67a101c5b910beaa5656030c19af50428989f1022de8780d2c2575bc49c7f",
+    "scout-positive-mm.stl": "0650d936b4f2c2ea7734b8ed8a6201f761150af04387b4d4b4ede9c0f5fb46fd",
+    "scout-positive-preview.svg": "ac493a8f258d9e2d8ffeb64e12399aef0bc3cc23141eddf7931c7883a0774ae0",
+    "seed-dimensions.svg": "fa4fc7b777c2763f9a01c1743986c093ae8c90ea42f8fff4d7506df7eaf9aa71",
+    "seed-positive-mm.stl": "343a4577d56e1204a3d5029bc77b8f51f0e60b22887ba3f08169814face042bd",
+    "seed-positive-preview.svg": "5b8f3ce030b60b25299d41af77d32a8f7a0077eb8f8a07a739ca4ac711efa5ee",
+    "silhouettes.mjs": "fd1af2fa6010c51bd4dd8afd0c4da93e288543727f95a7441fb9ff4d7609547c"
+  }
+}

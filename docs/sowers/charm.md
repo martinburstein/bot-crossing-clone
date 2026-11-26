@@ -1,5 +1,7 @@
 # Sowers: tiny colleagues with soft edges
 
+This records the superseded first-pass rig. The user rejected its inflated forms. The current character is the candy-first Scout in `sowers/candy/mascot.js`; the first implementation is retained at `sowers/archive/first-sower-avatar.js` for comparison. Current criteria and decisions are in `docs/sowers/candy/`.
+
 The target feeling is a handful of desk toys who have taken their responsibilities surprisingly seriously. They should be recognizable by silhouette before the viewer can read a name. The large helmet, bean belly, short boots and loosely hanging mittens make a useful worker feel approachable. A sprout on the bib gives Sowers an original motif: these are people tending something together.
 
 The reference is the relaxed, playful social energy of Wobbly Life. RubberBandGames describes its game as an open-world physics sandbox with quirky jobs and character customization ([official studio](https://www.rubberbandgames.com/), [official publisher page](https://curvegames.com/our-games/wobbly-life/)). Those sources establish the reference's broad spirit; the body, emblem, materials and motions here are original procedural geometry. There are no copied models, textures, branded costumes, character names or imported animation clips. Sowers uses authored motion rather than a physics solver.

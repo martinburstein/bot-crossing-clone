@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#211c2b">
+  <meta name="description" content="An original Sowers sour candy character and packaging concept review. Compare three shapes in 3D, at icon scale, and on pack.">
+  <title>SOWERS — A little sour. A lot of character.</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="../" aria-label="Sowers home" data-wordmark></a>
+    <span class="studio-label"><i></i> The character kitchen</span>
+    <nav aria-label="Design review"><a class="active" href="#shape-review">Shape study</a><a href="#on-pack">On pack</a><a href="../studio/">Original studio ↗</a></nav>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div class="intro-copy">
+        <p class="eyebrow">SOWERS / ORIGINAL CHARACTER CONCEPTS / 01</p>
+        <h1 id="page-title">A little sour.<br>A lot of<br><em>character.</em></h1>
+        <p class="lede">A tiny masked explorer. A seed of mischief. Three new shapes made to work as a character, a candy, and a very small icon.</p>
+        <a class="text-link" href="#shape-review">Meet the three shapes <span>↓</span></a>
+      </div>
+      <div class="hero-panel">
+        <div class="stage-topline"><span id="stage-kicker">01 / SCOUT</span><span class="concept-tag">Design concept</span></div>
+        <div class="sour-stamp" aria-hidden="true">SOUR<br><span>by nature.</span><svg viewBox="0 0 50 30"><path d="M5 15 Q12 2 20 15 T35 15 L44 15 M38 9 L44 15 L38 21"/></svg></div>
+        <div id="model-stage" aria-label="Interactive character preview"><div id="render-fallback" hidden><div id="fallback-character"></div><p>3D is unavailable here. These front-view shapes and the packaging studies still work.</p></div></div>
+        <div class="stage-caption"><span id="model-caption">Scout · citrus concept</span><span>Drag to turn <span aria-hidden="true">↔</span></span></div>
+        <div class="stage-shape-controls" role="group" aria-label="Preview shape"><button data-quick-variant="scout" aria-pressed="true">01 <strong>Scout</strong></button><button data-quick-variant="seed" aria-pressed="false">02 <strong>Seed</strong></button><button data-quick-variant="bud" aria-pressed="false">03 <strong>Bud</strong></button></div>
+        <div class="source-controls segmented" role="group" aria-label="Model source"><button data-source="agent" aria-pressed="false">Agent</button><button data-source="master" aria-pressed="true">Candy master</button></div>
+        <p id="master-status" class="master-status" role="status">Loading the exported candy master…</p>
+        <div id="master-error" class="master-error" role="alert" hidden></div>
+        <div class="camera-controls" role="group" aria-label="Camera angle"><button data-camera="front" aria-pressed="true">Front</button><button data-camera="three" aria-pressed="false">¾</button><button data-camera="side" aria-pressed="false">Side</button><button data-camera="back" aria-pressed="false">Back</button><button id="play" aria-pressed="false" aria-label="Play character animation">Play</button></div>
+      </div>
+    </section>
+
+    <section id="shape-review" class="shape-review" aria-labelledby="shape-heading">
+      <div class="section-heading"><div><p class="eyebrow">ONE LITTLE EXPLORER. THREE DIRECTIONS.</p><h2 id="shape-heading">Find the keeper.</h2></div><p>A shape first. The visor and sprout are shallow details; the outline does the heavy lifting.</p></div>
+      <div class="variant-grid" id="variant-grid"></div>
+      <div class="review-controls">
+        <div><span class="control-label">The finish</span><div class="segmented" role="group" aria-label="Material"><button data-material="matte" aria-pressed="true">Matte character</button><button data-material="gummy" aria-pressed="false">Sour gummy</button></div></div>
+        <div><span class="control-label">The read</span><div class="segmented" role="group" aria-label="Character presentation"><button data-pose="candy" aria-pressed="true">Rest pose</button><button data-pose="agent" aria-pressed="false">Agent pose</button><button id="monochrome" aria-pressed="false">One color</button></div></div>
+        <div><label class="control-label" for="status">Agent expression</label><select id="status"><option value="idle">Hello, world</option><option value="working">Getting things done</option><option value="complete">Little victory</option><option value="waiting">Ready when you are</option><option value="error">A little puzzled</option></select></div>
+      </div>
+      <p class="keyboard-note">Keyboard: 1–3 choose a shape · M toggles one color · R resets the view · Arrow keys turn the focused 3D view. Motion starts paused.</p>
+    </section>
+
+    <section class="flavor-section" aria-labelledby="flavor-heading">
+      <div class="section-heading"><div><p class="eyebrow">A SMALL WORLD OF BIG FLAVOR</p><h2 id="flavor-heading">Pick your punch.</h2></div><p>Three color directions. Flavor names are creative concepts, not product claims.</p></div>
+      <div class="flavor-grid">
+        <button class="flavor citrus" data-flavor="citrus" aria-pressed="true"><span class="flavor-top">01 <span>↗</span></span><span class="flavor-name">Citrus<br>scout.</span><span class="flavor-note">Tangerine + electric yellow</span><span class="flavor-dot" aria-hidden="true"></span></button>
+        <button class="flavor lime" data-flavor="lime" aria-pressed="false"><span class="flavor-top">02 <span>↗</span></span><span class="flavor-name">Lime<br>littleling.</span><span class="flavor-note">Sharp green + deep violet</span><span class="flavor-dot" aria-hidden="true"></span></button>
+        <button class="flavor berry" data-flavor="berry" aria-pressed="false"><span class="flavor-top">03 <span>↗</span></span><span class="flavor-name">Berry<br>brave.</span><span class="flavor-note">Raspberry + soft lilac</span><span class="flavor-dot" aria-hidden="true"></span></button>
+      </div>
+    </section>
+
+    <section id="on-pack" class="pack-section" aria-labelledby="pack-heading">
+      <div class="section-heading"><div><p class="eyebrow">SAME SHAPE. OFF THE SCREEN.</p><h2 id="pack-heading">A face for the shelf.</h2></div><p>A front-of-pack design study for the selected shape. Simple, bold, and easy to spot.</p></div>
+      <div class="pack-shelf" id="pack-shelf"></div>
+      <div class="pack-footnote"><span>SELECTED SHAPE <strong id="pack-selection">Scout</strong></span><p>Visual concepts only. Candy formulation, production tooling, labeling, and clearance have not been developed or validated.</p></div>
+    </section>
+
+    <section class="decision-section" aria-labelledby="decision-heading"><div><p class="eyebrow">WHAT TO LOOK FOR</p><h2 id="decision-heading">Cute at a glance.<br>Clear at a bite.</h2></div><div class="decision-grid"><article><span>01</span><h3>The outline</h3><p>Does the character stay recognizable at 32 pixels and in a single color?</p></article><article><span>02</span><h3>The candy</h3><p>Does the shape feel like one coherent piece, with few shallow details?</p></article><article><span>03</span><h3>The personality</h3><p>Does the masked explorer and seed cue read without a costume full of parts?</p></article></div></section>
+  </main>
+  <footer><div data-wordmark aria-label="Sowers"></div><p>Original design exploration · November 2026</p><a href="#page-title">Back to the top ↑</a></footer>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

@@ -1,17 +1,16 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createSower } from '../avatar.js';
-import { createHelmet } from '../helmet.js';
 
 const wrap = document.querySelector('#canvas-wrap');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const captions = {
-  working: 'A slight lean and busy mittens: quietly getting on with it.',
-  review: 'A thoughtful tilt. A careful look before the next little step.',
-  waiting: 'An expectant glance and a tiny wave: ready when you are.',
-  idle: 'A soft breath, a little sway, an occasional hello.',
-  complete: 'Both mittens up. A small victory deserves a little bounce.',
-  error: 'A hand to the helmet. A little puzzled, still full of resolve.',
+  working: 'Small, busy hand motions: quietly getting on with it.',
+  review: 'An inquisitive tilt. A careful look before the next little step.',
+  waiting: 'A tiny wave: ready when you are.',
+  idle: 'A quiet little turn while waiting for the next job.',
+  complete: 'A little hop for a little victory.',
+  error: 'A puzzled tilt. Still full of resolve.',
 };
 const names = { '#f5823a': 'Apricot', '#7fa594': 'Sage', '#82a6bf': 'Mist blue', '#b396ba': 'Heather' };
 const state = { status: 'working', moving: false, paused: reducedMotion.matches, color: '#f5823a', time: 1.6 };
@@ -105,7 +104,7 @@ if (renderer) {
   };
   const createScout = () => {
     disposeScout();
-    scout = createSower({ color: state.color, seed: 4, helmetFactory: createHelmet });
+    scout = createSower({ color: state.color, seed: 4, variant: new URLSearchParams(location.search).get('shape') || 'scout' });
     scene.add(scout);
     settle();
   };
@@ -144,7 +143,7 @@ if (renderer) {
   }));
   const setView = view => {
     if (view === 'detail') {
-      camera.position.set(.03, 1.56, 1.75);
+      camera.position.set(.03, 1.56, 2.7);
       orbit.target.set(0, 1.38, 0);
     } else {
       camera.position.set(.12, 1.5, view === 'back' ? -4.5 : 4.5);

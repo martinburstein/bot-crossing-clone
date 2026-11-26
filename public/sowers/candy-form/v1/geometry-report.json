@@ -1,0 +1,529 @@
+{
+  "units": "mm",
+  "kind": "positive-master-preview",
+  "source": "sowers/candy/silhouettes.mjs",
+  "sourceSha256": "fd1af2fa6010c51bd4dd8afd0c4da93e288543727f95a7441fb9ff4d7609547c",
+  "parameters": {
+    "height": 30.0,
+    "depth": 6.0,
+    "maskDepth": 0.65,
+    "eyeAdditionalDepth": 0.4,
+    "outerDraftDegrees": 0
+  },
+  "assumptions": {
+    "targetWebMm": 3,
+    "targetOutlineRadiusMm": 0.6,
+    "supplierConfirmedNumericMinima": false
+  },
+  "limits": [
+    "No tooling approval",
+    "No food-contact material claim",
+    "No shrink compensation",
+    "Sharp relief depth transitions",
+    "Zero outer draft",
+    "No sanding or release trial"
+  ],
+  "variants": [
+    {
+      "id": "scout",
+      "boundsMm": [
+        [
+          -12.296968460083008,
+          0.0,
+          0.0
+        ],
+        [
+          12.296968460083008,
+          30.0,
+          6.0
+        ]
+      ],
+      "widthMm": 24.593937343374364,
+      "heightMm": 30.0,
+      "depthMm": 6.0,
+      "volumeMm3": 2990.7684212419895,
+      "faceCount": 1780,
+      "vertexCount": 892,
+      "watertight": true,
+      "windingConsistent": true,
+      "positiveVolume": true,
+      "connectedComponents": 1,
+      "eulerNumber": 2,
+      "allEdgesTwoFaces": true,
+      "outlineValid": true,
+      "outlineHoles": 0,
+      "erosionAt1p5MmComponents": 1,
+      "faceClearanceMm": 1.653138723425512,
+      "stlSha256": "0650d936b4f2c2ea7734b8ed8a6201f761150af04387b4d4b4ede9c0f5fb46fd",
+      "minimumQuadraticRadiusMmSampled": 0.06144105597751374,
+      "outlineRadiusTargetMet": false,
+      "engineeringStatus": "outline-radius-target-missed",
+      "maskWidthMm": 13.826251141377018,
+      "maskHeightMm": 7.063410909181736,
+      "eyeStrokeMm": 1.0,
+      "eyeFloorMm": 4.949999999999999,
+      "downwardFacesOnlyOnBack": true,
+      "description": {
+        "name": "Scout / Seed Packet",
+        "character": "A clipped rectangular seed packet with a single folded leaf crown and mitten tabs.",
+        "cornerRadius": 0.022,
+        "depth": 0.2,
+        "face": {
+          "x": 0,
+          "y": 0.674,
+          "width": 0.46,
+          "height": 0.235,
+          "radius": 0.065
+        },
+        "points": [
+          [
+            -0.29,
+            0
+          ],
+          [
+            -0.055,
+            0
+          ],
+          [
+            -0.045,
+            0.115
+          ],
+          [
+            0.045,
+            0.115
+          ],
+          [
+            0.055,
+            0
+          ],
+          [
+            0.29,
+            0
+          ],
+          [
+            0.315,
+            0.065
+          ],
+          [
+            0.275,
+            0.235
+          ],
+          [
+            0.285,
+            0.36
+          ],
+          [
+            0.365,
+            0.325
+          ],
+          [
+            0.41,
+            0.365
+          ],
+          [
+            0.405,
+            0.49
+          ],
+          [
+            0.285,
+            0.565
+          ],
+          [
+            0.285,
+            0.825
+          ],
+          [
+            0.215,
+            0.915
+          ],
+          [
+            0.015,
+            0.915
+          ],
+          [
+            0.115,
+            1
+          ],
+          [
+            -0.035,
+            0.985
+          ],
+          [
+            -0.135,
+            0.915
+          ],
+          [
+            -0.215,
+            0.915
+          ],
+          [
+            -0.285,
+            0.825
+          ],
+          [
+            -0.285,
+            0.565
+          ],
+          [
+            -0.405,
+            0.49
+          ],
+          [
+            -0.41,
+            0.365
+          ],
+          [
+            -0.365,
+            0.325
+          ],
+          [
+            -0.285,
+            0.36
+          ],
+          [
+            -0.275,
+            0.235
+          ],
+          [
+            -0.315,
+            0.065
+          ]
+        ]
+      }
+    },
+    {
+      "id": "seed",
+      "boundsMm": [
+        [
+          -11.800517082214355,
+          0.0,
+          0.0
+        ],
+        [
+          11.800517082214355,
+          30.0,
+          6.0
+        ]
+      ],
+      "widthMm": 23.601034468815282,
+      "heightMm": 30.0,
+      "depthMm": 6.0,
+      "volumeMm3": 2766.1551426077317,
+      "faceCount": 1744,
+      "vertexCount": 874,
+      "watertight": true,
+      "windingConsistent": true,
+      "positiveVolume": true,
+      "connectedComponents": 1,
+      "eulerNumber": 2,
+      "allEdgesTwoFaces": true,
+      "outlineValid": true,
+      "outlineHoles": 0,
+      "erosionAt1p5MmComponents": 1,
+      "faceClearanceMm": 1.4680524839100892,
+      "stlSha256": "343a4577d56e1204a3d5029bc77b8f51f0e60b22887ba3f08169814face042bd",
+      "minimumQuadraticRadiusMmSampled": 0.627112249372248,
+      "outlineRadiusTargetMet": true,
+      "engineeringStatus": "geometry-preview-needs-supplier-proof",
+      "maskWidthMm": 13.904801182148162,
+      "maskHeightMm": 6.498983161221424,
+      "eyeStrokeMm": 1.0,
+      "eyeFloorMm": 4.949999999999999,
+      "downwardFacesOnlyOnBack": true,
+      "description": {
+        "name": "Seed / Little Voyager",
+        "character": "A tilted seed tip, full triangular shoulders, a tapered waist and two broad boots.",
+        "cornerRadius": 0.026,
+        "depth": 0.2,
+        "face": {
+          "x": -0.012,
+          "y": 0.63,
+          "width": 0.46,
+          "height": 0.215,
+          "radius": 0.065
+        },
+        "points": [
+          [
+            -0.265,
+            0
+          ],
+          [
+            -0.055,
+            0
+          ],
+          [
+            -0.045,
+            0.105
+          ],
+          [
+            0.045,
+            0.105
+          ],
+          [
+            0.055,
+            0
+          ],
+          [
+            0.265,
+            0
+          ],
+          [
+            0.29,
+            0.055
+          ],
+          [
+            0.235,
+            0.215
+          ],
+          [
+            0.26,
+            0.325
+          ],
+          [
+            0.365,
+            0.31
+          ],
+          [
+            0.395,
+            0.365
+          ],
+          [
+            0.355,
+            0.49
+          ],
+          [
+            0.3,
+            0.52
+          ],
+          [
+            0.31,
+            0.65
+          ],
+          [
+            0.255,
+            0.79
+          ],
+          [
+            0.13,
+            0.91
+          ],
+          [
+            -0.055,
+            1
+          ],
+          [
+            -0.14,
+            0.865
+          ],
+          [
+            -0.265,
+            0.76
+          ],
+          [
+            -0.315,
+            0.63
+          ],
+          [
+            -0.3,
+            0.52
+          ],
+          [
+            -0.355,
+            0.49
+          ],
+          [
+            -0.395,
+            0.365
+          ],
+          [
+            -0.365,
+            0.31
+          ],
+          [
+            -0.26,
+            0.325
+          ],
+          [
+            -0.235,
+            0.215
+          ],
+          [
+            -0.29,
+            0.055
+          ]
+        ]
+      }
+    },
+    {
+      "id": "bud",
+      "boundsMm": [
+        [
+          -11.892539024353027,
+          0.0,
+          0.0
+        ],
+        [
+          11.892539024353027,
+          30.0,
+          6.0
+        ]
+      ],
+      "widthMm": 23.785078323368033,
+      "heightMm": 30.0,
+      "depthMm": 6.0,
+      "volumeMm3": 3019.2258112624427,
+      "faceCount": 1816,
+      "vertexCount": 910,
+      "watertight": true,
+      "windingConsistent": true,
+      "positiveVolume": true,
+      "connectedComponents": 1,
+      "eulerNumber": 2,
+      "allEdgesTwoFaces": true,
+      "outlineValid": true,
+      "outlineHoles": 0,
+      "erosionAt1p5MmComponents": 1,
+      "faceClearanceMm": 1.8821616919717021,
+      "stlSha256": "7bc9ebca729510179b747561be611252310f8cac0bbfc97ea961e217f1105c67",
+      "minimumQuadraticRadiusMmSampled": 0.49836760531653923,
+      "outlineRadiusTargetMet": false,
+      "engineeringStatus": "outline-radius-target-missed",
+      "maskWidthMm": 13.400991246838531,
+      "maskHeightMm": 6.173490349667188,
+      "eyeStrokeMm": 1.0,
+      "eyeFloorMm": 4.949999999999999,
+      "downwardFacesOnlyOnBack": true,
+      "description": {
+        "name": "Bud / Leaf Ranger",
+        "character": "Two broad leaf peaks, a clear crown valley and a compact shield body with little fins.",
+        "cornerRadius": 0.023,
+        "depth": 0.2,
+        "face": {
+          "x": 0,
+          "y": 0.6,
+          "width": 0.445,
+          "height": 0.205,
+          "radius": 0.06
+        },
+        "points": [
+          [
+            -0.265,
+            0
+          ],
+          [
+            -0.055,
+            0
+          ],
+          [
+            -0.045,
+            0.105
+          ],
+          [
+            0.045,
+            0.105
+          ],
+          [
+            0.055,
+            0
+          ],
+          [
+            0.265,
+            0
+          ],
+          [
+            0.285,
+            0.06
+          ],
+          [
+            0.24,
+            0.2
+          ],
+          [
+            0.27,
+            0.325
+          ],
+          [
+            0.375,
+            0.35
+          ],
+          [
+            0.4,
+            0.415
+          ],
+          [
+            0.34,
+            0.5
+          ],
+          [
+            0.285,
+            0.505
+          ],
+          [
+            0.285,
+            0.69
+          ],
+          [
+            0.35,
+            0.835
+          ],
+          [
+            0.315,
+            1
+          ],
+          [
+            0.14,
+            0.965
+          ],
+          [
+            0,
+            0.835
+          ],
+          [
+            -0.14,
+            0.965
+          ],
+          [
+            -0.315,
+            1
+          ],
+          [
+            -0.35,
+            0.835
+          ],
+          [
+            -0.285,
+            0.69
+          ],
+          [
+            -0.285,
+            0.505
+          ],
+          [
+            -0.34,
+            0.5
+          ],
+          [
+            -0.4,
+            0.415
+          ],
+          [
+            -0.375,
+            0.35
+          ],
+          [
+            -0.27,
+            0.325
+          ],
+          [
+            -0.24,
+            0.2
+          ],
+          [
+            -0.285,
+            0.06
+          ]
+        ]
+      }
+    }
+  ]
+}

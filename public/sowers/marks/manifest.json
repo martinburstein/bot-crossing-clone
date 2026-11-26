@@ -1,0 +1,18 @@
+{
+  "kind": "graphic-marks",
+  "source": "sowers/candy/silhouettes.mjs",
+  "sourceSha256": "4ace24fd1694fcb346b4679cd18febfbbef619aa225b4410495b92c5e81e1a17",
+  "files": [
+    "scout-color.svg",
+    "scout-ink.svg",
+    "scout-silhouette.svg",
+    "seed-color.svg",
+    "seed-ink.svg",
+    "seed-silhouette.svg",
+    "bud-color.svg",
+    "bud-ink.svg",
+    "bud-silhouette.svg",
+    "readability-sheet.svg"
+  ],
+  "note": "Color and one-ink print graphics; physical relief is the separate positive-master STL."
+}

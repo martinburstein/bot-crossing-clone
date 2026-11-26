@@ -1,16 +1,17 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { createSower } from './avatar.js'
-import { createHelmet } from './helmet.js'
 import { createMissionBase } from './base.js'
 import { createCheckpointExpansion } from './expansion.js'
 import { observedConstruction, constructionStages } from './progress.mjs'
 import { DESIGN_THREADS, mergeBroadcastThreads, visibleThreads } from './telemetry.mjs'
 import { shouldRender } from './render-budget.mjs'
+import { createSowerMark } from './candy/mark.js'
 import './style.css'
 
 const $ = selector => document.querySelector(selector)
 const params = new URLSearchParams(location.search)
+const avatarVariant = ['scout','seed','bud'].includes(params.get('shape')) ? params.get('shape') : 'scout'
 const app = $('#app'), host = $('#scene')
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
 let mode = params.get('preview') === '1' ? 'demo' : 'live'
@@ -195,7 +196,7 @@ function renderWorld() {
       const base=createMissionBase({seed:thread.id,progress:observation.fraction ?? .12,kind:['habitat','power','relay'][thread.seed%3],color:thread.color})
       group.add(base)
       const expansion=createCheckpointExpansion({seed:thread.id,color:thread.color});group.add(expansion)
-      const avatar=createSower({color:thread.color,seed:thread.seed,helmetFactory:createHelmet})
+      const avatar=createSower({color:thread.color,seed:thread.seed,variant:avatarVariant})
       avatar.position.set(-2.2,.03,4.2);avatar.scale.setScalar(1);group.add(avatar)
       const ring=mesh(new THREE.RingGeometry(.8,.86,40),'#f9e6ac')
       ring.rotation.x=-Math.PI/2;ring.position.set(-2.2,.04,4.2);group.add(ring)
@@ -222,7 +223,7 @@ function drawRoster() {
     const row=element('button',`crew-row${thread.id===selectedId?' selected':''}`)
     row.dataset.id=thread.id
     row.setAttribute('aria-pressed',String(thread.id===selectedId))
-    const icon=element('span','crew-icon');icon.style.setProperty('--suit',colorCss(thread.color))
+    const icon=element('span','crew-icon actual-mark');icon.append(createSowerMark({variant:avatarVariant,color:colorCss(thread.color)}))
     const text=element('span','crew-text')
     text.append(element('strong','',thread.name),element('small','',thread.project))
     const dot=element('span',`status-dot ${thread.status}`);dot.title=labels[thread.status]

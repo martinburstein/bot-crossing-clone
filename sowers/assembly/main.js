@@ -3,7 +3,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createMissionBase } from '../base.js';
 import { createCheckpointExpansion } from '../expansion.js';
 import { createSower } from '../avatar.js';
-import { createHelmet } from '../helmet.js';
 import { constructionStages } from '../progress.mjs';
 
 const $ = selector => document.querySelector(selector);
@@ -62,7 +61,7 @@ if (renderer) {
   ring.rotation.x = -Math.PI / 2; ring.position.y = -.008; scene.add(ring);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ color: 0x6d775b, opacity: .10 }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = -.19; floor.receiveShadow = true; scene.add(floor);
-  const scout = createSower({ seed: 8, helmetFactory: createHelmet });
+  const scout = createSower({ seed: 8 });
   scout.position.set(1.8, 0, 3.15); scout.rotation.y = -.22; scene.add(scout);
   scout.userData.animate(state.time, 1, { status: 'idle', moving: false });
   let base, expansion;
