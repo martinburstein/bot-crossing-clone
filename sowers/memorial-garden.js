@@ -23,14 +23,21 @@ export function createMemorialGarden({ memorials = [], readiness = {}, capacity 
   const ready=()=>NEED.every(k=>gates[k])
   function addEntry(entry,{initial=false}={}) {
     if(!entry||typeof entry.id!=='string'||!entry.id||!Number.isInteger(entry.iteration)||entry.iteration<1) throw new Error('Memorial requires a stable id and positive integer iteration')
-    if(entries.has(entry.id)) return false
+    if(entries.has(entry.id)) {
+      const item=entries.get(entry.id);let art=item.group.children.find(child=>child.userData.textureCallerOwned)
+      if(entry.texture?.isTexture&&!art){art=new THREE.Mesh(imageGeo,new THREE.MeshBasicMaterial({map:entry.texture,side:THREE.DoubleSide,toneMapped:false}));art.position.set(0,1.14,.38);art.userData.textureCallerOwned=true;item.group.add(art)}
+      else if(entry.texture?.isTexture&&art.material.map!==entry.texture){art.material.map=entry.texture;art.material.needsUpdate=true}
+      item.entry=entry
+      return false
+    }
     if(entries.size>=capacity) {overflowIds.add(entry.id);return false}
-    const index=entries.size, group=new THREE.Group(); group.name=`Iteration ${entry.iteration} memorial`; group.userData={id:entry.id,iteration:entry.iteration,rising:!initial,riseProgress:initial?1:0}
+    const settled=initial||root.userData.reducedMotion
+    const index=entries.size, group=new THREE.Group(); group.name=`Iteration ${entry.iteration} memorial`; group.userData={id:entry.id,iteration:entry.iteration,rising:!settled,riseProgress:settled?1:0,riseComplete:settled}
     const foot=new THREE.Mesh(footGeo,stoneMat);foot.position.set(0,.12,0);foot.castShadow=true;foot.receiveShadow=true;group.add(foot)
     const outer=new THREE.Mesh(outerGeo,trimMat);outer.position.set(0,.22,0);outer.castShadow=true;outer.receiveShadow=true;group.add(outer)
     const inner=new THREE.Mesh(innerGeo,stoneMat);inner.position.set(0,.245,.14);inner.castShadow=true;inner.receiveShadow=true;group.add(inner)
     if(entry.texture?.isTexture){const art=new THREE.Mesh(imageGeo,new THREE.MeshBasicMaterial({map:entry.texture,side:THREE.DoubleSide,toneMapped:false}));art.position.set(0,1.14,.38);art.userData.textureCallerOwned=true;group.add(art)}
-    const p=positionFor(index);group.position.set(p.x,initial?0:-2,p.z);group.rotation.y=(index%5)*.09;group.visible=ready()
+    const p=positionFor(index);group.position.set(p.x,settled?0:-2,p.z);group.rotation.y=(index%5)*.09;group.visible=ready()
     root.add(group);entries.set(entry.id,{entry,group});return true
   }
   // Synchronously supplied archive entries are historical and appear settled.

@@ -6,23 +6,27 @@ images, while memorial export is limited to unmodified freehand strokes.
 
 ## Tools and files
 
-The workspace includes rectangular select, pencil, brush, airbrush, eraser, flood fill,
-eyedropper, text, line, three-click quadratic curve, rectangle, rounded rectangle,
-ellipse and click-to-build polygon. Shape options set outline, fill or both. Selection
-supports move, copy, cut, paste and crop. Canvas resize, horizontal/vertical flip,
-quarter-turn rotation, undo/redo, zoom, pixel grid and space/middle-button panning are
-available. Ctrl/Cmd-wheel zooms. Pointer, mouse and touch use the same canvas surface.
+The workspace includes rectangular and free-form lasso selection, pencil, brush, airbrush,
+magnifier, eraser, flood fill, eyedropper, text, line, three-click quadratic curve,
+rectangle, rounded rectangle, ellipse and click-to-build polygon. Shape options set outline, fill or both. Selection
+supports move, copy, cut, paste and crop. Lasso masks remain clipped through those actions.
+Opaque selection mode fills cut or pasted transparent pixels with the background color; turn
+it off to preserve alpha. Canvas resize, horizontal/vertical flip, quarter-turn rotation,
+invert, stretch/skew, print, undo/redo, click-to-focus magnifier zoom, pixel grid and
+space/middle-button panning are available. Ctrl/Cmd-wheel zooms. Pointer, mouse and touch use the same canvas surface.
 
 Open supports PNG, JPEG, GIF, WebP and Field Paint `.sfp.json` files. A document file
-embeds a PNG data URL, so it opens locally without fetching remote content. Export
-produces PNG; Save produces the JSON document. Image and canvas dimensions are bounded
+embeds a PNG data URL, so it opens locally without fetching remote content. Export offers
+PNG, JPEG and BMP; Save produces the JSON document. JPEG and BMP flatten transparency onto
+the selected background color. Print hides editor controls and prints the canvas. Image and canvas dimensions are bounded
 to 2048 pixels per side and 4,194,304 pixels total. Image import is limited to 20 MiB;
 document input is limited to 25 MiB. History is bounded by 20 states and 48 MiB of
 pixel data; if it fills, the oldest undo states are discarded.
 
 Keyboard shortcuts include Ctrl/Cmd+Z and Y for undo/redo, Ctrl/Cmd+O/S for open/save,
-Ctrl/Cmd+C/X/V for selection operations, P/B/A/E/F/I/T/L/C/R/O/M/G for tools, X to
-swap colors, and brackets to change brush width. Space-drag or middle-drag pans.
+Ctrl/Cmd+C/X/V for selection operations, P/B/A/E/F/I/T/L/C/R/O/M/G/Z for tools, Ctrl/Cmd+A to select all, Delete/Backspace to
+clear the selection, Escape to cancel/deselect, X to swap colors, and brackets to change brush
+width. Space-drag or middle-drag pans.
 
 ## Memorial drawing and private archive
 
@@ -55,5 +59,5 @@ Curve control uses three canvas clicks (start, end, bend). Polygon vertices are 
 and closed with a double-click. GIF import opens a single decoded frame. Memorial export
 does not vectorize shapes, text, fills or imported pixels; it refuses export unless
 freehand strokes are available, and other edits/undo invalidate its stroke history.
-There is no layered editing, lasso selection, transparency-preserving eraser, or
-format-specific JPEG/GIF save.
+There is no layered editing, transparency-preserving eraser, operating-system clipboard
+integration, or animated GIF export.

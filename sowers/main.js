@@ -32,16 +32,18 @@ const positions = [[-10, 3], [1, -10], [12, 4], [-21, -10], [17, -12], [-8, 18],
 const clock = new THREE.Clock()
 const pointer = new THREE.Vector2(), raycaster = new THREE.Raycaster()
 const target = new THREE.Vector3(), desiredTarget = new THREE.Vector3()
-let focusPending = false
+let focusPending = false,returnOverview=false
 let polling = false, modeVersion = 0
 let page = 0, pageThreads = []
 let lastBroadcastThreads = [], broadcastConfigured = false
 let compact = innerWidth <= 700, compactFramedId = null
 let renderDirty=true,lastRender=-Infinity,wasHidden=false
 let updatingControls=false
-let magiObservation=null,lastMagiObservation=null,lastMagiWave=null
+let magiObservation=null,lastMagiObservation=null,lastMagiWave=null,pendingFreshArrival=false,observedEmptyMagi=false
 let outpost,garden,memorials=[],archiveLoaded=false,packets=[],arrival=null
 const memorialTextures=new Map()
+const memorialTextureHashes=new Map()
+let packetCreateCount=0,packetDisposeCount=0
 const usageHUD=mountUsageHUD($('#usage-hud'))
 
 function element(tag, className, value) {
@@ -89,7 +91,7 @@ function setupScene() {
   controls.maxPolarAngle = Math.PI * .47
   controls.minPolarAngle = .15
   controls.target.set(0, 0, 0)
-  controls.addEventListener('start', () => { focusPending = false; setFollow(false);renderDirty=true })
+  controls.addEventListener('start', () => { focusPending = false;returnOverview=false;setFollow(false);renderDirty=true })
   controls.addEventListener('change', () => {if(!updatingControls)renderDirty=true})
   renderer.domElement.addEventListener('keydown',event=>{
     if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-'].includes(event.key))return
@@ -163,18 +165,23 @@ function setupScene() {
       while(object && !object.userData.sowerId) object=object.parent
       if(object?.userData.sowerId){select(object.userData.sowerId);break}
     }
+    const tablets=[...(garden?.userData.entries?.values()||[])].map(item=>item.group)
+    const memorialHit=raycaster.intersectObjects(tablets,true).find(hit=>{let node=hit.object;while(node&&!node.userData.id)node=node.parent;return node?.userData.id})
+    if(memorialHit){let node=memorialHit.object;while(node&&!node.userData.id)node=node.parent;const entry=memorials.find(item=>item.id===node.userData.id);if(entry)showMemorial(entry)}
   })
 }
 
 function clearPackets() {
-  for(const packet of packets){scene?.remove(packet.group);packet.dispose()}
+  for(const packet of packets){scene?.remove(packet.group);packet.dispose();packetDisposeCount++}
   packets=[];arrival=null
 }
 function packetSet(open=true) {
   clearPackets()
+  const origins=outpost?.userData.releasePositions||[]
   for(let i=0;i<3;i++) {
     const packet=createSowerPacket({number:i+1,color:[0xef844a,0x6ba99c,0xd3b157][i],seed:i,includeCandy:false})
-    packet.group.scale.setScalar(3);packet.group.position.set((i-1)*2.1,.03,3.5)
+    packetCreateCount++
+    packet.group.scale.setScalar(3);const p=origins[i]||new THREE.Vector3((i-1)*1.15,4.92,1.9);packet.group.position.copy(p)
     packet.setProgress(open?1:0);packet.group.visible=!open;scene.add(packet.group);packets.push(packet)
   }
 }
@@ -186,8 +193,8 @@ function routeToWork(entry) {
   entry.hop.setWaypoints(points.map(([x,z])=>({x:x-origin.x,z:z-origin.z,yaw:0})))
   entry.routeMode='work';entry.nextHop=(animate.elapsed||0)+8+entry.slot*2
 }
-function startArrival() {
-  if(!renderer||paused||pageThreads.length!==3||!['magi','demo'].includes(mode))return
+function startArrival({replay=false}={}) {
+  if(!renderer||paused||pageThreads.length!==3||!['magi','demo'].includes(mode))return false
   packetSet(false)
   const ordered=[...entries.values()].sort((a,b)=>(a.thread.magiSlot??a.slot)-(b.thread.magiSlot??b.slot))
   ordered.forEach((entry,i)=>{
@@ -195,27 +202,38 @@ function startArrival() {
     entry.hop.reset({x:p.x-entry.group.position.x,z:p.z-entry.group.position.z,yaw:0})
     entry.avatar.position.set(p.x-entry.group.position.x,.03,p.z-entry.group.position.z);entry.avatar.visible=false;entry.routeMode='arrival'
   })
+  if(reducedMotion){
+    ordered.forEach((entry,i)=>{packets[i].setProgress(1);packets[i].group.visible=false;entry.avatar.position.y=.03;entry.avatar.visible=true;routeToWork(entry)})
+    notify('Reduced motion · three packets settled at the ground release points')
+    renderDirty=true
+    return true
+  }
   arrival={started:animate.elapsed||0,entries:ordered,returnCamera:true}
   controls.target.set(0,1.2,3);camera.position.set(14,11,20);focusPending=false;setFollow(false)
-  notify(mode==='demo'?'Design preview · three fictional packet arrivals':'Replaying the recorded three-agent admission')
+  notify(mode==='demo'?'Design preview · three fictional packet arrivals':replay?'Presentation replay · recorded three-agent admission':'New three-agent admission observed')
   renderDirty=true
+  return true
 }
 function syncProtocolVisuals() {
   if(!outpost)return
   const protocol=mode==='magi',show=protocol||mode==='demo'
   outpost.visible=show;garden.visible=protocol
   const readiness=mode==='demo'?{agents:true,dispenser:true,computer:true,campfire:true}:magiObservation?.readiness||{}
-  outpost.userData.setReadiness(readiness);outpost.userData.setPhase(magiObservation?.phase==='campfire'?'review':'work')
-  garden.userData.setReadiness(readiness);garden.userData.setPaused(paused);garden.userData.setReducedMotion(reducedMotion&&paused)
+  outpost.userData.setReadiness(readiness);outpost.userData.setPhase(magiObservation?.phase==='campfire'||magiObservation?.phase==='validating'?'review':magiObservation?.phase==='complete'?'rest':'work')
+  garden.userData.setReadiness(readiness);garden.userData.setPaused(paused);garden.userData.setReducedMotion(reducedMotion)
   $('#protocol-controls').hidden=!show
   $('#wave-label').textContent=mode==='demo'?'DESIGN PREVIEW':magiObservation?`MAGI / WAVE ${magiObservation.number}`:'MAGI / AWAITING OBSERVATION'
   $('#wave-phase').textContent=mode==='demo'?'Fictional crew · real component preview':magiObservation?`${magiObservation.stale?'Last observed · ':''}${magiObservation.phase==='campfire'?'Campfire review':magiObservation.phase==='complete'?'Wave reviewed':magiObservation.phase==='validating'?'Inspecting completed artifacts':'Three distinct tasks'} · ${magiObservation.coordinator.model} / ${magiObservation.coordinator.effort}`:'A recorded three-agent admission will appear here.'
   $('#arrival').disabled=paused||pageThreads.length!==3
-  const first=lastMagiWave===null
+  $('#arrival').textContent=mode==='demo'?'Preview packet drop ↗':'Replay presentation ↗'
   if(protocol&&magiObservation&&lastMagiWave!==magiObservation.id) {
-    lastMagiWave=magiObservation.id;packetSet(true)
-    if(!first&&!magiObservation.stale&&Date.now()-magiObservation.admittedAt<300000)startArrival()
+    const watchedBeforeAdmission=observedEmptyMagi||lastMagiWave!==null
+    lastMagiWave=magiObservation.id
+    observedEmptyMagi=false
+    if(watchedBeforeAdmission&&!magiObservation.stale&&Date.now()-magiObservation.admittedAt<300000)pendingFreshArrival=true
   } else if(mode==='demo'&&packets.length===0)packetSet(true)
+  if(protocol&&!magiObservation)observedEmptyMagi=true
+  if(protocol&&pendingFreshArrival&&!paused&&startArrival())pendingFreshArrival=false
   if(!show)for(const packet of packets)packet.group.visible=false
   usageHUD.setObservation(protocol?magiObservation:null)
 }
@@ -226,28 +244,46 @@ async function pollMemorials() {
     const body=await response.json()
     if(!Array.isArray(body.entries)||body.warnings?.length)throw Error('Memorial archive unavailable; retaining saved images')
     memorials=body.entries
-    const entries=memorials.map(entry=>{
+    const retiredTextures=[]
+    const entries=await Promise.all(memorials.map(async entry=>{
       let texture=memorialTextures.get(entry.id)
+      const art=entry.image,proof=entry.proof
+      const approved=art?.mime==='image/png'&&art.width===512&&art.height===512&&typeof art.dataUrl==='string'&&/^data:image\/png;base64,/.test(art.dataUrl)&&proof?.inspected===true&&proof?.legacy===false&&proof.pngSha256===art.sha256&&/^[a-f0-9]{64}$/i.test(art.sha256||'')
+      if(approved&&memorialTextureHashes.get(entry.id)!==art.sha256) {
+        try {
+          const image=new Image();image.src=art.dataUrl
+          await image.decode()
+          const next=new THREE.Texture(image);next.colorSpace=THREE.SRGBColorSpace;next.needsUpdate=true
+          if(texture)retiredTextures.push(texture)
+          texture=next;memorialTextures.set(entry.id,texture);memorialTextureHashes.set(entry.id,art.sha256)
+        } catch { /* Preserve the prior verified art or legacy drawing if decoding fails. */ }
+      }
       if(!texture) {
         const canvas=document.createElement('canvas');canvas.width=canvas.height=256
         const ctx=canvas.getContext('2d');drawMemorial(ctx,entry,256)
         ctx.globalCompositeOperation='destination-over';ctx.fillStyle='#fff9ed';ctx.fillRect(0,0,256,256)
-        texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;memorialTextures.set(entry.id,texture)
+        texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;memorialTextures.set(entry.id,texture);memorialTextureHashes.set(entry.id,'legacy')
       }
       return {...entry,texture}
-    })
-    garden?.userData.setMemorials(entries,{initial:!archiveLoaded||paused});archiveLoaded=true
+    }))
+    garden?.userData.setMemorials(entries,{initial:!archiveLoaded});archiveLoaded=true
+    retiredTextures.forEach(texture=>texture.dispose())
     const list=$('#memorial-list');list.replaceChildren()
     for(const entry of memorials) {
       const button=element('button','',`Iteration ${entry.iteration}`)
       button.onclick=()=>showMemorial(entry);list.append(button)
     }
-    $('#memorial-empty').hidden=memorials.length>0;renderDirty=true
+    $('#memorial-empty').hidden=memorials.length>0
+    const overflow=garden?.userData.overflow||0
+    $('#memorial-status').textContent=overflow?`${memorials.length-overflow} tablets shown · ${overflow} older image${overflow===1?'':'s'} beyond the garden capacity; full records remain in this archive.`:`${memorials.length} saved iteration${memorials.length===1?'':'s'} · tablet rise follows the four readiness markers.`
+    renderDirty=true
   } catch {$('#memorial-empty').textContent=memorials.length?'Archive unavailable · saved images retained':'The first image arrives after verified work and a full preview.'}
 }
 function showMemorial(entry) {
-  const panel=$('#memorial-story');panel.replaceChildren(element('h2','',`Iteration ${entry.iteration}`),element('strong','',entry.symbol),element('p','',entry.task),element('p','',entry.explanation),element('small','',`${entry.agent} · ${new Date(entry.endedAt).toLocaleString()}`))
-  const canvas=document.createElement('canvas');canvas.width=canvas.height=256;drawMemorial(canvas.getContext('2d'),entry,256);panel.prepend(canvas)
+  const panel=$('#memorial-story'),close=element('button','story-close','Close ×');close.type='button';close.setAttribute('aria-label','Close Iteration story');close.onclick=()=>{panel.hidden=true;$('#memorial-list button')?.focus()}
+  panel.replaceChildren(close,element('h2','',`Iteration ${entry.iteration}`),element('strong','',entry.symbol),element('p','',entry.task),element('p','',entry.explanation),element('small','',`${entry.agent} · ${new Date(entry.endedAt).toLocaleString()}`))
+  if(entry.image?.dataUrl&&entry.proof?.inspected===true){const image=document.createElement('img');image.src=entry.image.dataUrl;image.alt=`Approved Iteration ${entry.iteration} tablet`;panel.prepend(image)}
+  else {const canvas=document.createElement('canvas');canvas.width=canvas.height=256;drawMemorial(canvas.getContext('2d'),entry,256);panel.prepend(canvas)}
   panel.hidden=false
   const item=garden?.userData.entries.get(entry.id)
   if(item&&controls) {
@@ -267,7 +303,8 @@ function resize() {
     compact=nextCompact;compactFramedId=null
     for(const entry of entries.values())entry.group.visible=!compact || mode==='magi' || entry.thread.id===selectedId
     const hub=scene.getObjectByName('mission-marker');if(hub)hub.visible=!compact&&mode==='live'
-    if(compact)focusSelected()
+    if(compact&&mode==='magi')focusProtocolOverview()
+    else if(compact)focusSelected()
     else {controls.target.set(0,0,0);camera.position.set(33,31,41);focusPending=false}
   }
 }
@@ -382,7 +419,7 @@ function update() {
   renderWorld();drawRoster();drawDetail();syncProtocolVisuals()
   app.classList.toggle('magi',mode==='magi')
   $('#memorial-archive').hidden=mode!=='magi'
-  if(compact && compactFramedId!==selectedId){focusSelected();compactFramedId=selectedId}
+  if(compact && compactFramedId!==selectedId){if(mode==='magi')focusProtocolOverview();else{focusSelected();compactFramedId=selectedId}}
   if(scene?.getObjectByName('mission-marker'))scene.getObjectByName('mission-marker').visible=!compact&&mode==='live'
   $('#activity-count').textContent=visible.filter(t=>t.status==='working').length
   $('#checkpoint-count').textContent=visible.reduce((sum,t)=>sum+t.checkpoints.length,0)
@@ -411,15 +448,25 @@ async function poll() {
       broadcastBody=await broadcastResponse.json()
       if(!Array.isArray(broadcastBody.threads))throw Error('Checkpoint broadcast returned an invalid observation')
       broadcastConfigured=Boolean(broadcastBody.configured)
-      lastBroadcastThreads=broadcastBody.threads
+      if(broadcastBody.readError||broadcastBody.warnings?.length) {
+      broadcastBody={...broadcastBody,threads:lastBroadcastThreads.map(thread=>({...thread,running:false,broadcastStale:true})),magi:(broadcastBody.magi||lastMagiObservation)?{...(broadcastBody.magi||lastMagiObservation),stale:true}:null}
+      } else lastBroadcastThreads=broadcastBody.threads
     } catch(error) {
       broadcastBody={threads:lastBroadcastThreads.map(thread=>({...thread,running:false,broadcastStale:true})),magi:lastMagiObservation?{...lastMagiObservation,stale:true}:null,warnings:[`${error.message}. Any retained broadcast observation is historical.`]}
     }
     if(!Array.isArray(body.threads))throw Error('Local observer returned an invalid session list')
     if(mode==='demo' || version!==modeVersion)return
     warnings=[...(body.warnings || []),...(broadcastBody.warnings || [])]
-    try {magiObservation=broadcastBody.magi?{...normalizeMagiObservation(broadcastBody.magi),observedAt:broadcastBody.magi.observedAt,stale:Boolean(broadcastBody.magi.stale)}:null;lastMagiObservation=magiObservation}
+    const previousMagi=lastMagiObservation,watchedEmpty=observedEmptyMagi
+    try {magiObservation=broadcastBody.magi?{...normalizeMagiObservation(broadcastBody.magi,{observedAt:Date.now()}),observedAt:broadcastBody.magi.observedAt,stale:Boolean(broadcastBody.magi.stale)}:lastMagiObservation?{...lastMagiObservation,stale:true}:null;lastMagiObservation=magiObservation}
     catch {magiObservation=lastMagiObservation?{...lastMagiObservation,stale:true}:null;warnings.push('MAGI observation is invalid; retaining historical participants.')}
+    if(magiObservation) {
+      const newAdmission=(previousMagi&&previousMagi.id!==magiObservation.id)||(!previousMagi&&watchedEmpty)
+      const age=Date.now()-magiObservation.admittedAt
+      if(newAdmission&&!magiObservation.stale&&age>=0&&age<300000){pendingFreshArrival=true;lastMagiWave=magiObservation.id}
+      else if(lastMagiWave===null)lastMagiWave=magiObservation.id
+      observedEmptyMagi=false
+    } else if(!previousMagi&&!warnings.length)observedEmptyMagi=true
     threads=mode==='magi'?magiObservedThreads(magiObservation,body.threads):mergeBroadcastThreads(body.threads,broadcastBody.threads || []);lastScan=Date.now();stale=false
     $('#connection').textContent=warnings.length?'Local signal · source warning':'Local signal connected'
     $('#connection').className='live'
@@ -437,7 +484,7 @@ async function poll() {
 }
 
 function select(id) {
-  selectedId=id;drawRoster();drawDetail()
+  selectedId=id;returnOverview=false;drawRoster();drawDetail()
   for(const entry of entries.values())entry.ring.visible=entry.thread.id===id
   if(compact&&mode!=='magi')for(const entry of entries.values())entry.group.visible=entry.thread.id===id
   focusSelected()
@@ -459,7 +506,12 @@ function focusSelected() {
   const direction=camera.position.clone().sub(controls.target).normalize()
   camera.position.copy(controls.target).addScaledVector(direction,23)
 }
-function setFollow(value){follow=value;$('#follow').setAttribute('aria-pressed',String(follow))}
+function setFollow(value){follow=value;if(value)returnOverview=false;$('#follow').setAttribute('aria-pressed',String(follow))}
+function focusProtocolOverview() {
+  if(!controls)return
+  setFollow(false);focusPending=false;returnOverview=false
+  controls.target.set(0,2,3);camera.position.set(50,45,61);controls.update();compactFramedId=selectedId;renderDirty=true
+}
 function setBroadcast(value) {
   broadcast=value;app.classList.toggle('broadcast',value);$('#exit-broadcast').hidden=!value
   $('#broadcast').setAttribute('aria-pressed',String(value));resize()
@@ -481,7 +533,7 @@ function animate(timestamp=performance.now()) {
   updatingControls=false
   const cameraMoving=controlsMoved || focusPending || follow && !paused
   if(!shouldRender({now:timestamp,lastRender,paused,dirty:renderDirty,cameraMoving,hidden:document.hidden}))return
-  const delta=Math.min(clock.getDelta(),.05)
+  const delta=Math.min(clock.getDelta(),.25),steps=Math.ceil(delta/.05),step=delta/steps
   lastRender=timestamp;renderDirty=false
   if(!paused)animate.elapsed=(animate.elapsed||0)+delta
   const elapsed=animate.elapsed || 0
@@ -490,12 +542,13 @@ function animate(timestamp=performance.now()) {
     arrival.entries.forEach((entry,index)=>{
       if(!entries.has(entry.thread.id))return
       const progress=THREE.MathUtils.clamp((age-index*.24)/1.4,0,1)
-      packets[index]?.setProgress(progress);if(packets[index])packets[index].group.visible=progress<1
+      const release=outpost?.userData.releasePositions?.[index]
+      packets[index]?.setProgress(progress);if(packets[index]){packets[index].group.visible=progress<1;if(release)packets[index].group.position.y=release.y*(1-progress)+.08*progress}
       entry.avatar.visible=progress>.18
       if(progress<1){entry.avatar.position.y=.03+Math.sin(progress*Math.PI)*.65}
       else if(entry.routeMode==='arrival'){entry.avatar.position.y=.03;routeToWork(entry)}
     })
-    if(age>2.3) {for(const entry of arrival.entries)entry.avatar.visible=true;arrival=null}
+    if(age>2.3) {for(const entry of arrival.entries)entry.avatar.visible=true;arrival=null;if(mode==='magi'){if(compact)returnOverview=true;else{desiredTarget.set(0,1,1);focusPending=true}}}
   }
   for(const entry of entries.values()) {
     if(!entry.group.visible){entry.label.hidden=true;continue}
@@ -503,7 +556,7 @@ function animate(timestamp=performance.now()) {
     let moving=false
     if(!paused) {
       const reviewing=mode==='magi'&&magiObservation?.phase==='campfire'&&!magiObservation.stale
-      if(reviewing&&entry.routeMode!=='campfire') {
+      if(reviewing&&!arrival&&entry.routeMode!=='campfire') {
         const destination=[[-2.7,8.4],[0,10],[2.7,8.4]][entry.slot]
         const origin=entry.group.position,current=entry.avatar.position.clone().add(origin)
         entry.hop.setWaypoints([[current.x,9.4],[destination[0],9.4],destination].map(([x,z])=>({x:x-origin.x,z:z-origin.z,yaw:Math.atan2(-destination[0],7-destination[1])})))
@@ -515,7 +568,7 @@ function animate(timestamp=performance.now()) {
         entry.nextHop=elapsed+8+entry.slot*1.5
       }
       if(entry.routeMode!=='arrival') {
-        const pose=entry.hop.update(delta)
+        let pose;for(let i=0;i<steps;i++)pose=entry.hop.update(step)
         moving=pose.airborne;entry.avatar.position.set(pose.x,pose.y,pose.z);entry.avatar.rotation.y=pose.yaw;entry.avatar.rotation.z=pose.lean
       }
       entry.avatar.userData.animate?.(elapsed,delta,{status:stale || entry.thread.broadcastStale?'idle':entry.thread.status,moving,selected:entry.thread.id===selectedId})
@@ -524,13 +577,17 @@ function animate(timestamp=performance.now()) {
     }
     entry.ring.position.x=entry.avatar.position.x;entry.ring.position.z=entry.avatar.position.z
   }
-  if(!paused){outpost?.userData.animate(elapsed,{paused:false,reducedMotion:false});garden?.userData.update(delta)}
+  if(!paused){outpost?.userData.animate(elapsed,{paused:false,reducedMotion:false});for(let i=0;i<steps;i++)garden?.userData.update(step)}
   if(follow && entries.has(selectedId)) {
     const entry=entries.get(selectedId)
     desiredTarget.copy(entry.group.position).add(entry.avatar.position)
     focusPending=true
   }
-  if(focusPending) {
+  if(returnOverview&&compact&&mode==='magi') {
+    const desiredCamera=new THREE.Vector3(50,45,61),desired=new THREE.Vector3(0,2,3)
+    controls.target.lerp(desired,1-Math.exp(-delta*2.4));camera.position.lerp(desiredCamera,1-Math.exp(-delta*2.4))
+    if(controls.target.distanceTo(desired)<.05&&camera.position.distanceTo(desiredCamera)<.08)returnOverview=false
+  } else if(focusPending) {
     target.copy(controls.target).lerp(desiredTarget,1-Math.exp(-delta*3))
     const offset=target.clone().sub(controls.target)
     camera.position.add(offset);controls.target.copy(target)
@@ -558,11 +615,11 @@ $('#scope').addEventListener('change',()=>{page=0;update()})
 $('#previous').addEventListener('click',()=>{page--;update()})
 $('#next').addEventListener('click',()=>{page++;update()})
 document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{
-  clearPackets();mode=button.dataset.mode;modeVersion++;threads=mode==='demo'?DESIGN_THREADS:[];stale=false;selectedId=null;page=0
+  clearPackets();mode=button.dataset.mode;modeVersion++;threads=mode==='demo'?DESIGN_THREADS:[];stale=false;selectedId=null;compactFramedId=null;returnOverview=false;page=0
   $('#connection').textContent=mode==='demo'?'Design preview · fictional agents':'Connecting to local agents'
   $('#connection').className='';update();if(mode!=='demo')poll()
 }))
-$('#overview').addEventListener('click',()=>{setFollow(false);focusPending=false;controls?.target.set(0,0,0);camera?.position.set(33,31,41)})
+$('#overview').addEventListener('click',()=>{setFollow(false);focusPending=false;returnOverview=false;controls?.target.set(0,0,0);camera?.position.set(33,31,41)})
 $('#follow').addEventListener('click',()=>{setFollow(!follow);if(follow)focusSelected()})
 $('#orbit').addEventListener('click',()=>{orbit=!orbit;$('#orbit').setAttribute('aria-pressed',String(orbit))})
 $('#motion').setAttribute('aria-pressed',String(paused))
@@ -575,9 +632,9 @@ $('#source-info').addEventListener('click',()=>{
   $('#source-info').setAttribute('aria-expanded',String(!$('#source-notes').hidden))
 })
 $('#exit-broadcast').addEventListener('click',()=>setBroadcast(false))
-$('#arrival').addEventListener('click',startArrival)
+$('#arrival').addEventListener('click',()=>startArrival({replay:true}))
 addEventListener('keydown',event=>{if(event.key==='Escape'){setBroadcast(false);$('#memorial-story').hidden=true}})
 if(mode==='demo') {threads=DESIGN_THREADS;$('#connection').textContent='Design preview · fictional agents'}
 update();poll();void pollMemorials();setInterval(poll,8000);setInterval(pollMemorials,8000);animate()
-window.sowersMissionReview={entries,get magi(){return magiObservation},get outpost(){return outpost},get garden(){return garden},get packets(){return packets},get usage(){return usageHUD.snapshot},get renderer(){return renderer},get scene(){return scene},get paused(){return paused}}
+window.sowersMissionReview={entries,get magi(){return magiObservation},get outpost(){return outpost},get garden(){return garden},get packets(){return packets},get packetMetrics(){return {created:packetCreateCount,disposed:packetDisposeCount}},get arrival(){return arrival},get usage(){return usageHUD.snapshot},get renderer(){return renderer},get scene(){return scene},get camera(){return camera},get paused(){return paused}}
 if(params.get('broadcast')==='1')setBroadcast(true)

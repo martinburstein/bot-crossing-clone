@@ -45,6 +45,23 @@ test('caller-owned canvas texture is never disposed by garden teardown',()=>{
   const g=createMemorialGarden({memorials:[entry('a',1,texture)]});g.userData.dispose();assert.equal(disposeCalls,0);texture.dispose()
 })
 
+test('same immutable entry can upgrade from legacy art to an approved caller-owned PNG texture',()=>{
+  const legacy=new THREE.CanvasTexture({width:2,height:2,getContext:()=>null}),approved=new THREE.Texture({width:512,height:512})
+  const g=createMemorialGarden({memorials:[entry('upgrade',1,legacy)]}),item=g.userData.entries.get('upgrade')
+  let art=item.group.children.find(o=>o.geometry.type==='PlaneGeometry');assert.equal(art.material.map,legacy)
+  g.userData.setMemorials([entry('upgrade',1,approved)])
+  assert.equal(art.material.map,approved);assert.equal(g.userData.count,1)
+  let disposed=0;approved.addEventListener('dispose',()=>disposed++);g.userData.dispose();assert.equal(disposed,0)
+  approved.dispose();legacy.dispose()
+})
+
+test('new marks settle immediately under reduced motion, including before readiness',()=>{
+  const g=createMemorialGarden();g.userData.setReducedMotion(true);g.userData.setMemorials([entry('static',1)])
+  const mark=g.userData.entries.get('static').group
+  assert.equal(mark.position.y,0);assert.equal(mark.userData.riseComplete,true)
+  g.userData.setReadiness(all);g.userData.update(.05);assert.equal(mark.position.y,0);g.userData.dispose()
+})
+
 test('invalid and excessive animation deltas are safely bounded',()=>{
   const g=createMemorialGarden({readiness:all});g.userData.setMemorials([entry('a',1)]);const mark=g.userData.entries.get('a').group
   g.userData.update(Infinity);assert.equal(mark.position.y,-2);g.userData.update(-1);assert.equal(mark.position.y,-2)

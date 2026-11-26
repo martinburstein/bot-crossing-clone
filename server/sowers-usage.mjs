@@ -15,6 +15,13 @@ export function measuredChat(snapshot,id) {
     totalTokens:count(chat.totalTokens),inputTokens:count(chat.usage?.input_tokens),
     cachedInputTokens:count(chat.usage?.cached_input_tokens),outputTokens:count(chat.usage?.output_tokens)}
 }
+function retainVerified(previous,current) {
+  if(previous?.totalTokens!==null&&previous?.totalTokens!==undefined&&
+    (current.totalTokens===null||current.totalTokens<previous.totalTokens)) {
+    return {...previous,status:'error',stale:true}
+  }
+  return current
+}
 async function monitor(file,id,account) {
   const args=[file,'--thread',id,'--json',...account?[]:['--tokens-only','--include-agents']]
   const {stdout}=await execute(process.execPath,args,{timeout:15000,maxBuffer:256*1024,windowsHide:true})
@@ -24,19 +31,20 @@ async function monitor(file,id,account) {
  * command/path arguments, no model turns, one account read per cached minute. */
 export function createSowersUsageReader({run=monitor,now=Date.now,
   file=process.env.SOWERS_USAGE_MONITOR||path.join(os.homedir(),'.codex/skill-repos/ai-tools/token-monitor.cjs'),
-  threadId=process.env.SOWERS_THREAD_ID||process.env.CODEX_THREAD_ID,
+  threadId=process.env.SOWERS_THREAD_ID,
   observation=async()=> (await loadSowersBroadcast()).magi,
   ttl=60000}={}) {
   let currentKey='',cached=null,cachedAt=-Infinity,pending=null
   return async function read() {
     const magi=await observation().catch(()=>null)
-    const selected=threadId||magi?.coordinator?.threadId
+    const selected=threadId||magi?.coordinator?.threadId||process.env.CODEX_THREAD_ID
     const participants=(magi?.agents||[]).filter(a=>a.nativeId?.startsWith('codex:')&&UUID.test(a.nativeId.slice(6))).slice(0,3)
     const key=JSON.stringify([selected,...participants.map(a=>a.nativeId)])
     if(key!==currentKey){currentKey=key;cached=null;cachedAt=-Infinity;pending=null}
     if(cached&&now()-cachedAt<ttl)return cached
     if(pending)return pending
     const work=async()=>{
+      const previous=cached
       const at=now(),empty={status:'unavailable',reportedAt:null,totalTokens:null,inputTokens:null,cachedInputTokens:null,outputTokens:null}
       const result={observedAt:at,source:'Maintained AI Tools token monitor',scope:'Lifetime processed tokens per local chat; cached input is already included. Account allowance is shared by the sign-in.',
         chat:{...empty},workers:participants.map(a=>({id:a.id,nativeId:a.nativeId,...empty})),
@@ -51,13 +59,19 @@ export function createSowersUsageReader({run=monitor,now=Date.now,
         const remaining=typeof a?.remainingPercent==='number'&&Number.isFinite(a.remainingPercent)&&a.remainingPercent>=0&&a.remainingPercent<=100?a.remainingPercent:null
         result.account={status:typeof a?.status==='string'?a.status:'unavailable',reportedAt:timestamp(a?.reportedAt),remainingPercent:remaining,windowMinutes:count(a?.windowMinutes),resetsAt:count(a?.resetsAt)}
       } else result.warnings.push('The local usage monitor could not be read.')
-      result.workers=result.workers.map((worker,index)=>values[index+1].status==='fulfilled'?{...worker,...measuredChat(values[index+1].value,worker.nativeId.slice(6))}:worker)
+      result.chat=retainVerified(previous?.chat,result.chat)
+      result.workers=result.workers.map((worker,index)=>{
+        const next=values[index+1].status==='fulfilled'?{...worker,...measuredChat(values[index+1].value,worker.nativeId.slice(6))}:worker
+        return retainVerified(previous?.workers.find(old=>old.nativeId===worker.nativeId),next)
+      })
       result.workersMeasured=result.workers.filter(w=>w.totalTokens!==null).length
+      result.workersFresh=result.workers.filter(w=>w.totalTokens!==null&&!w.stale&&w.status==='connected').length
+      result.waveStale=result.workers.some(w=>w.stale||w.status!=='connected')
       if(participants.length===3&&result.workersMeasured===3)result.waveTokens=result.workers.reduce((sum,w)=>sum+w.totalTokens,0)
       if(result.workersMeasured<participants.length)result.warnings.push('Some worker token reports are not yet available.')
-      if(cached&&result.chat.totalTokens===null&&result.account.remainingPercent===null){
-        return {...cached,stale:true,warnings:result.warnings,attemptedAt:at}
-      }
+      if(result.chat.stale||result.workers.some(w=>w.stale))result.warnings.push('A token source is unavailable or lower than its verified cumulative total; retained readings are historical.')
+      if(previous&&result.account.remainingPercent===null&&previous.account.remainingPercent!==null)result.account={...previous.account,status:'error'}
+      if(values.every(v=>v.status==='rejected')){result.stale=true;result.attemptedAt=at}
       return result
     }
     const request=work().then(result=>{

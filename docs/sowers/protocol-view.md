@@ -1,0 +1,9 @@
+# MAGI scene presentation
+
+The mission viewer presents the current read-only MAGI broadcast. Its first observation establishes a historical baseline and does not replay an admission. A later distinct, fresh observation queues one three-packet presentation; if motion is paused, that presentation starts on resume. The presentation replay control intentionally replays the current recorded admission for inspection. It creates one numbered packet per observed slot, uses the outpost's release positions, then shows the existing station avatars. Packets and hops are visual only and do not report work progress.
+
+The raised nest exports three ground socket positions and three release origins. The release origins sit at the dispenser chutes; the foil packets fall from there during their opening animation. The Sol computer, dispenser, campfire and worker seats respond to the four observed readiness flags. Work, review and rest phases adjust the console and fire highlights without deriving phase from animation.
+
+Saved Iterations are immutable archive records. Older stroke entries continue to use the legacy preview renderer. A PNG is shown only when the archive reader returns an inspected image with matching PNG proof; approval upgrades update the existing tablet texture without replaying its rise. Archive polling keeps prior images when the reader reports a warning. Garden capacity and rejected count are exposed in the archive panel; the archive list remains available for all returned records. The garden owns its tablet geometry/materials, while the caller owns and disposes image textures.
+
+Pause stops packet, hop and tablet motion, preserving current poses. New tablets wait behind every readiness gate and resume from their current height. Reduced motion settles new tablets and release presentations immediately. Hidden-tab time is discarded. Visible simulation advances in bounded 50ms steps, up to a 250ms frame delta.

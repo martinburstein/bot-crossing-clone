@@ -1,0 +1,7 @@
+# Sowers artifact history
+
+Memorial iteration numbers belong to the private product archive and are assigned only after a reviewed Paint preview is approved. Archive append validates every existing record, exact ordinal, unique completion ID, normalized symbol and drawing, and every persisted image/proof before it checks retries. A same completion ID with identical normalized strokes is idempotent; if its old entry has no image, an approved preview can attach image and provenance while preserving its iteration and `createdAt`. Changed content under that ID is rejected.
+
+New entries preserve the inspected 512×512 PNG as a bounded `data:image/png;base64` image with SHA-256. Their proof binds the exact draft bytes, normalized memorial, CLI plus Paint core source, and PNG digest, along with approval time and reviewer. The viewer serves the immutable PNG and a sanitized proof record. Older stroke-only iterations are explicitly returned as `legacy-strokes` with `approvalEvidence: not-embedded`; they retain their original strokes, dates and iteration numbers and can be upgraded only by previewing and approving the identical memorial after source freeze.
+
+Preview, receipt and approval files are local CLI sidecars. The archive is atomically replaced under an exclusive lock; a lock already present fails closed. Reader access is read-only and bounded. A missing archive is empty; malformed or changing archive data produces a warning rather than a valid-looking history.

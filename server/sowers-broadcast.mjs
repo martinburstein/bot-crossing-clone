@@ -1,12 +1,17 @@
 import fsp from 'node:fs/promises'
 import { constants } from 'node:fs'
 import path from 'node:path'
-import { normalizeMagiObservation } from '../sowers/magi-observation.mjs'
+import { createMagiObservationGuard } from '../sowers/magi-observation.mjs'
 
 const MAX_BYTES = 1024 * 1024
 const DEFAULT_MAX_AGE_MS = 30_000
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
 const own = (object, key) => Object.hasOwn(object, key)
+const magiGuards=new Map()
+function guardFor(file) {
+  if(!magiGuards.has(file)){if(magiGuards.size>=32)magiGuards.delete(magiGuards.keys().next().value);magiGuards.set(file,createMagiObservationGuard())}
+  return magiGuards.get(file)
+}
 
 function text(value, label, fallback = '') {
   if (value === undefined) return fallback
@@ -96,6 +101,7 @@ export async function loadSowersBroadcast({ file = process.env.SOWERS_BROADCAST_
     return result
   }
   let handle
+  const magiGuard=guardFor(file)
   try {
     handle = await fsp.open(file, constants.O_RDONLY | (constants.O_NONBLOCK || 0))
     const before = await handle.stat()
@@ -129,10 +135,22 @@ export async function loadSowersBroadcast({ file = process.env.SOWERS_BROADCAST_
       ? 'Sowers broadcast observation is in the future; showing historical evidence only.'
       : 'Sowers broadcast observation is stale; showing historical evidence only.')
     result.observedAt = snapshot.observedAt
-    if (own(snapshot,'magi')) result.magi = {...normalizeMagiObservation(snapshot.magi),observedAt:snapshot.observedAt,stale}
+    if (own(snapshot,'magi')) {
+      try {
+        if(snapshot.observedAt>now)throw Error('MAGI observation time is in the future')
+        result.magi={...magiGuard.accept(snapshot.magi,snapshot.observedAt),stale}
+      } catch(error) {
+        result.magi=magiGuard.last?{...magiGuard.last,stale:true}:null
+        result.warnings.push(`${error.message}; any retained MAGI observation is historical.`)
+      }
+    } else if(magiGuard.last) {
+      result.magi={...magiGuard.last,stale:true};result.warnings.push('MAGI observation missing; retaining historical participants.')
+    }
     result.threads = threads.map(entry => ({ ...entry, running: stale ? false : entry.running,
       broadcastStale: stale, broadcastObservedAt: snapshot.observedAt }))
   } catch (error) {
+    result.readError=true
+    if(magiGuard.last)result.magi={...magiGuard.last,stale:true}
     // Avoid returning local paths or raw JSON text in errors sent to the viewer.
     const detail = error instanceof SyntaxError ? 'snapshot is not valid JSON'
       : error?.code ? `snapshot is unreadable (${error.code})` : error.message

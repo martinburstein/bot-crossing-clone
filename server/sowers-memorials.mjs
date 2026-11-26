@@ -3,6 +3,7 @@ import { constants } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { validateMemorial, memorialSymbolKey, memorialVisualKey } from '../sowers/paint/core.mjs'
+import { validatePng, validateArchive } from '../tools/sowers-memorial.mjs'
 
 const defaultFile=fileURLToPath(new URL('../data/sowers-memorials.json',import.meta.url))
 /** Artifact history only. Reading it cannot mark tasks complete or dispatch work. */
@@ -18,15 +19,19 @@ export async function loadSowersMemorials({file=process.env.SOWERS_MEMORIAL_FILE
     const after=await handle.stat()
     if(length!==before.size||after.size!==before.size||after.mtimeMs!==before.mtimeMs)throw Error('Memorial archive changed during read.')
     const value=JSON.parse(bytes.subarray(0,length).toString('utf8'))
-    if(value.version!==1||!Array.isArray(value.entries))throw Error('Unsupported memorial archive.')
-    const ids=new Set(),symbols=new Set(),images=new Set()
-    const entries=value.entries.map((entry,index)=>{
+    validateArchive(value)
+    const entries=value.entries.map(entry=>{
       const next=validateMemorial(entry)
-      if(entry.iteration!==index+1||ids.has(next.sessionId)||symbols.has(memorialSymbolKey(next))||images.has(memorialVisualKey(next)))throw Error('Memorial archive identity/Iteration sequence is invalid.')
-      ids.add(next.sessionId);symbols.add(memorialSymbolKey(next));images.add(memorialVisualKey(next))
-      return {...next,id:next.sessionId,iteration:entry.iteration}
+      const legacy=!entry.image
+      let image=null
+      if(entry.image){
+        const encoded=entry.image.dataUrl.slice('data:image/png;base64,'.length)
+        const png=validatePng(Buffer.from(encoded,'base64'))
+        image={mime:'image/png',width:512,height:512,dataUrl:'data:image/png;base64,'+png.toString('base64'),sha256:entry.image.sha256}
+      }
+      const proof=legacy?{legacy:true,status:'legacy-strokes',approvalEvidence:'not-embedded'}:{legacy:false,inputSha256:entry.proof.inputSha256,normalizedSha256:entry.proof.normalizedSha256,sourceSha256:entry.proof.sourceSha256,pngSha256:entry.proof.pngSha256,approvedAt:entry.proof.approvedAt,inspectedBy:entry.proof.inspectedBy,inspected:true}
+      return {...next,id:next.sessionId,iteration:entry.iteration,createdAt:entry.createdAt,image,proof}
     })
-    if(value.nextIteration!==undefined&&value.nextIteration!==entries.length+1)throw Error('Memorial archive sequence is invalid.')
     result.entries=entries;result.nextIteration=entries.length+1
   } catch(error) {
     if(error.code!=='ENOENT')result.warnings.push(error instanceof SyntaxError?'Memorial archive is not valid JSON.':'Memorial archive unavailable; existing images remain historical.')

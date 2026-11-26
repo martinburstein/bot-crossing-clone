@@ -22,3 +22,15 @@ test('failed refresh retains the last verified reading as explicitly stale, conf
  const before=await read();failed=true;now=60001;const after=await read();assert.equal(after.chat.totalTokens,before.chat.totalTokens);assert.equal(after.stale,true);assert.doesNotMatch(JSON.stringify(after),/private error contents/)
  const missing=await createSowersUsageReader({file:'relative',threadId:'invalid',observation,run:()=>{throw Error('must not execute')}})();assert.equal(missing.account.remainingPercent,null)
 })
+test('scoped cumulative counts retain their high-water reading while account resets remain independent',async()=>{
+ let now=0,total=110,remaining=0
+ const read=createSowersUsageReader({now:()=>now,file:'/test/monitor.cjs',threadId:id(9),observation,run:async(file,thread)=>{const r=report(thread,total);r.account.remainingPercent=remaining;return r}})
+ await read();now=60001;total=20;remaining=100;const r=await read()
+ assert.equal(r.chat.totalTokens,110);assert.equal(r.chat.stale,true);assert.equal(r.waveTokens,330);assert.equal(r.waveStale,true);assert.equal(r.workersFresh,0);assert.equal(r.account.remainingPercent,100)
+ now=120002;total=120;const fresh=await read();assert.equal(fresh.chat.totalTokens,120);assert.equal(fresh.chat.stale,undefined);assert.equal(fresh.workersFresh,3)
+})
+test('usage follows the explicitly observed coordinator rather than an unrelated launch chat',async()=>{
+ const calls=[]
+ const read=createSowersUsageReader({file:'/test/monitor.cjs',observation:async()=>({coordinator:{threadId:id(8)},agents:[]}),run:async(file,thread)=>{calls.push(thread);return report(thread)}})
+ const r=await read();assert.deepEqual(calls,[id(8)]);assert.equal(r.chat.totalTokens,110)
+})
