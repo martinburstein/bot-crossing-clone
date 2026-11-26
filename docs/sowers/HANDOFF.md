@@ -1,30 +1,31 @@
-# Sowers handoff
+# Sowers — candy redesign checkpoint
 
-Saved 2026-11-25, America/Los_Angeles. Separate branch: `codex/sowers`. Local working copy: `Documents/ChatGPT/Sowers`. Existing newsletter workspace and the pre-existing Bot Crossing installation were preserved.
+25 November 2026, 22:22 Pacific. Branch: `codex/sowers` in `/Users/martinburstein/Documents/ChatGPT/Sowers`. This supersedes the [first-build handoff](HANDOFF-FIRST-BUILD.md). The user's minimum work window is 23:30 Pacific; final sustained mission evidence remains pending at this checkpoint.
 
-## Ready to review
+## Open the work
 
-- `/sowers/`: live local sessions, nine stations per page, recent/working/all scope, search, selection/follow/orbit, public activity, source warnings and clean broadcast composition.
-- `/sowers/?preview=1`: three fictional Sowers and fixed construction measures.
-- `/sowers/studio/`: six gestures, walking, palette and close-up masked helmet study.
-- `/sowers/assembly/`: seeded habitat/power/relay, five construction phases, fictional checkpoint extension study.
+The read-only production viewer is at `http://127.0.0.1:5286/sowers/`; the candy creator is `/sowers/design/`, character studio `/sowers/studio/`, and procedural construction study `/sowers/assembly/`. `npm run sowers` builds/starts the viewer if needed. Preview fixtures use `/sowers/?preview=1`. Live viewing launches no models or agents.
 
-Build with `npm ci && npm run build`, launch with `npm run sowers`, then open `http://127.0.0.1:5286/sowers/`. The local production viewer was left running on this port at handoff. Stop that process before starting another copy on the same port. No agent/model work is scheduled or launched by the viewer.
+## Current design
 
-## Evidence and validation
+Scout leads: broad rounded helmet, compact seed-packet body, connected mittens/boots, covered dark face, happy arches and one seed chest stamp. Seed and Bud remain alternatives. The prior inflated rig is archived. Six status poses carry the same neutral character; the actual positive candy master is shown independently from digital finish and animation.
 
-Three MAGI waves used three actual workers each, with all peer reviews recorded in [MAGI.md](MAGI.md). Final suite: 110 tests passed, zero failures. Production build passed. Production browser verification passed thirteen scenarios with no page errors: preview totals, selection/search, broadcast/Escape, pause, source merging, pagination/scope, text escaping, mode-switch race, mobile overflow, studio reduced motion, paused keyboard repaint, assembly evidence isolation and WebGL fallback. Both development and production dependency audits report zero vulnerabilities after a compatible lockfile refresh.
+The canonical v3 face uses the exact broad-moderate study profile: 0.55 mm mask recess and 0.40 mm eye rise inside a 30 × 6 mm overall master. The main eye crests measure approximately 0.96–0.98 mm; smaller curved-tip radii remain. All digital, print and physical paths come from `sowers/candy/silhouettes.mjs`. Three positive STLs, dimensional sheets, source/parameter hashes and independent geometric checks are retained in `public/sowers/candy-form/`; earlier v1/v2 evidence is preserved separately. Stronger relief, rounded top edge and an actual moderate-derived four-cavity negative coupon remain controlled studies in `public/sowers/candy-studies/`.
 
-Measured mission rendering is about 30Hz while animation time tracks wall time. Static paused scenes submit zero rendering calls; keyboard camera input repaints once and settles. Actual OS-background throttling was not verified in headless Chrome. Character studio retains its independent smooth loop.
+The creator includes original wordmark/one-ink downloads, Citrus/Lime/Berry packaging concepts, responsive controls, actual STL verification, source evidence drawer, keyboard and reduced-motion support. Concept images are distinct from code renders; exact built-in ImageGen prompts are in `docs/sowers/candy/imagegen-prompts.md`.
 
-## Deliberate limits
+## Agent watching and progress
 
-Native session state tells us whether an agent is running; it usually does not provide a task completion denominator. Such bases stay unmeasured. Checkpoints build auxiliary hardware without inventing a percentage. The optional broadcast reader requires a producer-supplied local snapshot; native Codex broadcast auto-export is not implemented. The snapshot reader and native adapters are read-only. Unconfigured optional Swarm protocol state can produce a source warning while native sessions remain visible.
+Native status remains authoritative. Optional local broadcast snapshots contribute explicit checkpoints and progress without overriding fresh native running state. Public latest commentary/tool names are bounded; reasoning and tool arguments are excluded. Source warnings, stale-history retention, nine/three paging, search, selection and broadcast mode remain available. Construction advances from reported progress or accepted checkpoints, never token count, transcript size or elapsed time. See `broadcast.md` and `research.md`.
 
-Native public activity is bounded to explicitly public commentary/final text and sanitized tool names. It excludes private reasoning, arguments and tool output. Cold activity outside the last 128 KiB may be unavailable; retained records show their source date/time. See [activity.md](activity.md) for cache limitations.
+## Verification at this checkpoint
 
-Historical Waypoint books and a real Mars Mission image archive were found. The mm002 balaclava astronaut linked by the old brief was visually corroborated by an accessible online retail photograph. An isolated photo of that minifigure was not located in the user's GitHub; negative filename searches do not establish absence from unlabeled/deleted assets. Private archive-specific negative search details stay in ignored local work notes.
+Full suite: 131/131 passing. Production build passed. Eleven mascot checks cover 4,320 poses, finite/grounded geometry, connected form/no scaling and exact neutral reset. Forty-five actual small-render pose comparisons distinguish all status pairs at 32/64/128 px. Independent STL/cavity checks establish closure, orientation, topology, dimensions, nested sections and source fidelity. These establish geometry and behavior, not manufacturing performance.
 
-## Allowance and stop decision
+Prior frozen actual-master viewer run: 903.048 seconds / 282 cycles, zero errors/reloads/source changes and stable live resources. The final v3 browser pass and immutable production mission soak through at least 23:30 Pacific are still pending; do not present either as passed until their reports exist. Final mission fixtures are browser-local and do not modify native agent records.
 
-The maintained usage monitor read 11% at admission, 10% during implementation and 9% at closeout. The initial Sowers build, reference recovery, integration, peer review and verification reached a complete checkpoint before the requested 2% reserve. Work stopped at that checkpoint, preserving the remaining allowance. No reset credits or paid services were used. Resume with visual feedback on the three equal design ingredients, or connect an explicit checkpoint broadcast producer using [broadcast.md](broadcast.md).
+## Remaining evidence and boundaries
+
+No consumer preference test, market clearance, recipe, sour-sanding readability, release trial, shrink compensation or production-tool approval exists. The flat drafted body has sharp outer front/back perimeter joins; the separately rounded-top study is not the canonical master. Physical proof with a confectionery supplier is the next necessary manufacturing step; no outreach or purchase has been made.
+
+The maintained allowance monitor read 7% at 22:17 Pacific. Preserve the requested approximately 2% reserve. No reset credits or paid services were used. MAGI wave 6 remains open until the mission soak completes and the same three agents perform their joint peer review. Record final results, stop reason, actual allowance and time before safe closeout.

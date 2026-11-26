@@ -6,7 +6,7 @@ import { getCandyFeatures, candySegmentsPath, getCandyContour } from '../candy/s
 
 // Drawn here rather than relying on an external font. Round terminals, a tilted O,
 // and a wide W make the compact mark legible on the small packaging studies.
-const wordmark = `<svg class="wordmark" viewBox="0 0 552 108" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"><path d="M72 25C58 9 17 12 14 34C10 58 75 46 75 72C74 98 29 99 11 82"/><ellipse cx="129" cy="55" rx="31" ry="36" transform="rotate(-9 129 55)"/><path d="M179 20L196 91L220 42L243 91L260 20M340 20H288V91H340M288 54H328M374 91V20H403Q440 20 437 43Q436 62 405 62H374M406 62L440 91M533 25C519 9 478 12 475 34C471 58 536 46 536 72C535 98 490 99 472 82"/></g><path d="M127 20Q125 5 141 4Q143 17 127 20Z" fill="currentColor"/></svg>`;
+const wordmark = `<svg class="wordmark" viewBox="0 0 540 108" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"><path d="M72 25C58 9 17 12 14 34C10 58 75 46 75 72C74 98 29 99 11 82"/><ellipse cx="133" cy="55" rx="31" ry="36" transform="rotate(-9 133 55)"/><path d="M188 20L205 91L229 42L252 91L269 20M345 20H293V91H345M293 54H333M369 91V20H398Q435 20 432 43Q431 62 400 62H369M401 62L435 91M520 25C506 9 465 12 462 34C458 58 523 46 523 72C522 98 477 99 459 82"/></g><path d="M131 20Q129 5 145 4Q147 17 131 20Z" fill="currentColor"/></svg>`;
 document.querySelectorAll('[data-wordmark]').forEach(el => { el.innerHTML = wordmark; });
 
 const variants = {
@@ -15,9 +15,9 @@ const variants = {
   bud: { name: 'Bud', number: '03', short: 'The leaf ranger', text: 'A broad leaf crown and compact shield body. A bolder sprout cue with attached mitten tabs.', strength: 'The strongest seed cue' },
 };
 const flavors = {
-  citrus: { name: 'citrus concept', color: '#ff9848', background: '#ffa24b', ink: '#382338', pop: '#edf16b', label: 'Citrus<br>scout.', tilt: '-4deg' },
-  lime: { name: 'lime concept', color: '#c7e45c', background: '#d2e965', ink: '#412c53', pop: '#a987d2', label: 'Lime<br>littleling.', tilt: '2deg' },
-  berry: { name: 'berry concept', color: '#e96392', background: '#c6a1e6', ink: '#4a2341', pop: '#f77997', label: 'Berry<br>brave.', tilt: '-2deg' },
+  citrus: { name: 'citrus concept', color: '#ff9848', background: '#ffa24b', ink: '#382338', pop: '#edf16b', label: 'Citrus.', tilt: '-4deg' },
+  lime: { name: 'lime concept', color: '#c7e45c', background: '#d2e965', ink: '#412c53', pop: '#a987d2', label: 'Lime.', tilt: '2deg' },
+  berry: { name: 'berry concept', color: '#e96392', background: '#c6a1e6', ink: '#4a2341', pop: '#f77997', label: 'Berry.', tilt: '-2deg' },
 };
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const state = { variant: 'scout', flavor: 'citrus', material: 'matte', monochrome: false, pose: 'candy', source: 'master', status: 'idle', paused: true, time: 0 };
@@ -29,16 +29,19 @@ const updateSourceControls = () => {
   document.querySelectorAll('[data-source]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.source === state.source)));
   document.querySelectorAll('[data-pose], #play').forEach(button => { button.disabled = !renderer || state.source === 'master'; });
   $('#status').disabled = !renderer || state.source === 'master' || state.pose !== 'agent';
-  $('#master-status').hidden = state.source !== 'master';
-  $('#model-caption').textContent = `${variants[state.variant].name} · ${state.source === 'master' ? 'actual positive master / one color' : 'digital agent'}`;
+  $('#character-controls').hidden = state.source !== 'agent';
+  $('#play').hidden = state.source !== 'agent';
+  $('#master-evidence').hidden = state.source !== 'master' || !renderer;
+  $('#master-status').hidden = state.source !== 'master' && !!renderer;
+  $('#model-caption').textContent = `${variants[state.variant].name} · ${state.source === 'master' ? 'actual positive master' : 'digital character'}`;
 };
 const announce = text => { $('#announcement').textContent = text; };
 
 /** Front-view art uses the very same quadratic contour as the 3D extrusion. */
 function characterSvg(variant, color, { silhouette = false, className = '', label = '' } = {}) {
   const features = getCandyFeatures(variant);
-  const featurePath = (feature, fill, opacity = 1) => `<path d="${candySegmentsPath(feature.segments)}" fill="${fill}" opacity="${opacity}"/>`;
-  return `<svg class="${className}" viewBox="-.55 -1.06 1.1 1.12" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'}><g transform="scale(1,-1)"><path d="${getCandyContour(variant)}" fill="${color}"/>${silhouette ? '' : featurePath(features.helmet, '#fff5ce', .25) + featurePath(features.face, '#33433c') + features.eyes.map(eye => featurePath(eye, '#fff5ce')).join('') + featurePath(features.chest, '#fff5ce', .6)}</g></svg>`;
+  const featurePath = (feature, fill, opacity = 1, name = '') => `<path data-feature="${name}" d="${candySegmentsPath(feature.segments)}" fill="${fill}" opacity="${opacity}"/>`;
+  return `<svg class="${className}" viewBox="-.55 -1.06 1.1 1.12" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'}><g transform="scale(1,-1)"><path d="${getCandyContour(variant)}" fill="${color}"/>${silhouette ? '' : featurePath(features.helmet, '#fff5ce', .25) + featurePath(features.face, '#33433c', 1, 'face') + features.eyes.map(eye => featurePath(eye, '#fff5ce')).join('') + featurePath(features.chest, '#fff5ce', .6)}</g></svg>`;
 
 }
 
@@ -57,7 +60,7 @@ function refreshFlatArt() {
   renderPacks();
   $('#fallback-character').innerHTML = characterSvg(state.variant, state.monochrome ? '#211c2b' : flavors[state.flavor].color, { silhouette: state.monochrome });
   $('#stage-kicker').textContent = `${variants[state.variant].number} / ${variants[state.variant].name.toUpperCase()}`;
-  $('#model-caption').textContent = `${variants[state.variant].name} · ${state.monochrome ? 'one-color silhouette' : flavors[state.flavor].name}`;
+  updateSourceControls();
   document.querySelectorAll('[data-quick-variant]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.quickVariant === state.variant)));
 }
 
@@ -101,7 +104,7 @@ function setPose(pose) {
   if (pose === 'candy') state.paused = true;
   updatePlayback();
   refreshModel();
-  announce(pose === 'agent' ? 'Agent pose selected. Animation is available in the hero.' : 'Candy form selected. The single-piece silhouette is shown at rest.');
+  announce(pose === 'agent' ? 'Animated character selected. Use Play or Pause to inspect the pose.' : 'Character at rest.');
 }
 document.querySelectorAll('[data-pose]').forEach(button => button.addEventListener('click', () => setPose(button.dataset.pose)));
 $('#status').disabled = true;
@@ -110,8 +113,7 @@ $('#monochrome').addEventListener('click', () => {
   state.monochrome = !state.monochrome;
   $('#monochrome').setAttribute('aria-pressed', String(state.monochrome));
   refreshFlatArt();
-  refreshModel();
-  announce(state.source === 'master' ? 'The candy master always uses one color. Packaging silhouette comparison updated.' : state.monochrome ? 'One-color silhouette mode on. Face details hidden.' : 'Full color restored.');
+  announce(state.monochrome ? 'Silhouette check on. Face details hidden on cards and packaging only.' : 'Full artwork restored on cards and packaging.');
 });
 document.querySelectorAll('[data-source]').forEach(button => button.addEventListener('click', () => {
   state.source = button.dataset.source;
@@ -119,7 +121,7 @@ document.querySelectorAll('[data-source]').forEach(button => button.addEventList
   updateSourceControls();
   updatePlayback();
   refreshModel();
-  announce(state.source === 'master' ? 'Actual exported candy master. One material, physical relief details.' : 'Digital agent selected.');
+  announce(state.source === 'master' ? 'Actual exported candy master. One material, physical relief details.' : 'Digital character selected. Finish, pose and expression controls are now available.');
 }));
 $('#play').addEventListener('click', () => {
   if (state.pose === 'candy') { setPose('agent'); state.paused = false; }
@@ -219,14 +221,15 @@ if (renderer) {
     needsRender = true;
     if (state.source === 'agent') {
       Object.assign(masterEvidence, { status: 'inactive' });
-      mascot = createCandySower({ variant: state.variant, color: flavors[state.flavor].color, seed: 4, materialMode: state.monochrome ? 'silhouette' : state.material });
+      mascot = createCandySower({ variant: state.variant, color: flavors[state.flavor].color, seed: 4, materialMode: state.material });
       scene.add(mascot);
       poseMascot();
       return;
     }
     const variant = state.variant;
     Object.assign(masterEvidence, { status: 'loading', variant });
-    $('#master-status').textContent = `Loading ${variants[variant].name} exported STL…`;
+    $('#master-status').textContent = `30 mm tall · 6 mm nominal depth · Loading ${variants[variant].name}…`;
+    $('#master-evidence-values').replaceChildren();
     let geometry;
     try {
       const reportResponse = await fetch(`/sowers/candy-form/geometry-report.json?t=${Date.now()}`, { signal, cache: 'no-store' });
@@ -252,7 +255,7 @@ if (renderer) {
       geometry.translate(0, -bounds.min.y, -(bounds.min.z + bounds.max.z) / 2);
       geometry.scale(1.85 / 30, 1.85 / 30, 1.85 / 30);
       // Preserve the STL's real faceted/rounded recess geometry. One material only.
-      const material = new THREE.MeshPhysicalMaterial({ color: flavors[state.flavor].color, roughness: state.material === 'gummy' ? .3 : .65, metalness: 0, clearcoat: state.material === 'gummy' ? .25 : 0 });
+      const material = new THREE.MeshPhysicalMaterial({ color: flavors[state.flavor].color, roughness: .5, metalness: 0, clearcoat: .12 });
       if (serial !== loadSerial || signal.aborted) { geometry.dispose(); material.dispose(); return; }
       mascot = new THREE.Mesh(geometry, material);
       mascot.name = `${variant}-exported-positive-master`;
@@ -261,14 +264,28 @@ if (renderer) {
       mascot.userData.master = { assetUrl, stlSha256: digest, boundsMm, reportedBoundsMm: entry.boundsMm, measuredDepthMm: size.z, reportedDepthMm: entry.depthMm, triangles, version: report.version || report.kind, sourceSha256: report.sourceSha256, generatorSha256: report.generatorSha256 || null, sourceHashes: report.sourceHashes || null, parametersSha256: report.parametersSha256 || null, provenance: report.provenance || null };
       scene.add(mascot);
       Object.assign(masterEvidence, { status: 'ready', variant, ...mascot.userData.master });
-      $('#master-status').textContent = `${Number(size.y.toFixed(2))} mm tall / ${Number(size.z.toFixed(2))} mm total depth · ${triangles.toLocaleString()} triangles · STL ${digest.slice(0, 10)} · ${report.version || report.kind || 'positive master'}`;
+      $('#master-status').textContent = `${Number(size.y.toFixed(2))} mm tall · ${Number(size.z.toFixed(2))} mm total depth · One physical material`;
+      const evidenceRows = {
+        Export: report.version || report.kind || 'Positive master',
+        Geometry: `${triangles.toLocaleString()} triangles · measured bounds ${boundsMm.map(point => point.map(value => Number(value.toFixed(3))).join(', ')).join(' / ')} mm`,
+        'STL SHA-256': digest,
+        Asset: assetUrl,
+        'Generator SHA-256': report.generatorSha256 || 'Not supplied',
+        'Parameters SHA-256': report.parametersSha256 || 'Not supplied',
+        'Source fingerprints': JSON.stringify(report.sourceHashes || { source: report.sourceSha256 || 'Not supplied' }),
+      };
+      for (const [label, value] of Object.entries(evidenceRows)) {
+        const term = document.createElement('dt'), detail = document.createElement('dd');
+        term.textContent = label; detail.textContent = value;
+        $('#master-evidence-values').append(term, detail);
+      }
       needsRender = true;
     } catch (error) {
       geometry?.dispose();
       if (serial !== loadSerial || signal.aborted) return;
       Object.assign(masterEvidence, { status: 'error', variant, message: error.message });
       $('#master-status').textContent = 'Candy master unavailable';
-      $('#master-error').textContent = `${error.message} Choose Agent to view the digital character, or reload to retry the export.`;
+      $('#master-error').textContent = `${error.message} Choose Character to view the digital character, or reload to retry the export.`;
       $('#master-error').hidden = false;
       needsRender = true;
     }

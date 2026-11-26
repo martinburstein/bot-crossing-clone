@@ -1,0 +1,82 @@
+{
+  "capturedAt": "2026-11-26T06:13:32.490Z",
+  "url": "http://127.0.0.1:5288/tools/sowers-relief-study.html?file=%2Fsowers%2Fcandy-studies%2Fbroad-moderate-rounded-top-positive-mm.stl&sha=2e8f12742b7e65c3ddbd7b3c5bc88cb134597cbfd6e9ca05e7ed53de7852f1b0",
+  "ready": true,
+  "study": {
+    "file": "/sowers/candy-studies/broad-moderate-rounded-top-positive-mm.stl",
+    "stlSha256": "2e8f12742b7e65c3ddbd7b3c5bc88cb134597cbfd6e9ca05e7ed53de7852f1b0",
+    "expectedShaVerified": true,
+    "dimensionsMm": [
+      23.747854232788086,
+      30,
+      6
+    ],
+    "sourcePins": null,
+    "parameters": null,
+    "lighting": [
+      {
+        "ambient": 2.2,
+        "sun": 1.2,
+        "pos": [
+          0,
+          3,
+          70
+        ]
+      },
+      {
+        "ambient": 0.65,
+        "sun": 3,
+        "pos": [
+          -35,
+          30,
+          50
+        ]
+      },
+      {
+        "ambient": 0.35,
+        "sun": 4.5,
+        "pos": [
+          -55,
+          18,
+          13
+        ]
+      }
+    ],
+    "camera": {
+      "orthographicHeightMm": 38,
+      "distanceMm": 75,
+      "near": 0.1,
+      "far": 150
+    },
+    "material": {
+      "color": "#efa044",
+      "roughness": 0.73,
+      "metalness": 0
+    },
+    "toneMapping": "ACESFilmic",
+    "exposure": 1,
+    "cellPixels": [
+      360,
+      280
+    ],
+    "canvasPixels": [
+      1080,
+      840
+    ],
+    "pixelRatio": 1,
+    "rowsNominalMm": [
+      30,
+      25,
+      20
+    ],
+    "note": "Uniform scaled geometry and fixed camera. No coating model; screen pixels are not physical viewing size."
+  },
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/159.0.0.0 Safari/537.36",
+  "rendererSourceSha256": "d2003250f1de2f8b3349f32ae12a863b23c39f582bacd5bf1be925a086484424",
+  "screenshotSha256": "044510fc010cc2e447c750e0279cfe03afac091be86cc16015fe573948e5ffcb",
+  "pageErrors": [],
+  "studyMetadata": {
+    "path": "public/sowers/candy-studies/broad-moderate-rounded-top-candidate.json",
+    "sha256": "c05047201df97c3298b8a49e862d8559705ff81cf581dad9484f901802868c3b"
+  }
+}

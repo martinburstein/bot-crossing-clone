@@ -13,7 +13,7 @@ test('positive masters retain canonical source provenance and millimetre dimensi
   assert.equal(report.sourceSha256, sha(await readFile(new URL('../sowers/candy/silhouettes.mjs', import.meta.url))));
   assert.equal(report.assumptions.supplierConfirmedNumericMinima, false);
   assert.deepEqual(report.variants.map(v => v.id).sort(), Object.keys(CANDY_VARIANTS).sort());
-  assert.equal(report.version, 'v2-drafted-rounded-shared-features');
+  assert.equal(report.version, 'v3-broad-moderate-shared-relief');
   for (const [path, expected] of Object.entries(report.sourceHashes)) {
     assert.equal(sha(await readFile(new URL('../'+path, import.meta.url))), expected, path+' changed; regenerate physical masters');
   }
@@ -33,6 +33,8 @@ test('positive masters retain canonical source provenance and millimetre dimensi
   const evidence=JSON.parse(await readFile(new URL('v1/evidence-manifest.json',dir)));
   for(const [path,expected] of Object.entries(evidence.files)) assert.equal(sha(await readFile(new URL('v1/'+path,dir))),expected,'v1 evidence '+path);
   for(const v of old.variants) assert.equal(sha(await readFile(new URL('v1/'+v.id+'-positive-mm.stl',dir))),v.stlSha256);
+  const prior=JSON.parse(await readFile(new URL('v2/evidence-manifest.json',dir)));
+  for(const [path,expected] of Object.entries(prior.files)) assert.equal(sha(await readFile(new URL('v2/'+path,dir))),expected,'v2 evidence '+path);
 });
 
 for (const entry of report.variants) {
@@ -95,7 +97,7 @@ for (const entry of report.variants) {
     const factor=30/(Math.max(...outline.map(p=>p[1]))-ymin);
     const shared=[{id:'outline',points:outline},...Object.values(getCandyFeatures(entry.id)).flat()];
     for(const feature of shared) {
-      const z={outline:0,helmet:5.35,chest:5.35,face:6,'left-eye':5.7,'right-eye':5.7}[feature.id];
+      const z={outline:0,helmet:5.35,chest:5.35,face:6,'left-eye':5.45,'right-eye':5.45}[feature.id];
       for(const [x,y] of feature.points) {
         assert(verts.some(v=>Math.hypot(v[0]-x*factor,v[1]-(y-ymin)*factor,v[2]-z)<1e-5),feature.id+' shared point must exist in STL');
       }
@@ -111,8 +113,8 @@ for (const entry of report.variants) {
         const v=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/den;
         if(u>=-1e-7&&v>=-1e-7&&u+v<=1+1e-7) hits.push(u*a[2]+v*b[2]+(1-u-v)*c[2]);
       }
-      const expected={helmet:6,face:5.7,'left-eye':5.92,'right-eye':5.92,chest:5.75}[probe.feature];
-      assert.equal(probe.expectedTopZMm,expected);
+      const expected={helmet:6,face:5.45,'left-eye':5.85,'right-eye':5.85,chest:5.75}[probe.feature];
+      assert(Math.abs(probe.expectedTopZMm-expected)<1e-10);
       assert(Math.abs(Math.max(...hits)-expected)<1e-5,probe.feature+' actual STL relief height');
       assert(Math.abs(Math.min(...hits))<1e-6);
     }

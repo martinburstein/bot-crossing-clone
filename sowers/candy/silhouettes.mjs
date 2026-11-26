@@ -74,12 +74,14 @@ const translated = (segments,x,y)=>segments.map(seg=>Object.fromEntries(Object.e
 // A single friendly closed arc; the exact profile and centers are shared with
 // tooling. No inferred circles, strokes or independent physical eye spacing.
 const EYE_SEGMENTS=[
-  {before:[-.037,-.017],corner:[-.037,.046],after:[0,.046]},
-  {before:[0,.046],corner:[.037,.046],after:[.037,-.017]},
-  {before:[.037,-.017],corner:[.027,-.033],after:[.016,-.017]},
-  {before:[.016,-.017],corner:[.014,.019],after:[0,.019]},
-  {before:[0,.019],corner:[-.014,.019],after:[-.016,-.017]},
-  {before:[-.016,-.017],corner:[-.027,-.033],after:[-.037,-.017]},
+  {before:[-0.053,-0.015], corner:[-0.053,0.054], after:[0,0.054]},
+  {before:[0,0.054], corner:[0.053,0.054], after:[0.053,-0.015]},
+  {before:[0.053,-0.015], corner:[0.053,-0.035], after:[0.0325,-0.035]},
+  {before:[0.0325,-0.035], corner:[0.012,-0.035], after:[0.012,-0.015]},
+  {before:[0.012,-0.015], corner:[0.012,0.012], after:[0,0.012]},
+  {before:[0,0.012], corner:[-0.012,0.012], after:[-0.012,-0.015]},
+  {before:[-0.012,-0.015], corner:[-0.012,-0.035], after:[-0.0325,-0.035]},
+  {before:[-0.0325,-0.035], corner:[-0.053,-0.035], after:[-0.053,-0.015]},
 ];
 const pathFeature=(id,segments,surface,extra={})=>({id,segments,points:sampleCandySegments(segments),surface,...extra});
 /** Fresh canonical front paths in GLOBAL normalized body XY, not local face XY.
@@ -92,9 +94,9 @@ export function getCandyFeatures(variant='scout') {
   const helmet={x:face.x,y:face.y,width:face.width+(variant==='seed'?.075:.105),height:face.height+.105,radius:.10};
   return {
     helmet:pathFeature('helmet',roundedRectSegments(helmet),{kind:'raised',heightMm:.65,edgeRoundMm:.12},helmet),
-    face:pathFeature('face',roundedRectSegments(face),{kind:'recess',depthMm:.30,edgeRoundMm:.05},face),
+    face:pathFeature('face',roundedRectSegments(face),{kind:'recess',depthMm:.55,edgeRoundMm:.05},face),
     eyes:[-1,1].map(side=>pathFeature(side<0?'left-eye':'right-eye',translated(EYE_SEGMENTS,face.x+side*.09,face.y+.008),
-      {kind:'raised',heightMm:.22,edgeRoundMm:.05},{x:face.x+side*.09,y:face.y+.008})),
+      {kind:'raised',heightMm:.40,edgeRoundMm:.05},{x:face.x+side*.09,y:face.y+.008})),
     chest:pathFeature('chest',roundedPolygonSegments([[-.063,.285],[-.061,.352],[.002,.405],[.071,.408],[.051,.342],[-.005,.294]],.015),
       {kind:'raised',heightMm:.40,edgeRoundMm:.05},{x:0,y:.343}),
   };

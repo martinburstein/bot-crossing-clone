@@ -1,0 +1,21 @@
+{
+  "sourceRevision": "3949e6a9bfc76a5ffb910ab806579a95cd0f4b0e",
+  "kind": "preserved-v2-before-broad-relief",
+  "files": {
+    "bud-dimensions.svg": "3c233c337a49778658e7e67e83debf4a728bf5fcb37ce2d590b30bfcdaf3fb4c",
+    "bud-positive-mm.stl": "19c865e113d8f95031b0fcc0d4eaf9e5002d840d6cf8a877e5d8557908b051bc",
+    "bud-positive-preview.svg": "bf0133ef66818c308bc1723de00c553901fb54f97830931c6e5401576968acbe",
+    "canonical-geometry.json": "d6c27d74afa0776a23d5711bf88a8ad733237783dd532e6a01ddc3a73a996e53",
+    "generator.py": "5049f82748f365b5e96cb3573ce5e1757a5f90de8e26ec5b6846b3943f2363b2",
+    "geometry-report.json": "ec645c72725568cdfe8224c3816820f9034c25c9f818cbaa4e363780078c556d",
+    "manufacturing.md": "78b7bda80fa771c35ae0e72eb7651f4123fd8d6d76c81b9290fe8f304c164a1b",
+    "mascot.js": "f25a26bbbb0b390cf2a3413f73a3cdcc2930012b3fbf921f8aa07357b27f151d",
+    "scout-dimensions.svg": "d55365adf1d1469c300d6c4feeb1381394ed4bae53805eda2d6ce4f380fe429b",
+    "scout-positive-mm.stl": "a70ab70cfc9cc86d3940440daad82ead2bedab4e58a2421a41a00bc18db36684",
+    "scout-positive-preview.svg": "58a395ea7f2e9b1ebbb24444be29f30963b4914faa4e43e24f35e771116c8512",
+    "seed-dimensions.svg": "713bf70a1a200b694285dd30d3047d6865ab1566a2514057ae693179fc074d49",
+    "seed-positive-mm.stl": "3bd529ba436f40a82d6faea21b8ac2bfbfb4c42bc8a8ea6ed3515f62283eb75e",
+    "seed-positive-preview.svg": "a3bd3de0999c30dbe581bd48e920e0b81d30380dcb505a7ae40813410f75cd0d",
+    "silhouettes.mjs": "4ace24fd1694fcb346b4679cd18febfbbef619aa225b4410495b92c5e81e1a17"
+  }
+}

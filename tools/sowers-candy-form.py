@@ -23,7 +23,7 @@ DEPTH = 6.0
 OUTER_DRAFT = 2.0
 RELIEF_DRAFT = 8.0
 BLEND_STEPS = 12
-VERSION = 'v2-drafted-rounded-shared-features'
+VERSION = 'v3-broad-moderate-shared-relief'
 
 
 def offset_rings(poly, offsets):
@@ -140,7 +140,7 @@ def svg_sheet(name, poly, face, eyes, metrics):
 <g transform="translate(75,25)"><rect width="6" height="30" fill="#e3ce62" stroke="#26392e" stroke-width=".15"/>
 <path d="M 0,34 v 4 M 6,34 v 4 M 0,36 h 6" fill="none" stroke="#4b6353" stroke-width=".18"/>
 <text x="3" y="41" text-anchor="middle" font-size="2.8">6.00</text><text x="-1" y="-3" font-size="2.6">SIDE / schematic</text></g>
-<text x="93" y="29" font-size="2.6">Helmet +0.65</text><text x="93" y="34" font-size="2.6">Mask -0.30 / eyes +0.22</text>
+<text x="93" y="29" font-size="2.6">Helmet +0.65</text><text x="93" y="34" font-size="2.6">Mask -0.55 / eyes +0.40</text>
 <text x="93" y="39" font-size="2.6">Back plane z = 0</text><text x="93" y="44" font-size="2.6">Front plane z = 6</text>
 <text x="8" y="80" font-size="2.7">One connected solid · flat back · 2° constant-normal outer draft · chest +0.40</text>
 <text x="8" y="86" font-size="2.5">Canonical base footprints shown. Relief has 8° walls and faceted circular transition approximations.</text>

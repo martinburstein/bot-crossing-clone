@@ -71,11 +71,15 @@ for(const variant of variants) {
   test(variant+' keeps connected-body poses finite and restores the complete neutral state',()=>{
     const model=createCandySower({variant,seed:17}),positions=model.userData.body.geometry.attributes.position;
     const original=positions.array.slice();
+    const surfaces=model.userData.face.children.map(mesh=>({mesh,positions:mesh.geometry.attributes.position.array.slice()}));
+    const originalFace=model.userData.face.position.clone();
     for(const status of ['idle','working','review','waiting','complete','error'])for(const moving of [false,true]) {
       for(let frame=0;frame<120;frame++) {
         model.userData.animate(frame/60,1/60,{status,moving,selected:frame%2===0});model.updateMatrixWorld(true);
         if(frame%20===0) {
-          model.traverse(object=>assert(object.matrixWorld.elements.every(Number.isFinite)));
+          model.traverse(object=>{assert(object.matrixWorld.elements.every(Number.isFinite));assert.deepEqual(object.scale.toArray(),[1,1,1],'no balloon scaling');});
+          assert(model.userData.face.position.equals(originalFace),'helmet stays attached to body coordinates');
+          const box=new THREE.Box3().setFromObject(model);assert(box.min.y>=-1e-7,'world ground remains clear');
           for(let i=0;i<positions.count;i++) {
             assert(Number.isFinite(positions.getX(i))&&Number.isFinite(positions.getY(i))&&Number.isFinite(positions.getZ(i)));
             assert(positions.getY(i)>=-1e-7,'attached vertices never fall below neutral ground');
@@ -87,10 +91,25 @@ for(const variant of variants) {
     assert(positions.array.every(Number.isFinite));
     model.userData.resetPose();assert.deepEqual(positions.array,original);assert.equal(model.userData.getStatus(),'idle');
     assert.equal(model.children[0].position.y,0);assert.equal(model.userData.face.rotation.z,0);
+    for(const {mesh,positions:neutral} of surfaces)assert.deepEqual(mesh.geometry.attributes.position.array,neutral,'exact canonical relief restored');
   });
 }
 test('Scout helmet is wider than its compact attached hand span',()=>{
   const points=CANDY_VARIANTS.scout.points;
   const span=predicate=>{const xs=points.filter(([,y])=>predicate(y)).map(([x])=>x);return Math.max(...xs)-Math.min(...xs);};
   assert(span(y=>y>.60)>=span(y=>y>.33&&y<.50));
+});
+
+test('Six held Scout poses have distinct connected contours and eye pivots',()=>{
+  const model=createCandySower({variant:'scout',seed:0}),poses=[];
+  for(const status of ['idle','working','review','waiting','complete','error']) {
+    model.userData.resetPose();model.userData.animate(0,.1,{status});
+    const body=model.userData.body.geometry.attributes.position.array;
+    const eyes=model.userData.face.children.filter(mesh=>mesh.name.includes('eye')).map(mesh=>Array.from(mesh.geometry.attributes.position.array));
+    poses.push({status,body:Array.from(body),eyes:eyes.flat()});
+  }
+  for(let i=0;i<poses.length;i++)for(let j=i+1;j<poses.length;j++) {
+    assert(poses[i].body.some((value,k)=>Math.abs(value-poses[j].body[k])>.035),poses[i].status+'/'+poses[j].status+' body gesture');
+    assert(poses[i].eyes.some((value,k)=>Math.abs(value-poses[j].eyes[k])>.012),poses[i].status+'/'+poses[j].status+' eye expression');
+  }
 });

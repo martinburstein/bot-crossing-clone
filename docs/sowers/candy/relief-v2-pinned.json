@@ -1,0 +1,86 @@
+{
+  "capturedAt": "2026-11-26T06:09:33.665Z",
+  "url": "http://127.0.0.1:5288/tools/sowers-relief-study.html",
+  "ready": true,
+  "study": {
+    "file": "/sowers/candy-form/scout-positive-mm.stl",
+    "stlSha256": "a70ab70cfc9cc86d3940440daad82ead2bedab4e58a2421a41a00bc18db36684",
+    "expectedShaVerified": true,
+    "dimensionsMm": [
+      23.747854232788086,
+      30,
+      6
+    ],
+    "sourcePins": null,
+    "parameters": {
+      "height": 30,
+      "depth": 6,
+      "outerDraftDegrees": 2,
+      "reliefWallDraftDegrees": 8,
+      "blendStepsPerQuarterCircle": 12,
+      "contourStepsPerQuadratic": 12,
+      "surfaceDimensions": "canonical getCandyFeatures.surface at nominal 30mm"
+    },
+    "lighting": [
+      {
+        "ambient": 2.2,
+        "sun": 1.2,
+        "pos": [
+          0,
+          3,
+          70
+        ]
+      },
+      {
+        "ambient": 0.65,
+        "sun": 3,
+        "pos": [
+          -35,
+          30,
+          50
+        ]
+      },
+      {
+        "ambient": 0.35,
+        "sun": 4.5,
+        "pos": [
+          -55,
+          18,
+          13
+        ]
+      }
+    ],
+    "camera": {
+      "orthographicHeightMm": 38,
+      "distanceMm": 75,
+      "near": 0.1,
+      "far": 150
+    },
+    "material": {
+      "color": "#efa044",
+      "roughness": 0.73,
+      "metalness": 0
+    },
+    "toneMapping": "ACESFilmic",
+    "exposure": 1,
+    "cellPixels": [
+      360,
+      280
+    ],
+    "canvasPixels": [
+      1080,
+      840
+    ],
+    "pixelRatio": 1,
+    "rowsNominalMm": [
+      30,
+      25,
+      20
+    ],
+    "note": "Uniform scaled geometry and fixed camera. No coating model; screen pixels are not physical viewing size."
+  },
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/159.0.0.0 Safari/537.36",
+  "rendererSourceSha256": "0044b7d728907e826539cba71b8e3a92b55917a4f0ea64032428fcd43590adcd",
+  "screenshotSha256": "66c3d67cb7a7cd4b6fd2655a5463f5412906769cef2479945eff08b0578ed80c",
+  "pageErrors": []
+}

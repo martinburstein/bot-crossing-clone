@@ -150,46 +150,92 @@ export function createCandySower({ color = 0xf5823a,seed = 0,variant = 'scout',m
   const chest=relief(featureShape(features.chest,scale,origin),candy,features.chest.surface.heightMm*mm-2*chestRound,chestRound);
   chest.position.z=chestRound;chest.name='chest-leaf-stamp';curveFeature(chest,chosen,scale,origin);face.add(chest);
 
-  // Connected mitten tabs flex at their broad base. Boots stay integral; only
-  // their outer tips lift during locomotion. No hidden separate limb spheres.
+  // Every surface shares the same connected-body bend. In particular, the
+  // helmet/mask never move as a separate screen across the candy slab. Eyes
+  // pivot around their own canonical centers before that shared bend.
   const positions = geometry.attributes.position;
   const rest = positions.array.slice();
-  const flex = [];
-  for (let i=0;i<positions.count;i++) {
-    const at=i*3,x=rest[at],y=rest[at+1];
-    const armBand=THREE.MathUtils.smoothstep(y,.49,.65)*(1-THREE.MathUtils.smoothstep(y,.95,1.10));
-    const armWeight=THREE.MathUtils.smoothstep(Math.abs(x),.46,.71)*armBand;
-    const footWeight=(1-THREE.MathUtils.smoothstep(y,.06,.34))*THREE.MathUtils.smoothstep(Math.abs(x),.09,.26);
-    if (armWeight || footWeight) flex.push({ at,side:Math.sign(x),armWeight,footWeight });
+  const surfaces=[{mesh:body,rest,offset:new THREE.Vector3()}];
+  for(const mesh of face.children) surfaces.push({mesh,rest:mesh.geometry.attributes.position.array.slice(),
+    offset:face.position.clone().add(mesh.position)});
+  const eyeCenters=features.eyes.map(eye=>({x:eye.x*scale,y:(eye.y-originalBox.min.y)*scale}));
+  for(const surface of surfaces) {
+    const count=surface.rest.length/3;
+    surface.weights=new Float32Array(count*3);surface.turn=new Float32Array(count*2);
+    for(let vertex=0;vertex<count;vertex++) {
+      const at=vertex*3,x=surface.rest[at]+surface.offset.x,y=surface.rest[at+1]+surface.offset.y;
+      const armBand=THREE.MathUtils.smoothstep(y,.49,.65)*(1-THREE.MathUtils.smoothstep(y,1.00,1.50));
+      surface.weights[at]=THREE.MathUtils.smoothstep(Math.abs(x),.46,.69)*armBand;
+      surface.weights[at+1]=(1-THREE.MathUtils.smoothstep(y,.06,.34))*THREE.MathUtils.smoothstep(Math.abs(x),.09,.26);
+      surface.weights[at+2]=THREE.MathUtils.smoothstep(y,.22,1.08);
+    }
+    // A conservative envelope includes the strongest bend, mitten and forward
+    // reach. It avoids rescanning every vertex of six surfaces every frame.
+    surface.mesh.geometry.computeBoundingSphere();surface.mesh.geometry.boundingSphere.radius+=.65;
   }
   const numericSeed = Number.isFinite(Number(seed)) ? Number(seed) : 0;
   const phase = ((Math.sin(numericSeed*127.1+19.7)*43758.5453)%1+1)%1*Math.PI*2;
-  let movement = 0,selection = 0,currentStatus = 'idle';
+  let movement = 0,selection = 0,currentStatus = 'idle',cachedBend=null;
   const smooth = (value,target,speed,dt) => THREE.MathUtils.damp(value,target,speed,dt);
+  const poses={
+    idle:{bend:0,forward:0,left:0,right:0,spread:0,eyes:[0,0],look:0},
+    working:{bend:-.065,forward:.20,left:.085,right:.085,spread:-.055,eyes:[-.19,.19],look:-.022},
+    review:{bend:-.19,forward:0,left:.035,right:-.025,spread:0,eyes:[-.46,.08],look:.016},
+    waiting:{bend:.10,forward:0,left:0,right:.235,spread:.035,eyes:[.10,.24],look:.024},
+    complete:{bend:0,forward:0,left:.185,right:.185,spread:.105,eyes:[-.26,.26],look:.034},
+    error:{bend:.145,forward:.12,left:-.065,right:-.065,spread:-.065,eyes:[.58,-.58],look:-.028},
+  };
   root.userData.animate = (elapsed,delta,{ status = 'idle',moving = false,selected = false } = {}) => {
     const dt = Number.isFinite(delta) ? THREE.MathUtils.clamp(delta,0,.1) : 1/60;
     const time = (Number.isFinite(elapsed) ? elapsed : 0)+phase;
     currentStatus = status;
     movement = smooth(movement,moving ? 1 : 0,8,dt);
     selection = smooth(selection,selected ? 1 : 0,6,dt);
+    const held=poses[status]||poses.idle;
     const step = Math.sin(time*7.2);
     const celebration = status === 'complete' && !moving ? Math.max(0,Math.sin(time*4)) : 0;
-    const work = status === 'working' ? 1 : 0;
-    const waiting = status === 'waiting' ? 1 : 0;
-    const greeting = waiting*Math.sin(time*4)*.035;
-    pose.position.y = Math.abs(step)*.026*movement+celebration*.038;
-    pose.rotation.y = Math.sin(time*.9)*.045*(1-movement)+step*.035*movement;
-    face.rotation.z = status === 'review' ? .045 : status === 'error' ? -.045 : 0;
-    for (const { at,side,armWeight,footWeight } of flex) {
-      positions.array[at+1]=rest[at+1]+armWeight*(celebration*.05+(side>0 ? greeting : 0))+footWeight*Math.max(0,step*side)*.035*movement;
-      positions.array[at+2]=rest[at+2]+armWeight*(Math.sin(time*7.2+side*Math.PI/2)*.055*movement+work*(.035+Math.sin(time*6+side)*.016));
+    // A held complete pose still reads when the scheduler pauses between hops.
+    pose.position.y = Math.abs(step)*.035*movement+celebration*.105;
+    pose.rotation.y = Math.sin(time*.9)*.025*(1-movement)+step*.035*movement;
+    if(cachedBend!==held.bend) {
+      for(const surface of surfaces)for(let vertex=0;vertex<surface.rest.length/3;vertex++) {
+        const angle=held.bend*surface.weights[vertex*3+2];
+        surface.turn[vertex*2]=Math.cos(angle);surface.turn[vertex*2+1]=Math.sin(angle);
+      }
+      cachedBend=held.bend;
     }
-    positions.needsUpdate=true;
-    // Tiny connected deformations preserve the calm, solid candy read.
+    const wave=status==='waiting'?Math.sin(time*4)*.035:0;
+    const strideLeft=Math.sin(time*7.2-Math.PI/2)*.055*movement;
+    const strideRight=Math.sin(time*7.2+Math.PI/2)*.055*movement;
+    const workLeft=status==='working'?.07+Math.sin(time*6-1)*.025:0;
+    const workRight=status==='working'?.07+Math.sin(time*6+1)*.025:0;
+    for(const surface of surfaces) {
+      const array=surface.mesh.geometry.attributes.position.array,base=surface.rest,offset=surface.offset;
+      const eyeIndex=surface.mesh.name==='left-eye-relief'?0:surface.mesh.name==='right-eye-relief'?1:-1;
+      const eyeCos=eyeIndex>=0?Math.cos(held.eyes[eyeIndex]):1,eyeSin=eyeIndex>=0?Math.sin(held.eyes[eyeIndex]):0;
+      for(let at=0;at<array.length;at+=3) {
+        let x=base[at]+offset.x,y=base[at+1]+offset.y,z=base[at+2]+offset.z;
+        if(eyeIndex>=0) {
+          const center=eyeCenters[eyeIndex],dx=x-center.x,dy=y-center.y;
+          x=center.x+dx*eyeCos-dy*eyeSin;
+          y=center.y+dx*eyeSin+dy*eyeCos+held.look;
+        }
+        const right=x>=0,armWeight=surface.weights[at],footWeight=surface.weights[at+1],weight=surface.weights[at+2];
+        y+=armWeight*((right?held.right:held.left)+(right?wave:0));
+        x+=(right?1:-1)*armWeight*held.spread;
+        y+=footWeight*Math.max(0,right?step:-step)*.045*movement;
+        z+=armWeight*(right?strideRight+workRight:strideLeft+workLeft);
+        const turnAt=at/3*2,cos=surface.turn[turnAt],sin=surface.turn[turnAt+1],dx=x,dy=y-.60;
+        x=dx*cos-dy*sin;y=.60+dx*sin+dy*cos;
+        z+=held.forward*weight;
+        array[at]=x-offset.x;array[at+1]=y-offset.y;array[at+2]=z-offset.z;
+      }
+      surface.mesh.geometry.attributes.position.needsUpdate=true;
+
+    }
     candy.emissive?.setHex(0x000000);
     if (selection && materialMode !== 'silhouette') {
-      candy.emissive.copy(tint);
-      candy.emissiveIntensity=selection*.045;
+      candy.emissive.copy(tint);candy.emissiveIntensity=selection*.045;
     }
   };
   root.userData.kind = 'candy-sower';
@@ -202,7 +248,10 @@ export function createCandySower({ color = 0xf5823a,seed = 0,variant = 'scout',m
   root.userData.features = features;
   root.userData.getStatus = () => currentStatus;
   root.userData.resetPose = () => {
-    positions.array.set(rest); positions.needsUpdate=true;
+    for(const surface of surfaces) {
+      surface.mesh.geometry.attributes.position.array.set(surface.rest);
+      surface.mesh.geometry.attributes.position.needsUpdate=true;
+    }
     pose.position.set(0,0,0); pose.rotation.set(0,0,0);face.rotation.set(0,0,0);
     candy.emissive?.setHex(0x000000);candy.emissiveIntensity=0;
     movement=0;selection=0;currentStatus='idle';

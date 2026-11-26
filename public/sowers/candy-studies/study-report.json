@@ -1,0 +1,326 @@
+{
+  "version": "v1-separate-relief-studies",
+  "units": "mm",
+  "sourceHashes": {
+    "tools/sowers-candy-studies.py": "48f3c17ae86821699f61868518a1d97be7b26264212ea659103aea32dcac2daf",
+    "tools/sowers-candy-form.py": "5049f82748f365b5e96cb3573ce5e1757a5f90de8e26ec5b6846b3943f2363b2",
+    "sowers/candy/silhouettes.mjs": "4ace24fd1694fcb346b4679cd18febfbbef619aa225b4410495b92c5e81e1a17"
+  },
+  "sourceSnapshotFiles": {
+    "tools/sowers-candy-studies.py": "source-study-generator.py",
+    "tools/sowers-candy-form.py": "source-base-generator.py",
+    "sowers/candy/silhouettes.mjs": "source-silhouettes.mjs"
+  },
+  "parametersCanonicalJson": "[{\"eyeLocalSegments\":null,\"eyeRiseMm\":0.22,\"id\":\"baseline\",\"maskDepthMm\":0.3,\"topPerimeterRoundMm\":0},{\"eyeLocalSegments\":[{\"after\":[0,0.054],\"before\":[-0.053,-0.015],\"corner\":[-0.053,0.054]},{\"after\":[0.053,-0.015],\"before\":[0,0.054],\"corner\":[0.053,0.054]},{\"after\":[0.0325,-0.035],\"before\":[0.053,-0.015],\"corner\":[0.053,-0.035]},{\"after\":[0.012,-0.015],\"before\":[0.0325,-0.035],\"corner\":[0.012,-0.035]},{\"after\":[0,0.012],\"before\":[0.012,-0.015],\"corner\":[0.012,0.012]},{\"after\":[-0.012,-0.015],\"before\":[0,0.012],\"corner\":[-0.012,0.012]},{\"after\":[-0.0325,-0.035],\"before\":[-0.012,-0.015],\"corner\":[-0.012,-0.035]},{\"after\":[-0.053,-0.015],\"before\":[-0.0325,-0.035],\"corner\":[-0.053,-0.035]}],\"eyeRiseMm\":0.4,\"id\":\"broad-moderate\",\"maskDepthMm\":0.55,\"topPerimeterRoundMm\":0},{\"eyeLocalSegments\":[{\"after\":[0,0.06],\"before\":[-0.058,-0.015],\"corner\":[-0.058,0.06]},{\"after\":[0.058,-0.015],\"before\":[0,0.06],\"corner\":[0.058,0.06]},{\"after\":[0.0345,-0.035],\"before\":[0.058,-0.015],\"corner\":[0.058,-0.035]},{\"after\":[0.011,-0.015],\"before\":[0.0345,-0.035],\"corner\":[0.011,-0.035]},{\"after\":[0,0.011],\"before\":[0.011,-0.015],\"corner\":[0.011,0.011]},{\"after\":[-0.011,-0.015],\"before\":[0,0.011],\"corner\":[-0.011,0.011]},{\"after\":[-0.0345,-0.035],\"before\":[-0.011,-0.015],\"corner\":[-0.011,-0.035]},{\"after\":[-0.058,-0.015],\"before\":[-0.0345,-0.035],\"corner\":[-0.058,-0.035]}],\"eyeRiseMm\":0.55,\"id\":\"broad-strong\",\"maskDepthMm\":0.65,\"topPerimeterRoundMm\":0},{\"eyeLocalSegments\":[{\"after\":[0,0.054],\"before\":[-0.053,-0.015],\"corner\":[-0.053,0.054]},{\"after\":[0.053,-0.015],\"before\":[0,0.054],\"corner\":[0.053,0.054]},{\"after\":[0.0325,-0.035],\"before\":[0.053,-0.015],\"corner\":[0.053,-0.035]},{\"after\":[0.012,-0.015],\"before\":[0.0325,-0.035],\"corner\":[0.012,-0.035]},{\"after\":[0,0.012],\"before\":[0.012,-0.015],\"corner\":[0.012,0.012]},{\"after\":[-0.012,-0.015],\"before\":[0,0.012],\"corner\":[-0.012,0.012]},{\"after\":[-0.0325,-0.035],\"before\":[-0.012,-0.015],\"corner\":[-0.012,-0.035]},{\"after\":[-0.053,-0.015],\"before\":[-0.0325,-0.035],\"corner\":[-0.053,-0.035]}],\"eyeRiseMm\":0.4,\"id\":\"broad-moderate-rounded-top\",\"maskDepthMm\":0.55,\"topPerimeterRoundMm\":0.3}]",
+  "parametersSha256": "f2391bcc729cfc7ffd57e1269121bfb6990ec6c5d31c62187dcda4e35b0b9065",
+  "pullDirection": [
+    0,
+    0,
+    -1
+  ],
+  "assumptions": {
+    "desiredEyeStrokeAboutMm": 1,
+    "supplierConfirmedNumericMinimum": false
+  },
+  "limits": [
+    "geometric studies only; no food-contact/tooling approval",
+    "no shrink compensation or physical release/sanding trial",
+    "sampled quadratic curvature does not bound join curvature; faceted STL blends"
+  ],
+  "candidates": [
+    {
+      "id": "baseline",
+      "stlSha256": "a70ab70cfc9cc86d3940440daad82ead2bedab4e58a2421a41a00bc18db36684",
+      "extentsMm": [
+        23.747854232788086,
+        30.0,
+        6.0
+      ],
+      "volumeMm3": 3110.1791108170323,
+      "watertight": true,
+      "windingConsistent": true,
+      "connectedComponents": 1,
+      "eulerNumber": 2,
+      "allEdgesTwoFaces": true,
+      "eyeStrokeMeasurements": {
+        "measurementMethod": "horizontal sections through serialized STL; arm width at unchanged eye-center Y; crest section .0001mm below top; base .0001mm above mask floor",
+        "baseArmSpansAtCenterYMm": [
+          0.6623201537609424,
+          0.6623201771612699,
+          0.6623202033716524,
+          0.6623202827934322
+        ],
+        "crestArmSpansAtCenterYMm": [
+          0.43168483249318523,
+          0.4316848331786165,
+          0.43168485540180446,
+          0.4316848610705599
+        ],
+        "baseCrownStrokeMm": 0.80692829218615,
+        "crestCrownStrokeMm": 0.5782992214259473
+      }
+    },
+    {
+      "id": "broad-moderate",
+      "stlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+      "extentsMm": [
+        23.747854232788086,
+        30.0,
+        6.0
+      ],
+      "volumeMm3": 3084.945111145788,
+      "watertight": true,
+      "windingConsistent": true,
+      "connectedComponents": 1,
+      "eulerNumber": 2,
+      "allEdgesTwoFaces": true,
+      "eyeStrokeMeasurements": {
+        "measurementMethod": "horizontal sections through serialized STL; arm width at unchanged eye-center Y; crest section .0001mm below top; base .0001mm above mask floor",
+        "baseArmSpansAtCenterYMm": [
+          1.2427671016628161,
+          1.2427671264348095,
+          1.2427672007761599,
+          1.2427672542580783
+        ],
+        "crestArmSpansAtCenterYMm": [
+          0.9614034447202138,
+          0.9614035664995644,
+          0.9614036233813192,
+          0.9614036615767483
+        ],
+        "baseCrownStrokeMm": 1.2569311690079594,
+        "crestCrownStrokeMm": 0.9778279902482794
+      }
+    },
+    {
+      "id": "broad-strong",
+      "stlSha256": "7f3505d23c5a87277e69f0d74b206e751e93fd04e9f8c341f13575ad949fabb3",
+      "extentsMm": [
+        23.747854232788086,
+        30.0,
+        6.0
+      ],
+      "volumeMm3": 3076.4664907906595,
+      "watertight": true,
+      "windingConsistent": true,
+      "connectedComponents": 1,
+      "eulerNumber": 2,
+      "allEdgesTwoFaces": true,
+      "eyeStrokeMeasurements": {
+        "measurementMethod": "horizontal sections through serialized STL; arm width at unchanged eye-center Y; crest section .0001mm below top; base .0001mm above mask floor",
+        "baseArmSpansAtCenterYMm": [
+          1.4256897742399306,
+          1.4256898015346762,
+          1.4256898637751712,
+          1.4256898650549406
+        ],
+        "crestArmSpansAtCenterYMm": [
+          1.1006231048178834,
+          1.1006231338905237,
+          1.100623248972632,
+          1.1006232755237233
+        ],
+        "baseCrownStrokeMm": 1.4669341878675013,
+        "crestCrownStrokeMm": 1.1454616104486668
+      }
+    },
+    {
+      "id": "broad-moderate-rounded-top",
+      "stlSha256": "2e8f12742b7e65c3ddbd7b3c5bc88cb134597cbfd6e9ca05e7ed53de7852f1b0",
+      "extentsMm": [
+        23.747854232788086,
+        30.0,
+        6.0
+      ],
+      "volumeMm3": 3082.8998980974807,
+      "watertight": true,
+      "windingConsistent": true,
+      "connectedComponents": 1,
+      "eulerNumber": 2,
+      "allEdgesTwoFaces": true,
+      "eyeStrokeMeasurements": {
+        "measurementMethod": "horizontal sections through serialized STL; arm width at unchanged eye-center Y; crest section .0001mm below top; base .0001mm above mask floor",
+        "baseArmSpansAtCenterYMm": [
+          1.2427671016628161,
+          1.2427671264348095,
+          1.2427672007761599,
+          1.2427672542580783
+        ],
+        "crestArmSpansAtCenterYMm": [
+          0.9614034447202138,
+          0.9614035664995644,
+          0.9614036233813192,
+          0.9614036615767483
+        ],
+        "baseCrownStrokeMm": 1.2569311690079594,
+        "crestCrownStrokeMm": 0.9778279902482794
+      }
+    }
+  ],
+  "coupon": {
+    "stlSha256": "5b35a48d13d48e67a2071480e53b71eeff01b2cb74d43186bcd8bebafab9000c",
+    "boundsMm": [
+      [
+        -32.87392807006836,
+        -39.0,
+        -9.0
+      ],
+      [
+        32.87392807006836,
+        39.0,
+        0.0
+      ]
+    ],
+    "extentsMm": [
+      65.74785614013672,
+      78.0,
+      9.0
+    ],
+    "volumeMm3": 33815.21464141741,
+    "faceCount": 83212,
+    "vertexCount": 41608,
+    "watertight": true,
+    "windingConsistent": true,
+    "connectedComponents": 1,
+    "eulerNumber": 2,
+    "allEdgesTwoFaces": true,
+    "id": "broad-moderate-2x2-negative-coupon",
+    "sourcePositiveId": "broad-moderate",
+    "sourcePositiveStlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+    "sourceTransform": "mirror positive Z; translate XY to grid; subtract actual positive solids from rectangular stock",
+    "cavityCount": 4,
+    "centersMm": [
+      [
+        -16.0,
+        -19.0
+      ],
+      [
+        -16.0,
+        19.0
+      ],
+      [
+        16.0,
+        -19.0
+      ],
+      [
+        16.0,
+        19.0
+      ]
+    ],
+    "pitchMm": [
+      32.0,
+      38.0
+    ],
+    "stockDimensionsMm": [
+      65.74785423278809,
+      78.0,
+      9.0
+    ],
+    "minimumFloorStockMm": 3.0,
+    "minimumPerimeterStockMm": 5.0,
+    "minimumBetweenOpeningBoundsStockMm": 8.0,
+    "openingPlaneZMm": 0,
+    "deepestCavityZMm": -6,
+    "stockBottomZMm": -9.0,
+    "extractionAxis": [
+      0,
+      0,
+      1
+    ],
+    "expectedSubtractedVolumeMm3": 12339.780444583152,
+    "expectedRemainingVolumeMm3": 33815.21322683409,
+    "serializedVolumeDifferenceMm3": 0.0014145833265502006,
+    "openingSectionCheck": {
+      "zMm": [
+        -5.999,
+        -5.90528125,
+        -5.8115625,
+        -5.71784375,
+        -5.624124999999999,
+        -5.5304062499999995,
+        -5.4366875,
+        -5.34296875,
+        -5.24925,
+        -5.15553125,
+        -5.0618125,
+        -4.9680937499999995,
+        -4.874375,
+        -4.78065625,
+        -4.6869375,
+        -4.59321875,
+        -4.499499999999999,
+        -4.4057812499999995,
+        -4.3120625,
+        -4.21834375,
+        -4.124625,
+        -4.03090625,
+        -3.9371875,
+        -3.84346875,
+        -3.7497499999999997,
+        -3.65603125,
+        -3.5623125,
+        -3.46859375,
+        -3.374875,
+        -3.28115625,
+        -3.1874375,
+        -3.09371875,
+        -3.0,
+        -2.90628125,
+        -2.8125625,
+        -2.71884375,
+        -2.625125,
+        -2.53140625,
+        -2.4376875,
+        -2.34396875,
+        -2.2502500000000003,
+        -2.15653125,
+        -2.0628125,
+        -1.9690937499999999,
+        -1.875375,
+        -1.7816562500000002,
+        -1.6879375000000003,
+        -1.5942187500000005,
+        -1.5004999999999997,
+        -1.4067812499999999,
+        -1.3130625,
+        -1.2193437500000002,
+        -1.1256250000000003,
+        -1.0319062500000005,
+        -0.9381875000000006,
+        -0.8444687499999999,
+        -0.75075,
+        -0.6570312500000002,
+        -0.5633125000000003,
+        -0.4695937500000005,
+        -0.3758750000000006,
+        -0.2821562499999999,
+        -0.18843750000000004,
+        -0.09471875000000018,
+        -0.001
+      ],
+      "maxNonNestedSolidAreaMm2": 0.0,
+      "cavitiesWidenTowardsPositiveZ": true
+    },
+    "assumptions": "5mm edge stock, 3mm floor and 32x38mm pitch are layout hypotheses; no recipe, material, process, food-contact or tooling approval"
+  },
+  "files": {
+    "broad-strong-candidate.json": "0196421206524e9587aa209401d935be1fc7f18f741b34237f0b1352ef5ae876",
+    "source-silhouettes.mjs": "4ace24fd1694fcb346b4679cd18febfbbef619aa225b4410495b92c5e81e1a17",
+    "broad-moderate-candidate.json": "0adfa197436762e04058a30b6959842dd26775162cdf28cf3e9abea31f4d7981",
+    "broad-moderate-preview.svg": "aa1926d1731baa4ce32c6029367a73aa6bbe978b3fef0b3eeb2ce759e82298ba",
+    "broad-moderate-rounded-top-candidate.json": "c05047201df97c3298b8a49e862d8559705ff81cf581dad9484f901802868c3b",
+    "source-base-generator.py": "5049f82748f365b5e96cb3573ce5e1757a5f90de8e26ec5b6846b3943f2363b2",
+    "broad-moderate-rounded-top-positive-mm.stl": "2e8f12742b7e65c3ddbd7b3c5bc88cb134597cbfd6e9ca05e7ed53de7852f1b0",
+    "broad-moderate-rounded-top-preview.svg": "af3e2179ecfddeda8b3da504a12b24fc2074c59a57344b11e2c335ac1827f457",
+    "negative-coupon-report.json": "3ce9d54f2c02d2d5eccb7de0acb69d74c35549219f45804db53a995f2413e9df",
+    "broad-moderate-positive-mm.stl": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+    "broad-strong-preview.svg": "5ee064d8f1fe003dd197fb1e2d94e89c3a97f681c87284b084882bff81d1c505",
+    "baseline-positive-mm.stl": "a70ab70cfc9cc86d3940440daad82ead2bedab4e58a2421a41a00bc18db36684",
+    "baseline-candidate.json": "25f6dc309ac6e8bec2d5e3cbbea25841f9ce88db71f7103f6e801a76b610c905",
+    "negative-coupon-preview.svg": "1489865ba08f9c0cf098230ea45d5c34b9f42dafa8f94d09a8238f007dd6cbdf",
+    "source-study-generator.py": "48f3c17ae86821699f61868518a1d97be7b26264212ea659103aea32dcac2daf",
+    "broad-strong-positive-mm.stl": "7f3505d23c5a87277e69f0d74b206e751e93fd04e9f8c341f13575ad949fabb3",
+    "baseline-preview.svg": "c81ab4630d1b742b9b114066d1ecf6dcec3ca3f736360d3e0a02a42993648fd4",
+    "broad-moderate-2x2-negative-coupon-mm.stl": "5b35a48d13d48e67a2071480e53b71eeff01b2cb74d43186bcd8bebafab9000c"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "capturedAt": "2026-11-26T06:11:32.184Z",
+  "url": "http://127.0.0.1:5288/tools/sowers-relief-study.html",
+  "ready": true,
+  "study": {
+    "file": "/sowers/candy-form/scout-positive-mm.stl",
+    "stlSha256": "a70ab70cfc9cc86d3940440daad82ead2bedab4e58a2421a41a00bc18db36684",
+    "expectedShaVerified": true,
+    "dimensionsMm": [
+      23.747854232788086,
+      30,
+      6
+    ],
+    "sourcePins": {
+      "sourceHashes": {
+        "sowers/candy/silhouettes.mjs": "4ace24fd1694fcb346b4679cd18febfbbef619aa225b4410495b92c5e81e1a17",
+        "sowers/candy/mascot.js": "f25a26bbbb0b390cf2a3413f73a3cdcc2930012b3fbf921f8aa07357b27f151d",
+        "tools/sowers-candy-form.py": "5049f82748f365b5e96cb3573ce5e1757a5f90de8e26ec5b6846b3943f2363b2"
+      },
+      "sourceSha256": "4ace24fd1694fcb346b4679cd18febfbbef619aa225b4410495b92c5e81e1a17",
+      "generatorSha256": "5049f82748f365b5e96cb3573ce5e1757a5f90de8e26ec5b6846b3943f2363b2",
+      "canonicalGeometrySha256": "d6c27d74afa0776a23d5711bf88a8ad733237783dd532e6a01ddc3a73a996e53",
+      "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711"
+    },
+    "parameters": {
+      "height": 30,
+      "depth": 6,
+      "outerDraftDegrees": 2,
+      "reliefWallDraftDegrees": 8,
+      "blendStepsPerQuarterCircle": 12,
+      "contourStepsPerQuadratic": 12,
+      "surfaceDimensions": "canonical getCandyFeatures.surface at nominal 30mm"
+    },
+    "lighting": [
+      {
+        "ambient": 2.2,
+        "sun": 1.2,
+        "pos": [
+          0,
+          3,
+          70
+        ]
+      },
+      {
+        "ambient": 0.65,
+        "sun": 3,
+        "pos": [
+          -35,
+          30,
+          50
+        ]
+      },
+      {
+        "ambient": 0.35,
+        "sun": 4.5,
+        "pos": [
+          -55,
+          18,
+          13
+        ]
+      }
+    ],
+    "camera": {
+      "orthographicHeightMm": 38,
+      "distanceMm": 75,
+      "near": 0.1,
+      "far": 150
+    },
+    "material": {
+      "color": "#efa044",
+      "roughness": 0.73,
+      "metalness": 0
+    },
+    "toneMapping": "ACESFilmic",
+    "exposure": 1,
+    "cellPixels": [
+      360,
+      280
+    ],
+    "canvasPixels": [
+      1080,
+      840
+    ],
+    "pixelRatio": 1,
+    "rowsNominalMm": [
+      30,
+      25,
+      20
+    ],
+    "note": "Uniform scaled geometry and fixed camera. No coating model; screen pixels are not physical viewing size."
+  },
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/159.0.0.0 Safari/537.36",
+  "rendererSourceSha256": "d2003250f1de2f8b3349f32ae12a863b23c39f582bacd5bf1be925a086484424",
+  "screenshotSha256": "66c3d67cb7a7cd4b6fd2655a5463f5412906769cef2479945eff08b0578ed80c",
+  "pageErrors": []
+}

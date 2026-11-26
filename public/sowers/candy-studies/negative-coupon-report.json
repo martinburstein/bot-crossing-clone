@@ -1,0 +1,146 @@
+{
+  "stlSha256": "5b35a48d13d48e67a2071480e53b71eeff01b2cb74d43186bcd8bebafab9000c",
+  "boundsMm": [
+    [
+      -32.87392807006836,
+      -39.0,
+      -9.0
+    ],
+    [
+      32.87392807006836,
+      39.0,
+      0.0
+    ]
+  ],
+  "extentsMm": [
+    65.74785614013672,
+    78.0,
+    9.0
+  ],
+  "volumeMm3": 33815.21464141741,
+  "faceCount": 83212,
+  "vertexCount": 41608,
+  "watertight": true,
+  "windingConsistent": true,
+  "connectedComponents": 1,
+  "eulerNumber": 2,
+  "allEdgesTwoFaces": true,
+  "id": "broad-moderate-2x2-negative-coupon",
+  "sourcePositiveId": "broad-moderate",
+  "sourcePositiveStlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+  "sourceTransform": "mirror positive Z; translate XY to grid; subtract actual positive solids from rectangular stock",
+  "cavityCount": 4,
+  "centersMm": [
+    [
+      -16.0,
+      -19.0
+    ],
+    [
+      -16.0,
+      19.0
+    ],
+    [
+      16.0,
+      -19.0
+    ],
+    [
+      16.0,
+      19.0
+    ]
+  ],
+  "pitchMm": [
+    32.0,
+    38.0
+  ],
+  "stockDimensionsMm": [
+    65.74785423278809,
+    78.0,
+    9.0
+  ],
+  "minimumFloorStockMm": 3.0,
+  "minimumPerimeterStockMm": 5.0,
+  "minimumBetweenOpeningBoundsStockMm": 8.0,
+  "openingPlaneZMm": 0,
+  "deepestCavityZMm": -6,
+  "stockBottomZMm": -9.0,
+  "extractionAxis": [
+    0,
+    0,
+    1
+  ],
+  "expectedSubtractedVolumeMm3": 12339.780444583152,
+  "expectedRemainingVolumeMm3": 33815.21322683409,
+  "serializedVolumeDifferenceMm3": 0.0014145833265502006,
+  "openingSectionCheck": {
+    "zMm": [
+      -5.999,
+      -5.90528125,
+      -5.8115625,
+      -5.71784375,
+      -5.624124999999999,
+      -5.5304062499999995,
+      -5.4366875,
+      -5.34296875,
+      -5.24925,
+      -5.15553125,
+      -5.0618125,
+      -4.9680937499999995,
+      -4.874375,
+      -4.78065625,
+      -4.6869375,
+      -4.59321875,
+      -4.499499999999999,
+      -4.4057812499999995,
+      -4.3120625,
+      -4.21834375,
+      -4.124625,
+      -4.03090625,
+      -3.9371875,
+      -3.84346875,
+      -3.7497499999999997,
+      -3.65603125,
+      -3.5623125,
+      -3.46859375,
+      -3.374875,
+      -3.28115625,
+      -3.1874375,
+      -3.09371875,
+      -3.0,
+      -2.90628125,
+      -2.8125625,
+      -2.71884375,
+      -2.625125,
+      -2.53140625,
+      -2.4376875,
+      -2.34396875,
+      -2.2502500000000003,
+      -2.15653125,
+      -2.0628125,
+      -1.9690937499999999,
+      -1.875375,
+      -1.7816562500000002,
+      -1.6879375000000003,
+      -1.5942187500000005,
+      -1.5004999999999997,
+      -1.4067812499999999,
+      -1.3130625,
+      -1.2193437500000002,
+      -1.1256250000000003,
+      -1.0319062500000005,
+      -0.9381875000000006,
+      -0.8444687499999999,
+      -0.75075,
+      -0.6570312500000002,
+      -0.5633125000000003,
+      -0.4695937500000005,
+      -0.3758750000000006,
+      -0.2821562499999999,
+      -0.18843750000000004,
+      -0.09471875000000018,
+      -0.001
+    ],
+    "maxNonNestedSolidAreaMm2": 0.0,
+    "cavitiesWidenTowardsPositiveZ": true
+  },
+  "assumptions": "5mm edge stock, 3mm floor and 32x38mm pitch are layout hypotheses; no recipe, material, process, food-contact or tooling approval"
+}

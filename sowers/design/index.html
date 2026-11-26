@@ -25,12 +25,18 @@
       </div>
       <div class="hero-panel">
         <div class="stage-topline"><span id="stage-kicker">01 / SCOUT</span><span class="concept-tag">Design concept</span></div>
+        <div class="preview-selector"><span class="control-label">Preview</span><div class="source-controls segmented" role="group" aria-label="Model source"><button data-source="agent" aria-pressed="false">Character</button><button data-source="master" aria-pressed="true">Candy master</button></div></div>
         <div class="sour-stamp" aria-hidden="true">SOUR<br><span>by nature.</span><svg viewBox="0 0 50 30"><path d="M5 15 Q12 2 20 15 T35 15 L44 15 M38 9 L44 15 L38 21"/></svg></div>
         <div id="model-stage" aria-label="Interactive character preview"><div id="render-fallback" hidden><div id="fallback-character"></div><p>3D is unavailable here. These front-view shapes and the packaging studies still work.</p></div></div>
         <div class="stage-caption"><span id="model-caption">Scout · citrus concept</span><span>Drag to turn <span aria-hidden="true">↔</span></span></div>
         <div class="stage-shape-controls" role="group" aria-label="Preview shape"><button data-quick-variant="scout" aria-pressed="true">01 <strong>Scout</strong></button><button data-quick-variant="seed" aria-pressed="false">02 <strong>Seed</strong></button><button data-quick-variant="bud" aria-pressed="false">03 <strong>Bud</strong></button></div>
-        <div class="source-controls segmented" role="group" aria-label="Model source"><button data-source="agent" aria-pressed="false">Agent</button><button data-source="master" aria-pressed="true">Candy master</button></div>
-        <p id="master-status" class="master-status" role="status">Loading the exported candy master…</p>
+        <p id="master-status" class="master-status" role="status">30 mm tall · 6 mm nominal depth · Loading master…</p>
+        <details id="master-evidence" class="master-evidence"><summary>View source evidence</summary><p>Actual exported STL · one mesh, one material. Byte fingerprint and measured bounds are checked when loaded.</p><dl id="master-evidence-values"><dt>Export</dt><dd>Loading…</dd></dl></details>
+        <div id="character-controls" class="character-controls" hidden>
+          <div><span class="control-label">Finish study</span><div class="segmented" role="group" aria-label="Material"><button data-material="matte" aria-pressed="true">Matte</button><button data-material="gummy" aria-pressed="false">Gummy</button></div></div>
+          <div><span class="control-label">Pose</span><div class="segmented" role="group" aria-label="Character presentation"><button data-pose="candy" aria-pressed="true">Rest</button><button data-pose="agent" aria-pressed="false">Animated</button></div></div>
+          <div><label class="control-label" for="status">Expression</label><select id="status"><option value="idle">Hello, world</option><option value="working">Getting things done</option><option value="complete">Little victory</option><option value="waiting">Ready when you are</option><option value="error">A little puzzled</option></select></div>
+        </div>
         <div id="master-error" class="master-error" role="alert" hidden></div>
         <div class="camera-controls" role="group" aria-label="Camera angle"><button data-camera="front" aria-pressed="true">Front</button><button data-camera="three" aria-pressed="false">¾</button><button data-camera="side" aria-pressed="false">Side</button><button data-camera="back" aria-pressed="false">Back</button><button id="play" aria-pressed="false" aria-label="Play character animation">Play</button></div>
       </div>
@@ -39,26 +45,23 @@
     <section id="shape-review" class="shape-review" aria-labelledby="shape-heading">
       <div class="section-heading"><div><p class="eyebrow">ONE LITTLE EXPLORER. THREE DIRECTIONS.</p><h2 id="shape-heading">Find the keeper.</h2></div><p>A shape first. The visor and sprout are shallow details; the outline does the heavy lifting.</p></div>
       <div class="variant-grid" id="variant-grid"></div>
-      <div class="review-controls">
-        <div><span class="control-label">The finish</span><div class="segmented" role="group" aria-label="Material"><button data-material="matte" aria-pressed="true">Matte character</button><button data-material="gummy" aria-pressed="false">Sour gummy</button></div></div>
-        <div><span class="control-label">The read</span><div class="segmented" role="group" aria-label="Character presentation"><button data-pose="candy" aria-pressed="true">Rest pose</button><button data-pose="agent" aria-pressed="false">Agent pose</button><button id="monochrome" aria-pressed="false">One color</button></div></div>
-        <div><label class="control-label" for="status">Agent expression</label><select id="status"><option value="idle">Hello, world</option><option value="working">Getting things done</option><option value="complete">Little victory</option><option value="waiting">Ready when you are</option><option value="error">A little puzzled</option></select></div>
-      </div>
-      <p class="keyboard-note">Keyboard: 1–3 choose a shape · M toggles one color · R resets the view · Arrow keys turn the focused 3D view. Motion starts paused.</p>
+      <div class="review-controls"><div><span class="control-label">Flat artwork</span><button id="monochrome" class="silhouette-toggle" aria-pressed="false">Silhouette check</button></div><p class="art-note">Hide the face details on cards and packs to judge the outline. The 3D preview keeps its physical relief or character finish.</p></div>
+      <p class="keyboard-note">Keyboard: 1–3 choose a shape · M toggles the silhouette check · R resets the view · Arrow keys turn the focused 3D view. Motion starts paused.</p>
     </section>
 
     <section class="flavor-section" aria-labelledby="flavor-heading">
       <div class="section-heading"><div><p class="eyebrow">A SMALL WORLD OF BIG FLAVOR</p><h2 id="flavor-heading">Pick your punch.</h2></div><p>Three color directions. Flavor names are creative concepts, not product claims.</p></div>
       <div class="flavor-grid">
-        <button class="flavor citrus" data-flavor="citrus" aria-pressed="true"><span class="flavor-top">01 <span>↗</span></span><span class="flavor-name">Citrus<br>scout.</span><span class="flavor-note">Tangerine + electric yellow</span><span class="flavor-dot" aria-hidden="true"></span></button>
-        <button class="flavor lime" data-flavor="lime" aria-pressed="false"><span class="flavor-top">02 <span>↗</span></span><span class="flavor-name">Lime<br>littleling.</span><span class="flavor-note">Sharp green + deep violet</span><span class="flavor-dot" aria-hidden="true"></span></button>
-        <button class="flavor berry" data-flavor="berry" aria-pressed="false"><span class="flavor-top">03 <span>↗</span></span><span class="flavor-name">Berry<br>brave.</span><span class="flavor-note">Raspberry + soft lilac</span><span class="flavor-dot" aria-hidden="true"></span></button>
+        <button class="flavor citrus" data-flavor="citrus" aria-pressed="true"><span class="flavor-top">01 <span>↗</span></span><span class="flavor-name">Citrus.</span><span class="flavor-note">Orange + electric yellow</span><span class="flavor-dot" aria-hidden="true"></span></button>
+        <button class="flavor lime" data-flavor="lime" aria-pressed="false"><span class="flavor-top">02 <span>↗</span></span><span class="flavor-name">Lime.</span><span class="flavor-note">Sharp green + deep violet</span><span class="flavor-dot" aria-hidden="true"></span></button>
+        <button class="flavor berry" data-flavor="berry" aria-pressed="false"><span class="flavor-top">03 <span>↗</span></span><span class="flavor-name">Berry.</span><span class="flavor-note">Pink + soft lilac</span><span class="flavor-dot" aria-hidden="true"></span></button>
       </div>
     </section>
 
     <section id="on-pack" class="pack-section" aria-labelledby="pack-heading">
       <div class="section-heading"><div><p class="eyebrow">SAME SHAPE. OFF THE SCREEN.</p><h2 id="pack-heading">A face for the shelf.</h2></div><p>A front-of-pack design study for the selected shape. Simple, bold, and easy to spot.</p></div>
       <div class="pack-shelf" id="pack-shelf"></div>
+      <div class="brand-downloads"><a href="/sowers/brand-kit/sowers-wordmark.svg" download>Download original wordmark SVG ↗</a><a href="/sowers/brand-kit/sowers-one-ink.svg" download>Download one-ink character sheet ↗</a></div>
       <div class="pack-footnote"><span>SELECTED SHAPE <strong id="pack-selection">Scout</strong></span><p>Visual concepts only. Candy formulation, production tooling, labeling, and clearance have not been developed or validated.</p></div>
     </section>
 

@@ -2,9 +2,9 @@
 
 An original Mars outpost for watching coding agents work. A separate `codex/sowers` branch in Bot Crossing's repository; the existing colony and animation pages remain available.
 
-![Sowers character study](docs/sowers/character-preview.png)
+![Candy-first Sowers character study](docs/sowers/candy-character-preview.png)
 
-The direction gives equal weight to three ingredients: Wobbly Life's soft, physical charm; the masked Mars Mission explorer's quiet readiness; and modular mission hardware that grows from reported work. All runtime meshes are original procedural geometry. No LEGO or Wobbly Life assets are runtime dependencies.
+The direction combines playful physical charm, a masked Mars explorer, and modular mission hardware that grows from reported work. The current candy-first Scout replaces the rejected inflated first pass: a broad helmet, short attached limbs, one seed stamp, and a single connected outline. Seed and Bud remain comparison directions. All runtime meshes are original procedural geometry. No LEGO or Wobbly Life assets are runtime dependencies.
 
 ## Open it
 
@@ -19,6 +19,7 @@ npm run sowers
 - Mission watch: <http://127.0.0.1:5286/sowers/>
 - Fixed fictional preview: <http://127.0.0.1:5286/sowers/?preview=1>
 - Character studio: <http://127.0.0.1:5286/sowers/studio/>
+- Character kitchen and actual candy master: <http://127.0.0.1:5286/sowers/design/>
 - Base assembly study: <http://127.0.0.1:5286/sowers/assembly/>
 - Broadcast composition: append `&broadcast=1` to preview or `?broadcast=1` to live.
 
@@ -49,4 +50,4 @@ The optional [browser verification script](tools/verify-sowers-browser.cjs) uses
 
 [MAGI assignments, reviews and accepted findings](docs/sowers/MAGI.md) retain the actual agent handles, evidence, repaired defects and limitations. The app performs no model calls, so watching it does not consume model allowance.
 
-Final validation: 110 tests passed; thirteen production browser scenarios passed without page errors; dependency audit clean. [Handoff and remaining limitations](docs/sowers/HANDOFF.md).
+Candy-redesign checkpoint: 124 tests and the production build pass; thirteen browser scenarios pass with the new rig. The sustained frozen-candidate test is recorded separately as it completes. [Candy design assets](docs/sowers/candy/asset-index.md), [manufacturing geometry and limits](docs/sowers/candy-manufacturing.md), [work record](docs/sowers/MAGI.md).

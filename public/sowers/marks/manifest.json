@@ -1,7 +1,7 @@
 {
   "kind": "graphic-marks",
   "source": "sowers/candy/silhouettes.mjs",
-  "sourceSha256": "4ace24fd1694fcb346b4679cd18febfbbef619aa225b4410495b92c5e81e1a17",
+  "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
   "files": [
     "scout-color.svg",
     "scout-ink.svg",
