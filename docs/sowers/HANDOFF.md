@@ -27,4 +27,4 @@ Historical Waypoint books and a real Mars Mission image archive were found. The 
 
 ## Allowance and stop decision
 
-The maintained usage monitor read 11% at admission and 10% throughout implementation and final validation. The initial Sowers build, reference recovery, integration, peer review and verification reached a complete checkpoint before the requested 2% reserve. Work stopped at that checkpoint, preserving the remaining allowance. No reset credits or paid services were used. Resume with visual feedback on the three equal design ingredients, or connect an explicit checkpoint broadcast producer using [broadcast.md](broadcast.md).
+The maintained usage monitor read 11% at admission, 10% during implementation and 9% at closeout. The initial Sowers build, reference recovery, integration, peer review and verification reached a complete checkpoint before the requested 2% reserve. Work stopped at that checkpoint, preserving the remaining allowance. No reset credits or paid services were used. Resume with visual feedback on the three equal design ingredients, or connect an explicit checkpoint broadcast producer using [broadcast.md](broadcast.md).

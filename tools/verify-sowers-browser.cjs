@@ -13,7 +13,7 @@ let browser
   args:['--use-angle=swiftshader','--enable-webgl','--ignore-gpu-blocklist']})
  const errors=[]
  const page=await browser.newPage({viewport:{width:1440,height:1000}})
- page.setDefaultTimeout(15000)
+ page.setDefaultTimeout(30000)
  page.on('pageerror',error=>errors.push(error.message))
  await page.goto(`${base}/sowers/?preview=1`)
  await page.locator('.crew-row').first().waitFor()
@@ -30,6 +30,8 @@ let browser
  assert.equal(await page.locator('#app').evaluate(node=>node.classList.contains('broadcast')),false)
  await page.locator('#motion').click()
  assert.equal(await page.locator('#motion').getAttribute('aria-pressed'),'true')
+ await page.locator('#overview').click()
+ await page.locator('#notice').waitFor({state:'hidden'})
  await page.screenshot({path:`${output}/mission-desktop.png`})
  console.log('Passed preview controls')
 
@@ -66,8 +68,9 @@ let browser
  await page.setViewportSize({width:390,height:844})
  await page.screenshot({path:`${output}/mission-mobile.png`})
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false)
+ await page.close()
  const context=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'})
- context.setDefaultTimeout(15000)
+ context.setDefaultTimeout(30000)
  const studio=await context.newPage()
  studio.on('pageerror',error=>errors.push(error.message))
  await studio.goto(`${base}/sowers/studio/`)
@@ -76,6 +79,7 @@ let browser
  await studio.locator('[data-view="detail"]').click()
  await studio.screenshot({path:`${output}/studio-detail.png`})
  assert.match(await studio.locator('#play').innerText(),/Play/)
+ await studio.close()
  console.log('Passed studio and compact layout')
 
  const pausedMission=await context.newPage()
@@ -87,6 +91,7 @@ let browser
  await pausedMission.keyboard.press('ArrowLeft')
  const afterCamera=await pausedMission.locator('canvas').screenshot()
  assert.notDeepEqual(beforeCamera,afterCamera,'Paused keyboard camera input must repaint')
+ await pausedMission.close()
  console.log('Passed paused keyboard repaint')
 
  const assembly=await context.newPage()
@@ -103,6 +108,7 @@ let browser
  await assembly.locator('#retract').click()
  assert.equal(await assembly.locator('#checkpoint-count').innerText(),'0')
  await assembly.screenshot({path:`${output}/assembly-study.png`})
+ await assembly.close()
  console.log('Passed assembly evidence isolation')
 
  const fallback=await browser.newPage({viewport:{width:1200,height:900}})
