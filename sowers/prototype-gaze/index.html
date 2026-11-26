@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5ead0">
+  <title>Sowers · Gaze Cue Study</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="page">
+    <header><a href="/sowers/prototypes/">SOWERS / PROTOTYPES</a><span>ITERATION 16</span></header>
+    <section class="intro">
+      <p class="eyebrow">CODE-NATIVE FACE WORKBENCH</p>
+      <h1>One Scout, three proposed states.</h1>
+      <p>The hood, crop, palette and face window stay fixed while the eye treatment changes. Select a state, then inspect it at icon sizes.</p>
+    </section>
+    <section class="layout" aria-label="Gaze cue workbench">
+      <div class="stage">
+        <canvas id="large" width="256" height="256" aria-label="Enlarged Scout face preview"></canvas>
+        <p id="selected-name" aria-live="polite">DEFAULT · content</p>
+      </div>
+      <div class="details">
+        <fieldset id="choices">
+          <legend>PROPOSED STATE</legend>
+          <label><input type="radio" name="state" value="default" checked> <span><b>DEFAULT</b><small>Content · original happy arches</small></span></label>
+          <label><input type="radio" name="state" value="inspect"> <span><b>INSPECT</b><small>Directional gaze · both pupils shift right</small></span></label>
+          <label><input type="radio" name="state" value="input"> <span><b>NEEDS INPUT</b><small>Friendly open eyes · pupils centered</small></span></label>
+        </fieldset>
+        <section class="samples" aria-label="Selected face at icon sizes">
+          <h2>ICON-SIZE PREVIEW</h2>
+          <div class="sample-grid">
+            <figure><canvas data-size="16" width="16" height="16" aria-label="16 pixel sample"></canvas><figcaption>16 px</figcaption></figure>
+            <figure><canvas data-size="32" width="32" height="32" aria-label="32 pixel sample"></canvas><figcaption>32 px</figcaption></figure>
+            <figure><canvas data-size="64" width="64" height="64" aria-label="64 pixel sample"></canvas><figcaption>64 px</figcaption></figure>
+            <figure><canvas data-size="128" width="128" height="128" aria-label="128 pixel sample"></canvas><figcaption>128 px</figcaption></figure>
+          </div>
+        </section>
+        <p class="note">Pixel inspection only: the smallest size where direction may become ambiguous is a synthetic visual estimate, not evidence of human recognition.</p>
+        <button id="export">PNG labeled comparison</button>
+      </div>
+    </section>
+    <footer>Proposed visual states only · no agent activity inference · static by default</footer>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

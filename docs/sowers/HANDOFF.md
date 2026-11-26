@@ -1,35 +1,31 @@
-# Sowers — active prototype checkpoint
+# Sowers — stopped at the requested allowance floor
 
-Latest direction, 26 November 2026: devote all MAGI work to character prototypes. Build three separate corpora before blending Mars Mission, Wobbly Life and Bot Crossing; retain Goat 4's cream/orange/cocoa palette and cute helper feel. Creative work stops at reported2%; reserve through1% is for backup and safe handoff. Work remains active above that floor.
+Creative work stopped at **2026-11-26 10:55:02 UTC**, when the maintained monitor reported **2% remaining**. The final reserve is for backup and handoff. Do not restart generation or workers automatically. Work is on branch `codex/sowers` in `/Users/martinburstein/Documents/ChatGPT/Sowers`; original The Needle and Desktop work were preserved.
 
-## Open the work
+## Open the prototypes
 
-Current dev comparison: `http://127.0.0.1:5301/sowers/prototypes/index.html`. The exact soil-style ternary grid selects reviewed character/candy recipes; percentages sum to100 and describe authored direction, not measured source attribution. Seven recipes are now available: three70/15/15 leaders, three45/45/10 edge studies and balanced34/33/33. ImageGen concepts, prompts and reviews are in `docs/sowers/prototypes/`; original source references and raw receipts remain private. Design Iteration labels are separate from the memorial history.
+Reviewed comparison hub: http://127.0.0.1:5286/sowers/prototypes/index.html?study=balanced (dev copy on port5301). Seven character/candy recipes sit on an exact soil-style ternary triangle: three70/15/15 leaders, three45/45/10 edges and balanced34/33/33. Weights describe authored direction, not measured style attribution. Goat4 remains the fixed cream/orange/cocoa helper preference anchor, not a fourth axis.
 
-Read-only agent-watching prototype remains `http://127.0.0.1:5301/sowers/?magi=1`, with Field Paint at `/sowers/paint/`. Production5286 may still have the earlier Node API imports until a deliberate rebuild/restart. The static `dist` directory has changed during validation; use the configured dev instance for current API/UI consistency.
+Portable poster: `public/sowers/prototypes/poster.html`; PNG: `docs/sowers/prototypes/iteration-12-prototype-poster.png`. Family lineup: `public/sowers/prototypes/lineup.html`. Personality sheets: `public/sowers/prototypes/personality.html`. The hub links controlled 3D mixture, fixed-template Paint hops and actual candy geometry studies. Design Iteration labels are separate from the private memorial ordinals.
 
-## Accepted work and open design questions
+## What is reviewed
 
-The corpus wave accepted37source-tagged traits, after all3terminal workers and same3formal peer challenges. Goat4 is a fixed preference anchor, not a fourth percentage axis. Mars provides protected presence; Wobbly supplies simple masses/reaching poses; Bot supplies friendly helper readability. Literal source masks, badges, logos and meshes do not transfer wholesale.
+Three separate corpora were completed and challenged before any blend generation:37source-tagged traits across Mars Mission, Wobbly Life and Bot Crossing. Wave10–12 generated seven original concepts and follow-up studies. Wave13–14 replaced uncertain illustrations with consistent 3D/2D templates, exact-mesh views, procedural authored mixtures and draft/stripe factors. Wave15 added six Scout expressions, Canopy/Pod helper gestures and three matched candy contours. Last fully reviewed source checkpoint is `3c28b0d`, pushed before the stop. See `MAGI.md` and per-study records for challenges, corrections and limits.
 
-Six exploratory blends preserve the shared family; canopy and seed-pod produce the largest contour differences. Balanced Scout preserves candy proportions better, but mittens are large and the hood remains close to the favorite family. Candy material/pose changes confound some earlier comparisons. AI-generated front/side/back illustrations are not projections of a single object. The six-frame Paint-like hop is readable but proportions drift and its paper texture is not literal MS Paint.
+The final wave16 is explicitly unaccepted WIP. Canopy-hands finished its worker task; Scout-fidelity and gaze-cues were interrupted at the floor. No formal campfire or root acceptance occurred. Scout comparison PNG and final Markdown are missing; gaze final MD/JSON records are missing. Source/assets are preserved, not promoted. Read `prototypes/iteration-16-STOPPED.md` before resuming.
 
-Wave13 addresses those gaps with3fresh LunaMedium tasks: an actual canopy candy solid rendered from one mesh, a fixed-template code-native Paint hop, and a consistent3D balanced mascot blockout. These are isolated studies; they do not replace the canonical avatar or positive master. See MAGI.md for actual assignments, peer reviews and next-wave decisions.
+## Application and services
 
-## Existing application checkpoint
+Read-only agent viewer: http://127.0.0.1:5286/sowers/?magi=1 ; Paint: /sowers/paint/. Production5286 was deliberately refreshed with current API imports and child-agent observation enabled; dev5301 also remains available. Both are loopback previews, not public deployments. Existing private broadcast is a historical derived wave15 observation, not an execution authority or current roster. Native collaboration tools remain execution authority; no browser model launcher or parallel protocol store was introduced.
 
-Branch `codex/sowers`, repo `/Users/martinburstein/Documents/ChatGPT/Sowers`. Application checkpoint2707583 and corpus/six-concept checkpointd770ff8 are pushed to origin. The earlier wave8 full suite176/176 and production build passed. Source guard, measured usage, packet lifecycle, pause/reduced-motion and archive browser checks are bounded implementation evidence; intercepted fixtures do not prove real dispatch or future execution. A generic unmatched404 console warning remains in the protocol browser log.
+Earlier application checkpoint2707583 passed176/176 tests and build. Later prototype checkpoints passed production builds and focused mesh/browser/hash checks. Full application tests were not rerun for each isolated art study. Known limits: memorial export is freehand-stroke-only, print evidence is stub/CSS only, and CLI append has an unresolved aggregate10MiB archive boundary. Private archive is small and retains Iterations1–3 with their original metadata; wave8 drafts remain unapproved. No later design wave was admitted as memorial history.
 
-Classic Paint supports lasso/masked selection and more export/transformation tools. Memorial draft export remains freehand-stroke-only; arbitrary shapes/text/imported pixels are not converted. Print checks stub dispatch and inspect media CSS, not actual printer fidelity. Archive integrity binds normalized entries and approved PNGs, but CLI append has an unresolved aggregate10MiB boundary: a sufficiently large append could exceed the reader limit. Actual private archive is currently small. Do not call these limitations finished.
+## Physical and visual limits
 
-Private Iterations1–3 retain their existing ordinal and creation metadata and now embed the exact previously inspected PNGs and approval proof. Wave8 drafts remain unapproved. No new memorial acceptance or complete phase was fabricated for later prototype waves. Native collaboration remains execution authority; viewer snapshots are derived read-only observations.
+Canonical Scout v3 and original avatar are preserved. New solids/concepts do not establish real mold release, sour-coating readability, shrink tolerance, food-contact approval or market demand. No physical samples, supplier tests, purchase or outreach occurred. Foreground mitten layering is 2D evidence; coarse mesh bounds are not exact intersection proof. Synthetic expression differences do not establish human recognition. Gesture seed handling does not prove planting/contact mechanics.
 
-## Physical and usage boundaries
+## Backup and restoration
 
-Canonical v3 Scout remains the shared30mm-high,6mm-deep positive master with broad-moderate face relief. Historicalv1/v2 and other study masters remain intact. New generated candy imagery is concept work, not manufactured evidence. No recipe, sanding/release trial, shrink compensation, supplier approval or market test exists; no outreach or purchase occurred.
+Private closeout backup is under `/Users/martinburstein/Documents/ChatGPT/Sowers-Backups/20261126T105502Z/`. Its README and SHA256 manifest describe the Git bundle, working-files snapshot including interrupted partials, private references/receipts/memorials/drafts, built preview, and separate AI Tools usage-monitor bundle. Verify with `verify-backup.py` before restoring. Do not publish the private archive or copy private identity/usage records into Git.
 
-The maintained usage helper remains AI Tools' root token-monitor.cjs. Its isolated `codex/sowers-agent-usage` worktree has explicit child-agent support and documentation, pushed through96917a7;29tests and offline Mac desktop launch passed. Original checkout/default scope remains untouched. Account allowance is shared, not attributable solely to this chat. Private usage snapshots and execution identities stay out of public Git.
-
-## Safe closeout
-
-At2%, stop creative admissions and preserve terminal/partial worker evidence. Commit/push completed source and assets, retain private originals/receipts/archives/drafts locally, verify backup hashes and record exact stop time/allowance. Keep incomplete work explicitly incomplete. Do not consume the final1% on new experiments.
+The maintained account monitor is `/Users/martinburstein/.codex/skill-repos/ai-tools/token-monitor.cjs --json`. The isolated `codex/sowers-agent-usage` branch is pushed through96917a7, with explicit child-agent support,29tests and offline Mac desktop verification. Shared allowance is not solely attributable to this chat.

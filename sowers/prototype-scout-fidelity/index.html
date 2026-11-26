@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f1e5" />
+    <title>Sowers · Scout fidelity</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+  </head>
+  <body>
+    <main class="study">
+      <header>
+        <p class="eyebrow">SOWERS / GEOMETRY STUDY 16</p>
+        <h1>Scout, back to the source shape.</h1>
+        <p class="dek">The canonical Scout contour and shared face paths form both solids. The refined version adds one shallow recessed crown stripe.</p>
+        <span class="badge">CANONICAL XY · 30 × 6 MM MAX · POSITIVE GEOMETRY REVIEW</span>
+      </header>
+      <section class="controls" aria-label="Variant and view selection">
+        <div><label>Solid</label><div class="button-row" id="variants"></div></div>
+        <div><label>Orthographic view</label><div class="button-row"><button data-view="front" aria-pressed="true">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="three-quarter" aria-pressed="false">Three-quarter</button></div></div>
+        <label class="check"><input type="checkbox" id="flat" /> Flat inspection</label>
+      </section>
+      <section class="viewer" aria-label="Interactive STL inspection">
+        <canvas id="model" aria-label="Orthographic rendering of selected Scout candy STL"></canvas>
+        <div class="load-state" id="load-state">Loading the selected STL…</div>
+        <p class="hint">Drag to inspect · scroll to zoom</p>
+      </section>
+      <section class="facts">
+        <div><span>Selected solid</span><strong id="factor">Loading…</strong></div>
+        <div><span>Measured envelope</span><strong id="dimensions">Loading…</strong></div>
+        <div><span>Recomputed exported volume</span><strong id="volume">Loading…</strong></div>
+        <div><span>Selected STL SHA-256</span><code id="hash">Loading…</code></div>
+      </section>
+      <p class="limits">The band is a shallow straight-sided recess in a positive geometry study. No release, coating readability, food-contact, supplier, tolerance, shrink, tooling or manufacturing approval is implied.</p>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

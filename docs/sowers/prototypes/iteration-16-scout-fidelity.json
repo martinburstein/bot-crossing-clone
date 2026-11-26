@@ -1,0 +1,169 @@
+{
+  "iteration": 16,
+  "title": "Scout fidelity: canonical control and crown-band refinement",
+  "kind": "canonical-contour-positive-solid-fidelity-study",
+  "units": "mm",
+  "variants": [
+    {
+      "id": "canonical-control",
+      "label": "Canonical Scout control",
+      "stl": "sowers/prototypes/scout-fidelity/canonical-scout-control.stl",
+      "metrics": {
+        "boundsMm": [
+          [
+            -11.873927116394043,
+            0.0,
+            0.0
+          ],
+          [
+            11.873927116394043,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 23.747854232788086,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 3084.945111145788,
+        "vertices": 10400,
+        "faces": 20796,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveRecomputedVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98"
+      }
+    },
+    {
+      "id": "crown-band-refinement",
+      "label": "Scout with recessed crown band",
+      "stl": "sowers/prototypes/scout-fidelity/scout-crown-band-refinement.stl",
+      "metrics": {
+        "boundsMm": [
+          [
+            -11.873927116394043,
+            0.0,
+            0.0
+          ],
+          [
+            11.873927116394043,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 23.747854232788086,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 3084.158200671778,
+        "vertices": 10436,
+        "faces": 20868,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveRecomputedVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "53e5dcd6ad7959e098fd0808ae13164dd66ee9835f7c7776dcbc3c85f1468a35"
+      }
+    }
+  ],
+  "canonicalSource": {
+    "path": "sowers/candy/silhouettes.mjs",
+    "sha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+    "outlineMethod": "getCandyOutline/getCandyRoundedSegments with shared sampleCandySegments(\u2026,12)",
+    "featuresMethod": "getCandyFeatures(\"scout\"); helmet, face, eyes and chest XY are exact shared paths",
+    "heightNormalization": "30 mm using canonical sampled outline min/max Y",
+    "actualWidthMm": 23.747854106722276
+  },
+  "parameters": {
+    "heightMm": 30.0,
+    "depthMm": 6.0,
+    "outerDraftDegrees": 2.0,
+    "reliefWallDraftDegrees": 8.0,
+    "blendStepsPerQuarterCircle": 12,
+    "contourStepsPerQuadratic": 12,
+    "crownBand": "engraved polygon; top z=6.03 mm, floor z=5.73 mm; same canonical XY contour and features"
+  },
+  "parametersCanonicalJson": "{\"blendStepsPerQuarterCircle\":12,\"contourStepsPerQuadratic\":12,\"crownBand\":\"engraved polygon; top z=6.03 mm, floor z=5.73 mm; same canonical XY contour and features\",\"depthMm\":6.0,\"heightMm\":30.0,\"outerDraftDegrees\":2.0,\"reliefWallDraftDegrees\":8.0}",
+  "parametersSha256": "0613056a3ad542d75e0dcb51e0be1c31ee6ce8f774241295855e63b323d18ecc",
+  "sourceHashes": {
+    "tools/sowers-scout-fidelity.py": "4750e162c75f142d96a48847888c8f45ca3581886f77ab5c7932d2534ed24dac",
+    "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+    "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+    "public/sowers/candy-form/scout-positive-mm.stl": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+    "docs/sowers/prototypes/preference-anchor.md": "77c687582bf84b7ec84d5d98efe0413c95e547b8ec2c9763e55fca663cf4ae60",
+    "docs/sowers/prototypes/iteration-15-contour-candies.json": "bfb8926d99bb17717e66a670533449a82d13353eaf7b8173435d556f9c14e340",
+    "/Users/martinburstein/Downloads/goat4.png": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7"
+  },
+  "dimensions": {
+    "canonicalWidthMm": 23.747854106722276,
+    "heightMm": 30.0,
+    "maximumDepthMm": 6.0,
+    "controlBoundsMm": [
+      [
+        -11.873927116394043,
+        0.0,
+        0.0
+      ],
+      [
+        11.873927116394043,
+        30.0,
+        6.0
+      ]
+    ],
+    "refinedBoundsMm": [
+      [
+        -11.873927116394043,
+        0.0,
+        0.0
+      ],
+      [
+        11.873927116394043,
+        30.0,
+        6.0
+      ]
+    ]
+  },
+  "proportionReadout": {
+    "headYRangeMm": [
+      19.5,
+      29.0
+    ],
+    "coreTorsoYRangeMm": [
+      4.0,
+      9.5
+    ],
+    "exclusion": "Mitten tabs occur above the torso measurement range; boots are below it. Width is maximum horizontal span of the exact canonical body path within each stated range.",
+    "headWidthMm": 23.747758897643934,
+    "coreTorsoWidthMm": 15.800000000000002,
+    "headToCoreTorsoWidthRatio": 1.5030227150407551
+  },
+  "crownBand": {
+    "planform": "Broad tapered stripe reaching to 29.82 mm, near the canonical crown at 30 mm; it widens toward the helmet rim and has no closed pill/badge outline.",
+    "widthAt26_9Mm": 4.0,
+    "widthAt28_85Mm": 2.4,
+    "depthMm": 0.27,
+    "bottomMm": 5.73,
+    "topMm": 6.03,
+    "strategy": "Shallow recessed cut in the existing 6 mm front envelope; no added bulk."
+  },
+  "comparisonViews": {
+    "path": "public/sowers/prototypes/scout-fidelity/comparison.png",
+    "method": "Front, side and three-quarter orthographic views rendered from each exact final STL; common camera scale, lighting, material and flat back."
+  },
+  "observations": [
+    "The refined mesh keeps the exact canonical Scout outline and shared canonical helmet, face, eyes and chest paths.",
+    "The crown-band recess is the only geometry change from the canonical v3 solid.",
+    "The canonical outline width is measured from source and is not forced to 24 mm.",
+    "Mitten cues and the narrow core torso come from the original canonical contour."
+  ],
+  "limits": [
+    "Positive geometry study only; no mold-release, coating readability, food-contact, supplier, tolerance, shrink, tooling or manufacturing approval.",
+    "The recessed stripe has faceted straight side walls; it is a shape cue, not a proven production relief.",
+    "Source contour and feature sampling remain faceted at the shared 12-step quadratic sampling."
+  ]
+}

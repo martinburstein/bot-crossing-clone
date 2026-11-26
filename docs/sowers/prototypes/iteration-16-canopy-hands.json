@@ -1,0 +1,187 @@
+{
+  "iteration": 16,
+  "title": "Canopy hands comparison",
+  "type": "code-native fixed-template character contour and hand-layering study",
+  "status": "bounded 2D drawing study; not a source animation or 3D intersection proof",
+  "basedOn": "Iteration 14 Canopy Hop renderer and shared six pose records",
+  "characterDirection": {
+    "preferenceAnchor": "Goat 4",
+    "variants": [
+      {
+        "id": "broad-canopy-control",
+        "name": "Broad canopy control",
+        "description": "Broad fixed shell; original hand-behind-shell draw order."
+      },
+      {
+        "id": "foreground-mittens",
+        "name": "Foreground mittens",
+        "description": "Same broad fixed shell and attached rotating arms; mitten shapes are redrawn above the shell."
+      },
+      {
+        "id": "reduced-cowl-sweep",
+        "name": "Reduced cowl sweep",
+        "description": "Smooth fixed shell with reduced lower lateral sweep; original hand-behind-shell draw order."
+      }
+    ],
+    "shared": "All variants keep the same head, torso/face placement, seed, palette, six pose records, timing, limb transforms, render envelope and ground marks. Only cowl sweep and mitten draw order vary."
+  },
+  "renderer": {
+    "name": "drawFrame/drawSower Canvas 2D",
+    "resolution": {
+      "logical": [
+        360,
+        360
+      ],
+      "render": [
+        180,
+        180
+      ],
+      "upscale": 2
+    },
+    "imageSmoothingEnabled": false,
+    "palette": {
+      "paper": "#fff8e8",
+      "cream": "#f5ead0",
+      "orange": "#f58232",
+      "cocoa": "#70402a",
+      "outline": "#392317",
+      "ground": "#b75a32"
+    },
+    "timingProposal": {
+      "millisecondsPerPose": 320,
+      "cycleMilliseconds": 1920,
+      "interpolation": "none; discrete proposed poses",
+      "sourceAnimation": false
+    },
+    "pausedBehavior": "Default paused. One cancellable play loop; no animation-frame callback while paused. prefers-reduced-motion disables Play."
+  },
+  "poses": [
+    {
+      "index": 1,
+      "name": "Crouch"
+    },
+    {
+      "index": 2,
+      "name": "Push"
+    },
+    {
+      "index": 3,
+      "name": "Ascent"
+    },
+    {
+      "index": 4,
+      "name": "Apex"
+    },
+    {
+      "index": 5,
+      "name": "Landing"
+    },
+    {
+      "index": 6,
+      "name": "Settle"
+    }
+  ],
+  "controls": {
+    "variantSelector": "Native select; keyboard operable",
+    "poseSelector": "Native range, six discrete positions; keyboard operable and pauses playback",
+    "playPause": true,
+    "default": "paused on Settle",
+    "reducedMotion": "static on Settle; Play disabled"
+  },
+  "sourcePins": [
+    {
+      "path": "sowers/prototype-canopy-hands/index.html",
+      "sha256": "7c4dc329bc44668aa86dab603f7780e0b80953120fdbdd87ccbf59956b7e5c76"
+    },
+    {
+      "path": "sowers/prototype-canopy-hands/main.js",
+      "sha256": "53a8cfaf9d81f8bfa505e04f5b963374425c8950a627f1398ece0f586427f98d"
+    },
+    {
+      "path": "sowers/prototype-canopy-hands/style.css",
+      "sha256": "19bddc9ea19e70c63a05a5494c6aa4a5409b8d6e2438032be6aee7634d2a2846"
+    },
+    {
+      "path": "public/sowers/prototypes/canopy-hands/index.html",
+      "sha256": "7c4dc329bc44668aa86dab603f7780e0b80953120fdbdd87ccbf59956b7e5c76"
+    },
+    {
+      "path": "public/sowers/prototypes/canopy-hands/main.js",
+      "sha256": "53a8cfaf9d81f8bfa505e04f5b963374425c8950a627f1398ece0f586427f98d"
+    },
+    {
+      "path": "public/sowers/prototypes/canopy-hands/style.css",
+      "sha256": "19bddc9ea19e70c63a05a5494c6aa4a5409b8d6e2438032be6aee7634d2a2846"
+    }
+  ],
+  "referencePins": [
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "sha256": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7",
+      "role": "Goat 4 preference anchor: warm palette, friendly arch eyes, crown stripe, seed chestmark and compact attached mitten direction."
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-14-canopy-hop-neutral-comparison.png",
+      "sha256": "f20b3bc07333c82ea9b3ed0fc53a8bbc12d6d4afc77af8461f6db638e64798cb",
+      "role": "Neutral contour comparison reference."
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-14-canopy-hop-18-pose-sheet.png",
+      "sha256": "670ae58cad4ea582263e6458259a4e0f0420c95ad7e3a1e3e19ea6491e84490b",
+      "role": "Shared pose/data and prior canopy sheet reference."
+    },
+    {
+      "path": "docs/sowers/prototypes/preference-anchor.md",
+      "sha256": "77c687582bf84b7ec84d5d98efe0413c95e547b8ec2c9763e55fca663cf4ae60",
+      "role": "Textual notes on Goat 4 preference anchor."
+    }
+  ],
+  "exports": [
+    {
+      "path": "public/sowers/prototypes/iteration-16-canopy-hands-neutral-comparison.png",
+      "sha256": "3b913a15be9a51f16957ffaa17dfffb85ec7e7fafc5574f44927cff6ea0629b8",
+      "kind": "three-variant neutral comparison",
+      "width": 1080,
+      "height": 420,
+      "format": "PNG"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-16-canopy-hands-18-pose-sheet.png",
+      "sha256": "b165ce59a441998bf2980ad48e5a73cee65e7f163db0f9dcb6f3590f6ff1ecbd",
+      "kind": "three variants × six poses contact sheet",
+      "width": 2160,
+      "height": 1188,
+      "format": "PNG"
+    }
+  ],
+  "observations": [
+    "Broad shell control hides the mitten cues at neutral.",
+    "Redrawing the same attached mittens above the shell makes round, compact hand ends readable while the arms remain joint-attached.",
+    "Reducing the cowl sweep narrows the lower contour and reduces the skirt/flower impression.",
+    "All pose labels and variants are in-frame; no character anatomy changes across poses."
+  ],
+  "verification": {
+    "nodeSyntaxCheck": "passed",
+    "publicRoute": "loaded at /sowers/prototypes/canopy-hands/index.html on existing port 5301",
+    "renderedCombinations": 18,
+    "uniqueFrames": 18,
+    "pausedFrameStable500ms": true,
+    "default": "paused on Settle",
+    "reducedMotion": "opened paused; Play disabled",
+    "mobile390": {
+      "documentWidth": 390,
+      "clientWidth": 390,
+      "stageWidth": 358,
+      "horizontalOverflow": false
+    },
+    "pageErrors": [],
+    "sourcePublicParity": true,
+    "visualExportReview": "Neutral comparison and 18-pose sheet inspected; all poses/captions fit inside image bounds."
+  },
+  "limitations": [
+    "Foreground layering is a 2D study, not proof of 3D garment/hand intersection.",
+    "No conclusion about candy moldability or manufacturing.",
+    "Authored visual comparison, not measured preference evidence.",
+    "Proposed poses/timing do not constitute source animation or production timing."
+  ]
+}
