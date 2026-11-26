@@ -1,0 +1,16 @@
+{
+  "at": "2026-11-26T07:13:19.928Z",
+  "revision": "36b75f3aa23438b127cdf93fb3de2baf47149b2f",
+  "frames": 120,
+  "warmupFrames": 30,
+  "stations": 9,
+  "finalNeutralProfile": "broad-moderate",
+  "meanNineRigMilliseconds": 2.6623524916666668,
+  "priorUnoptimizedNineRigMilliseconds": 17.436390733333333,
+  "priorOptimizedNarrowEyeMilliseconds": 1.5273401333333338,
+  "scope": "Node CPU animation only; excludes rendering/shadows; concurrent software-GPU mission watcher remains running",
+  "sourceHashes": {
+    "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+    "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624"
+  }
+}

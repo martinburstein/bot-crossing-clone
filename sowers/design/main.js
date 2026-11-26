@@ -186,6 +186,10 @@ if (renderer) {
   let loadSerial = 0;
   let loadController;
   const masterEvidence = { status: 'loading' };
+  const setMasterEvidence = next => {
+    for (const key of Object.keys(masterEvidence)) delete masterEvidence[key];
+    Object.assign(masterEvidence, next);
+  };
   const stlLoader = new STLLoader();
   let needsRender = true;
   function disposeMascot() {
@@ -220,14 +224,14 @@ if (renderer) {
     $('#master-error').hidden = true;
     needsRender = true;
     if (state.source === 'agent') {
-      Object.assign(masterEvidence, { status: 'inactive' });
+      setMasterEvidence({ status: 'inactive' });
       mascot = createCandySower({ variant: state.variant, color: flavors[state.flavor].color, seed: 4, materialMode: state.material });
       scene.add(mascot);
       poseMascot();
       return;
     }
     const variant = state.variant;
-    Object.assign(masterEvidence, { status: 'loading', variant });
+    setMasterEvidence({ status: 'loading', variant });
     $('#master-status').textContent = `30 mm tall · 6 mm nominal depth · Loading ${variants[variant].name}…`;
     $('#master-evidence-values').replaceChildren();
     let geometry;
@@ -263,7 +267,7 @@ if (renderer) {
       mascot.receiveShadow = true;
       mascot.userData.master = { assetUrl, stlSha256: digest, boundsMm, reportedBoundsMm: entry.boundsMm, measuredDepthMm: size.z, reportedDepthMm: entry.depthMm, triangles, version: report.version || report.kind, sourceSha256: report.sourceSha256, generatorSha256: report.generatorSha256 || null, sourceHashes: report.sourceHashes || null, parametersSha256: report.parametersSha256 || null, provenance: report.provenance || null };
       scene.add(mascot);
-      Object.assign(masterEvidence, { status: 'ready', variant, ...mascot.userData.master });
+      setMasterEvidence({ status: 'ready', variant, ...mascot.userData.master });
       $('#master-status').textContent = `${Number(size.y.toFixed(2))} mm tall · ${Number(size.z.toFixed(2))} mm total depth · One physical material`;
       const evidenceRows = {
         Export: report.version || report.kind || 'Positive master',
@@ -283,7 +287,7 @@ if (renderer) {
     } catch (error) {
       geometry?.dispose();
       if (serial !== loadSerial || signal.aborted) return;
-      Object.assign(masterEvidence, { status: 'error', variant, message: error.message });
+      setMasterEvidence({ status: 'error', variant, message: error.message });
       $('#master-status').textContent = 'Candy master unavailable';
       $('#master-error').textContent = `${error.message} Choose Character to view the digital character, or reload to retry the export.`;
       $('#master-error').hidden = false;

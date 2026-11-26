@@ -1,0 +1,522 @@
+{
+  "sourceAtStart": {
+    "sowers/design/index.html": "7bacb4ca38ae0122e087570015f95f8e1aa1d5f93682e251afe88b7e15f93e6e",
+    "sowers/design/style.css": "87b5eb48f12afc64df09f9362b9cc45870afb37ed2ff5b1ea2f3c6a419b0c0f9",
+    "sowers/design/main.js": "383a64c346563b3468dd71d6e7fea948f2fab3efd87e6602ade6794f96755f7e",
+    "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+    "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+    "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+  },
+  "hmrBlocked": false,
+  "requireStableSources": true,
+  "startedAt": "2026-11-26T06:20:21.652Z",
+  "requestedStressSeconds": 180,
+  "checks": [
+    "One Character / Candy master selector; contextual character controls; dimensions visible and provenance collapsed; silhouette check changes flat artwork without replacing the master",
+    "Flavor tint, comparison cards and all packaging selections stay synchronized",
+    "Each exported STL is fetched, SHA-256 verified, 30 mm tall with bounds/depth matching the geometry report, and displayed as a single mesh/material",
+    "Paused master draws zero additional frames",
+    "320/390/768/1440 px layout and keyboard rotation/selection/reset",
+    "STL HTTP failure is visible; no silent digital substitute",
+    "A delayed superseded STL cannot overwrite the current selection",
+    "Reduced motion starts paused and permits explicit Play",
+    "WebGL fallback is explicitly an illustration and retains shape/pack selection",
+    "Sustained 183.6 second interaction run, 43 cycles, live GL resources bounded within six objects across settled snapshots",
+    "Source hashes, STL hashes and parameter hashes stayed fixed throughout final validation, without page reloads"
+  ],
+  "errors": [],
+  "samples": [
+    {
+      "cycle": 0,
+      "elapsedSeconds": 0,
+      "resources": {
+        "buffers": 6,
+        "textures": 7,
+        "programs": 3,
+        "created": {
+          "buffers": 20,
+          "textures": 7,
+          "programs": 10
+        },
+        "deleted": {
+          "buffers": 14,
+          "textures": 0,
+          "programs": 7
+        }
+      },
+      "geometries": 2,
+      "rendererTextures": 3,
+      "rendererPrograms": 3,
+      "triangles": 41910,
+      "source": "master",
+      "master": {
+        "status": "ready",
+        "variant": "bud",
+        "assetUrl": "/sowers/candy-form/bud-positive-mm.stl?sha=a99c2ff741f80a0ac555c2b3411b3f7161584b89f4cc5187ecbbba877355f5f2",
+        "stlSha256": "a99c2ff741f80a0ac555c2b3411b3f7161584b89f4cc5187ecbbba877355f5f2",
+        "boundsMm": [
+          [
+            -12.216375350952148,
+            0,
+            0
+          ],
+          [
+            12.216375350952148,
+            30,
+            6
+          ]
+        ],
+        "reportedBoundsMm": [
+          [
+            -12.216375350952148,
+            0,
+            0
+          ],
+          [
+            12.216375350952148,
+            30,
+            6
+          ]
+        ],
+        "measuredDepthMm": 6,
+        "reportedDepthMm": 6,
+        "triangles": 20954,
+        "version": "v3-broad-moderate-shared-relief",
+        "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+        "sourceHashes": {
+          "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+          "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+          "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+        },
+        "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+        "provenance": null,
+        "message": "STL HTTP 503"
+      }
+    },
+    {
+      "cycle": 1,
+      "elapsedSeconds": 4,
+      "resources": {
+        "buffers": 6,
+        "textures": 8,
+        "programs": 3,
+        "created": {
+          "buffers": 96,
+          "textures": 8,
+          "programs": 16
+        },
+        "deleted": {
+          "buffers": 90,
+          "textures": 0,
+          "programs": 13
+        }
+      },
+      "geometries": 2,
+      "rendererTextures": 4,
+      "rendererPrograms": 3,
+      "triangles": 41594,
+      "source": "master",
+      "master": {
+        "status": "ready",
+        "variant": "scout",
+        "assetUrl": "/sowers/candy-form/scout-positive-mm.stl?sha=b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+        "stlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+        "boundsMm": [
+          [
+            -11.873927116394043,
+            0,
+            0
+          ],
+          [
+            11.873927116394043,
+            30,
+            6
+          ]
+        ],
+        "reportedBoundsMm": [
+          [
+            -11.873927116394043,
+            0,
+            0
+          ],
+          [
+            11.873927116394043,
+            30,
+            6
+          ]
+        ],
+        "measuredDepthMm": 6,
+        "reportedDepthMm": 6,
+        "triangles": 20796,
+        "version": "v3-broad-moderate-shared-relief",
+        "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+        "sourceHashes": {
+          "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+          "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+          "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+        },
+        "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+        "provenance": null,
+        "message": "STL HTTP 503"
+      }
+    },
+    {
+      "cycle": 18,
+      "elapsedSeconds": 66,
+      "resources": {
+        "buffers": 6,
+        "textures": 8,
+        "programs": 3,
+        "created": {
+          "buffers": 1406,
+          "textures": 8,
+          "programs": 119
+        },
+        "deleted": {
+          "buffers": 1400,
+          "textures": 0,
+          "programs": 116
+        }
+      },
+      "geometries": 2,
+      "rendererTextures": 4,
+      "rendererPrograms": 3,
+      "triangles": 41910,
+      "source": "master",
+      "master": {
+        "status": "ready",
+        "variant": "bud",
+        "assetUrl": "/sowers/candy-form/bud-positive-mm.stl?sha=a99c2ff741f80a0ac555c2b3411b3f7161584b89f4cc5187ecbbba877355f5f2",
+        "stlSha256": "a99c2ff741f80a0ac555c2b3411b3f7161584b89f4cc5187ecbbba877355f5f2",
+        "boundsMm": [
+          [
+            -12.216375350952148,
+            0,
+            0
+          ],
+          [
+            12.216375350952148,
+            30,
+            6
+          ]
+        ],
+        "reportedBoundsMm": [
+          [
+            -12.216375350952148,
+            0,
+            0
+          ],
+          [
+            12.216375350952148,
+            30,
+            6
+          ]
+        ],
+        "measuredDepthMm": 6,
+        "reportedDepthMm": 6,
+        "triangles": 20954,
+        "version": "v3-broad-moderate-shared-relief",
+        "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+        "sourceHashes": {
+          "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+          "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+          "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+        },
+        "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+        "provenance": null,
+        "message": "STL HTTP 503"
+      }
+    },
+    {
+      "cycle": 31,
+      "elapsedSeconds": 127,
+      "resources": {
+        "buffers": 6,
+        "textures": 8,
+        "programs": 3,
+        "created": {
+          "buffers": 2394,
+          "textures": 8,
+          "programs": 197
+        },
+        "deleted": {
+          "buffers": 2388,
+          "textures": 0,
+          "programs": 194
+        }
+      },
+      "geometries": 2,
+      "rendererTextures": 4,
+      "rendererPrograms": 3,
+      "triangles": 41594,
+      "source": "master",
+      "master": {
+        "status": "ready",
+        "variant": "scout",
+        "assetUrl": "/sowers/candy-form/scout-positive-mm.stl?sha=b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+        "stlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+        "boundsMm": [
+          [
+            -11.873927116394043,
+            0,
+            0
+          ],
+          [
+            11.873927116394043,
+            30,
+            6
+          ]
+        ],
+        "reportedBoundsMm": [
+          [
+            -11.873927116394043,
+            0,
+            0
+          ],
+          [
+            11.873927116394043,
+            30,
+            6
+          ]
+        ],
+        "measuredDepthMm": 6,
+        "reportedDepthMm": 6,
+        "triangles": 20796,
+        "version": "v3-broad-moderate-shared-relief",
+        "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+        "sourceHashes": {
+          "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+          "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+          "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+        },
+        "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+        "provenance": null,
+        "message": "STL HTTP 503"
+      }
+    },
+    {
+      "cycle": 43,
+      "elapsedSeconds": 184,
+      "resources": {
+        "buffers": 6,
+        "textures": 8,
+        "programs": 3,
+        "created": {
+          "buffers": 3308,
+          "textures": 8,
+          "programs": 270
+        },
+        "deleted": {
+          "buffers": 3302,
+          "textures": 0,
+          "programs": 267
+        }
+      },
+      "geometries": 2,
+      "rendererTextures": 4,
+      "rendererPrograms": 3,
+      "triangles": 41594,
+      "source": "master",
+      "master": {
+        "status": "ready",
+        "variant": "scout",
+        "assetUrl": "/sowers/candy-form/scout-positive-mm.stl?sha=b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+        "stlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+        "boundsMm": [
+          [
+            -11.873927116394043,
+            0,
+            0
+          ],
+          [
+            11.873927116394043,
+            30,
+            6
+          ]
+        ],
+        "reportedBoundsMm": [
+          [
+            -11.873927116394043,
+            0,
+            0
+          ],
+          [
+            11.873927116394043,
+            30,
+            6
+          ]
+        ],
+        "measuredDepthMm": 6,
+        "reportedDepthMm": 6,
+        "triangles": 20796,
+        "version": "v3-broad-moderate-shared-relief",
+        "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+        "sourceHashes": {
+          "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+          "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+          "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+        },
+        "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+        "provenance": null,
+        "message": "STL HTTP 503"
+      }
+    }
+  ],
+  "navigations": [
+    {
+      "at": "2026-11-26T06:20:22.389Z",
+      "url": "http://127.0.0.1:5286/sowers/design/"
+    }
+  ],
+  "mastersAtStart": [
+    {
+      "status": "ready",
+      "variant": "scout",
+      "assetUrl": "/sowers/candy-form/scout-positive-mm.stl?sha=b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+      "stlSha256": "b064861eaf0987f79c499b0789ec06d2afde795ec33852c63fa1be1180de7c98",
+      "boundsMm": [
+        [
+          -11.873927116394043,
+          0,
+          0
+        ],
+        [
+          11.873927116394043,
+          30,
+          6
+        ]
+      ],
+      "reportedBoundsMm": [
+        [
+          -11.873927116394043,
+          0,
+          0
+        ],
+        [
+          11.873927116394043,
+          30,
+          6
+        ]
+      ],
+      "measuredDepthMm": 6,
+      "reportedDepthMm": 6,
+      "triangles": 20796,
+      "version": "v3-broad-moderate-shared-relief",
+      "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+      "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+      "sourceHashes": {
+        "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+        "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+      },
+      "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+      "provenance": null
+    },
+    {
+      "status": "ready",
+      "variant": "seed",
+      "assetUrl": "/sowers/candy-form/seed-positive-mm.stl?sha=61d50f2d18211ece3872c5607cc33263b7c502136021a9733cdaedf2a2db2c9d",
+      "stlSha256": "61d50f2d18211ece3872c5607cc33263b7c502136021a9733cdaedf2a2db2c9d",
+      "boundsMm": [
+        [
+          -11.944168090820312,
+          0,
+          0
+        ],
+        [
+          11.944168090820312,
+          30,
+          6
+        ]
+      ],
+      "reportedBoundsMm": [
+        [
+          -11.944168090820312,
+          0,
+          0
+        ],
+        [
+          11.944168090820312,
+          30,
+          6
+        ]
+      ],
+      "measuredDepthMm": 6,
+      "reportedDepthMm": 6,
+      "triangles": 20900,
+      "version": "v3-broad-moderate-shared-relief",
+      "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+      "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+      "sourceHashes": {
+        "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+        "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+      },
+      "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+      "provenance": null
+    },
+    {
+      "status": "ready",
+      "variant": "bud",
+      "assetUrl": "/sowers/candy-form/bud-positive-mm.stl?sha=a99c2ff741f80a0ac555c2b3411b3f7161584b89f4cc5187ecbbba877355f5f2",
+      "stlSha256": "a99c2ff741f80a0ac555c2b3411b3f7161584b89f4cc5187ecbbba877355f5f2",
+      "boundsMm": [
+        [
+          -12.216375350952148,
+          0,
+          0
+        ],
+        [
+          12.216375350952148,
+          30,
+          6
+        ]
+      ],
+      "reportedBoundsMm": [
+        [
+          -12.216375350952148,
+          0,
+          0
+        ],
+        [
+          12.216375350952148,
+          30,
+          6
+        ]
+      ],
+      "measuredDepthMm": 6,
+      "reportedDepthMm": 6,
+      "triangles": 20954,
+      "version": "v3-broad-moderate-shared-relief",
+      "sourceSha256": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+      "generatorSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+      "sourceHashes": {
+        "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+        "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+        "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+      },
+      "parametersSha256": "d50e4a45a1c0a20a32bc39e2ce1a0ea9e92feb2a49a951573435c06c888cf711",
+      "provenance": null
+    }
+  ],
+  "stressNavigationStart": 1,
+  "stressElapsedSeconds": 183.563,
+  "cycles": 43,
+  "stressReloads": 0,
+  "sourceAtEnd": {
+    "sowers/design/index.html": "7bacb4ca38ae0122e087570015f95f8e1aa1d5f93682e251afe88b7e15f93e6e",
+    "sowers/design/style.css": "87b5eb48f12afc64df09f9362b9cc45870afb37ed2ff5b1ea2f3c6a419b0c0f9",
+    "sowers/design/main.js": "383a64c346563b3468dd71d6e7fea948f2fab3efd87e6602ade6794f96755f7e",
+    "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+    "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+    "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+  },
+  "sourceChangedDuringRun": false,
+  "finishedAt": "2026-11-26T06:23:46.528Z",
+  "status": "passed"
+}

@@ -11,15 +11,19 @@
       <div id="scene" aria-label="Interactive three dimensional Sowers mission base"></div>
       <header class="topbar">
         <a class="brand" href="/sowers/" aria-label="Sowers home"><span class="brand-mark">✳</span> SOWERS<span class="edition">MISSION WATCH / 001</span></a>
-        <div class="top-actions"><a class="studio-link" href="/sowers/design/">Character kitchen ↗</a><span id="connection" role="status">Connecting to local agents</span><button id="source-info" aria-expanded="false" aria-controls="source-notes" aria-label="Observation sources and warnings">ⓘ</button><button id="broadcast" aria-pressed="false">Broadcast view <span>↗</span></button></div>
+        <div class="top-actions"><a class="studio-link" href="/sowers/paint/">Field Paint ↗</a><a class="studio-link" href="/sowers/design/">Character kitchen ↗</a><span id="connection" role="status">Connecting to local agents</span><button id="source-info" aria-expanded="false" aria-controls="source-notes" aria-label="Observation sources and warnings">ⓘ</button><button id="broadcast" aria-pressed="false">Broadcast view <span>↗</span></button></div>
       </header>
+      <div id="usage-hud" class="usage-hud" aria-label="Measured token and account usage"></div>
+      <section id="protocol-controls" class="protocol-controls" hidden><div><strong id="wave-label"></strong><span id="wave-phase"></span></div><button id="arrival">Replay packets ↗</button></section>
+      <details id="memorial-archive" class="memorial-archive panel" hidden><summary>Iterations · images of completed work</summary><div id="memorial-list"></div><p id="memorial-empty">The first image arrives after verified work and a full preview.</p></details>
+      <aside id="memorial-story" class="memorial-story panel" hidden aria-label="Iteration story"></aside>
       <section id="source-notes" class="source-notes" hidden aria-label="Observation sources"><h2>Observation sources</h2><p id="source-description">Connecting to local sessions.</p><ul id="source-warnings"></ul></section>
       <main class="overlay">
         <section class="intro"><div class="eyebrow">A LITTLE WORK. A NEW WORLD.</div><h1>Good things<br>are taking shape.</h1><p>Your agents, out in the field.<br>Every checkpoint leaves something behind.</p><a class="assembly-link" href="/sowers/assembly/">Explore base assembly ↗</a></section>
         <aside class="crew-panel panel" aria-label="Agent roster">
           <div class="panel-heading"><h2>On the surface</h2><span id="crew-count">00</span></div>
           <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Find a Sower or project" aria-label="Find a Sower or project" /></label>
-          <div class="mode-picker" role="group" aria-label="Data source"><button data-mode="live" class="active">Local agents</button><button data-mode="demo">Design preview</button></div>
+          <div class="mode-picker" role="group" aria-label="Data source"><button data-mode="live" class="active">Local agents</button><button data-mode="magi">MAGI wave</button><button data-mode="demo">Design preview</button></div>
           <label class="scope-label">Show <select id="scope" aria-label="Session scope"><option value="recent">Active + recent</option><option value="active">Working now</option><option value="all">All sessions</option></select></label>
           <div id="roster"></div>
           <div id="pagination" hidden><button id="previous" aria-label="Previous Sowers">←</button><span id="page-label"></span><button id="next" aria-label="Next Sowers">→</button></div>

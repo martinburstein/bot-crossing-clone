@@ -1,3 +1,5 @@
+> Ongoing: after approving Scout, the user expanded the scope to hopping MAGI packets, a raised nest/Sol computer/campfire, Field Paint and Iteration memorials. Wave7 is integrated; wave8 repairs are underway. Continue until approximately2% allowance; do not treat this earlier checkpoint as final.
+
 # Sowers — candy redesign checkpoint
 
 25 November 2026, 22:22 Pacific. Branch: `codex/sowers` in `/Users/martinburstein/Documents/ChatGPT/Sowers`. This supersedes the [first-build handoff](HANDOFF-FIRST-BUILD.md). The user's minimum work window is 23:30 Pacific; final sustained mission evidence remains pending at this checkpoint.

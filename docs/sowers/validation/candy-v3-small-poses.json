@@ -1,0 +1,435 @@
+{
+  "startedAt": "2026-11-26T06:17:45.102Z",
+  "deadline": "2026-11-26T07:30:00.000Z",
+  "sourceAtStart": {
+    "revision": "3949e6a9bfc76a5ffb910ab806579a95cd0f4b0e",
+    "files": {
+      "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+      "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+      "sowers/main.js": "3a6c713fb94819a02e257fa13274a3176c65d9392a9714ddc714dde245376588",
+      "sowers/telemetry.mjs": "422e6cda86fe19232f3eaca330839e40a7ce3b64b964e202505c86a3ff45de18",
+      "tools/soak-sowers-mission.cjs": "2d013a1918c39b794c37d0830fbd0650607aca0bbf8e40ce29540307af40e1af",
+      "dist/assets/BufferGeometryUtils-DFxMWhFD.js": "c758cdd2fa5e8ee75a79eb3011e80a33b39d84596a5eae313be560591aa7d574",
+      "dist/assets/CREDITS.md": "a2d8015876e2f09b9f7f6ea40e543e6a7c74963b7eca1f8f4425c0a3c8819e9d",
+      "dist/assets/OrbitControls-Chjs0ogv.js": "f5ba0adaa332660685d0ad73f9d9a0aa03b7a5bf664c1db05375e6a3a176db60",
+      "dist/assets/animations-BeSGRINk.js": "3c86c8e29735c029160bf1a893e2f441e8b7ccb3ee2f29f44b654fcf9076d8c1",
+      "dist/assets/animations-OVXi71tR.css": "3c448813bf09d83f8bbf2564a8a1617323d8e7c09664b499b7663b85db45824a",
+      "dist/assets/assembly-B5EQR5zF.css": "eb7fa9c46e27090f2518db0278c04b352179985e1181e97d4d65e5938036990c",
+      "dist/assets/assembly-C_ILd61M.js": "7bd3090cdb73d468cd42ae81939a06a045431ab139debe9f8ce6112d2bc29ff2",
+      "dist/assets/avatar-DMMCtBD2.js": "9188d01c693a6c9c161d00598eeed863aaf48aa97cb1162a1c1c8428d89b7c91",
+      "dist/assets/crew.glb": "a4a9bbdb91f5a028e059d935d197de77b08eafc958832302f0cb414f99349ac6",
+      "dist/assets/design-CoTvFxb1.js": "90d6aaadc851e2bbe1664929253c64f2c09efb69e70a2d055d97998f149fd3d0",
+      "dist/assets/design-DhWBaqjY.css": "f59dbe0395ff553675f2a54bcb6c891af9dab2d10a46ed92a216dfe14a095ed9",
+      "dist/assets/dyson-CsVBwuq6.css": "2f828a7668e1649e2c77c73dd7dcdfdebe7c33cbfb33e850e829f10bdb0bac75",
+      "dist/assets/dyson-DTJR7WJv.js": "69fe3cb28ddd91c4abaec43dd6455ebf062b404fb1b53b784b1374ddc3b5c7c9",
+      "dist/assets/expansion-C79W2wsM.js": "b94d0b48319ea647e0586ab6f06eb528d8c6ade334624550c3225698bc310db9",
+      "dist/assets/faces-Cys6HgDS.js": "4762f125c62107bb14aab627b740ef8ee3915d25aa691d1be8ad9f1ce40d8fac",
+      "dist/assets/forest.glb": "8d7dfa511015e66d454c271efda29174981957220d63fc88ec0fabec5cdd224d",
+      "dist/assets/main-4PKrcCgX.js": "260ed9eef920d3c4448b931b78aba3e68f36764e048f3e55688f2fead95ba4ee",
+      "dist/assets/main-BEL866d5.css": "1c135dc4e9469940f4c123e9326b274e11771e208e7b6788735e7df495f11276",
+      "dist/assets/mascot-5TY9QILM.js": "c4e2439d09e889bfb11205c493b35b5543cc53ae978e5924299a1eabd4fe2547",
+      "dist/assets/sowers-BBDUq1uo.css": "1989ce0811a2d088b1b393d0d8ac01ba2a1b2e73496ba90832acf92e6b37b0a1",
+      "dist/assets/sowers-C8lDo0GE.js": "6281cf9177302e9c92e1eb96c8fddecdb3a10402cf71e4e2b8086326447a31c1",
+      "dist/assets/spacebase.glb": "7119c99d625876ec49c0c3126b3e96f00c025e1606035203a3e7f38f7813c388",
+      "dist/assets/studio-BVzBQkUE.css": "185d3932a32acfa50769c4b869f018209823be47f0948d7b7999e0b8405dad9b",
+      "dist/assets/studio-iuvG8N7X.js": "8075800efeaaead7d0b628b3ab41d5f24506aa5ebfb9ac6227a24ba534c07b04",
+      "dist/assets/three.module-CgZAih0L.js": "9595270fdca5a8933e663d5300230b35d9e4529db66da9b135a6619f2247effc"
+    }
+  },
+  "errors": [],
+  "navigations": [
+    {
+      "at": "2026-11-26T06:17:46.407Z",
+      "url": "http://127.0.0.1:5292/sowers/studio/"
+    }
+  ],
+  "observations": [],
+  "checks": [
+    "All fifteen rendered pose pairs differ at 32, 64 and 128 actual pixels with fixed camera/light/seed; at least eight salient pixels or 0.7% of image"
+  ],
+  "mockedSources": true,
+  "poseComparisons": [
+    {
+      "size": 32,
+      "images": [
+        {
+          "status": "idle"
+        },
+        {
+          "status": "working"
+        },
+        {
+          "status": "review"
+        },
+        {
+          "status": "waiting"
+        },
+        {
+          "status": "complete"
+        },
+        {
+          "status": "error"
+        }
+      ],
+      "differences": [
+        {
+          "a": "idle",
+          "b": "working",
+          "changedPixels": 181,
+          "meanChannelDelta": 12.8095703125
+        },
+        {
+          "a": "idle",
+          "b": "review",
+          "changedPixels": 276,
+          "meanChannelDelta": 26.580078125
+        },
+        {
+          "a": "idle",
+          "b": "waiting",
+          "changedPixels": 231,
+          "meanChannelDelta": 19.2373046875
+        },
+        {
+          "a": "idle",
+          "b": "complete",
+          "changedPixels": 243,
+          "meanChannelDelta": 16.3662109375
+        },
+        {
+          "a": "idle",
+          "b": "error",
+          "changedPixels": 241,
+          "meanChannelDelta": 23.5576171875
+        },
+        {
+          "a": "working",
+          "b": "review",
+          "changedPixels": 241,
+          "meanChannelDelta": 21.220703125
+        },
+        {
+          "a": "working",
+          "b": "waiting",
+          "changedPixels": 267,
+          "meanChannelDelta": 24.390625
+        },
+        {
+          "a": "working",
+          "b": "complete",
+          "changedPixels": 258,
+          "meanChannelDelta": 19.703125
+        },
+        {
+          "a": "working",
+          "b": "error",
+          "changedPixels": 265,
+          "meanChannelDelta": 25.9794921875
+        },
+        {
+          "a": "review",
+          "b": "waiting",
+          "changedPixels": 311,
+          "meanChannelDelta": 31.75390625
+        },
+        {
+          "a": "review",
+          "b": "complete",
+          "changedPixels": 319,
+          "meanChannelDelta": 30.15234375
+        },
+        {
+          "a": "review",
+          "b": "error",
+          "changedPixels": 310,
+          "meanChannelDelta": 32.828125
+        },
+        {
+          "a": "waiting",
+          "b": "complete",
+          "changedPixels": 277,
+          "meanChannelDelta": 22.4228515625
+        },
+        {
+          "a": "waiting",
+          "b": "error",
+          "changedPixels": 166,
+          "meanChannelDelta": 12.0712890625
+        },
+        {
+          "a": "complete",
+          "b": "error",
+          "changedPixels": 306,
+          "meanChannelDelta": 28.26171875
+        }
+      ]
+    },
+    {
+      "size": 64,
+      "images": [
+        {
+          "status": "idle"
+        },
+        {
+          "status": "working"
+        },
+        {
+          "status": "review"
+        },
+        {
+          "status": "waiting"
+        },
+        {
+          "status": "complete"
+        },
+        {
+          "status": "error"
+        }
+      ],
+      "differences": [
+        {
+          "a": "idle",
+          "b": "working",
+          "changedPixels": 541,
+          "meanChannelDelta": 12.933349609375
+        },
+        {
+          "a": "idle",
+          "b": "review",
+          "changedPixels": 925,
+          "meanChannelDelta": 27.289794921875
+        },
+        {
+          "a": "idle",
+          "b": "waiting",
+          "changedPixels": 744,
+          "meanChannelDelta": 20.051025390625
+        },
+        {
+          "a": "idle",
+          "b": "complete",
+          "changedPixels": 691,
+          "meanChannelDelta": 16.180908203125
+        },
+        {
+          "a": "idle",
+          "b": "error",
+          "changedPixels": 840,
+          "meanChannelDelta": 24.574951171875
+        },
+        {
+          "a": "working",
+          "b": "review",
+          "changedPixels": 801,
+          "meanChannelDelta": 22.099609375
+        },
+        {
+          "a": "working",
+          "b": "waiting",
+          "changedPixels": 862,
+          "meanChannelDelta": 25.34716796875
+        },
+        {
+          "a": "working",
+          "b": "complete",
+          "changedPixels": 772,
+          "meanChannelDelta": 19.955078125
+        },
+        {
+          "a": "working",
+          "b": "error",
+          "changedPixels": 919,
+          "meanChannelDelta": 27.280029296875
+        },
+        {
+          "a": "review",
+          "b": "waiting",
+          "changedPixels": 1077,
+          "meanChannelDelta": 33.078857421875
+        },
+        {
+          "a": "review",
+          "b": "complete",
+          "changedPixels": 1075,
+          "meanChannelDelta": 31.399169921875
+        },
+        {
+          "a": "review",
+          "b": "error",
+          "changedPixels": 1109,
+          "meanChannelDelta": 34.1953125
+        },
+        {
+          "a": "waiting",
+          "b": "complete",
+          "changedPixels": 889,
+          "meanChannelDelta": 23.47265625
+        },
+        {
+          "a": "waiting",
+          "b": "error",
+          "changedPixels": 549,
+          "meanChannelDelta": 12.92138671875
+        },
+        {
+          "a": "complete",
+          "b": "error",
+          "changedPixels": 1030,
+          "meanChannelDelta": 29.81201171875
+        }
+      ]
+    },
+    {
+      "size": 128,
+      "images": [
+        {
+          "status": "idle"
+        },
+        {
+          "status": "working"
+        },
+        {
+          "status": "review"
+        },
+        {
+          "status": "waiting"
+        },
+        {
+          "status": "complete"
+        },
+        {
+          "status": "error"
+        }
+      ],
+      "differences": [
+        {
+          "a": "idle",
+          "b": "working",
+          "changedPixels": 1844,
+          "meanChannelDelta": 13.22064208984375
+        },
+        {
+          "a": "idle",
+          "b": "review",
+          "changedPixels": 3325,
+          "meanChannelDelta": 27.86480712890625
+        },
+        {
+          "a": "idle",
+          "b": "waiting",
+          "changedPixels": 2592,
+          "meanChannelDelta": 20.52203369140625
+        },
+        {
+          "a": "idle",
+          "b": "complete",
+          "changedPixels": 2306,
+          "meanChannelDelta": 16.5240478515625
+        },
+        {
+          "a": "idle",
+          "b": "error",
+          "changedPixels": 3022,
+          "meanChannelDelta": 25.06640625
+        },
+        {
+          "a": "working",
+          "b": "review",
+          "changedPixels": 2772,
+          "meanChannelDelta": 22.45184326171875
+        },
+        {
+          "a": "working",
+          "b": "waiting",
+          "changedPixels": 3131,
+          "meanChannelDelta": 25.90753173828125
+        },
+        {
+          "a": "working",
+          "b": "complete",
+          "changedPixels": 2678,
+          "meanChannelDelta": 20.33929443359375
+        },
+        {
+          "a": "working",
+          "b": "error",
+          "changedPixels": 3261,
+          "meanChannelDelta": 27.513671875
+        },
+        {
+          "a": "review",
+          "b": "waiting",
+          "changedPixels": 3893,
+          "meanChannelDelta": 33.46966552734375
+        },
+        {
+          "a": "review",
+          "b": "complete",
+          "changedPixels": 3835,
+          "meanChannelDelta": 31.82647705078125
+        },
+        {
+          "a": "review",
+          "b": "error",
+          "changedPixels": 4042,
+          "meanChannelDelta": 34.60784912109375
+        },
+        {
+          "a": "waiting",
+          "b": "complete",
+          "changedPixels": 3105,
+          "meanChannelDelta": 23.99822998046875
+        },
+        {
+          "a": "waiting",
+          "b": "error",
+          "changedPixels": 1838,
+          "meanChannelDelta": 13.07843017578125
+        },
+        {
+          "a": "complete",
+          "b": "error",
+          "changedPixels": 3692,
+          "meanChannelDelta": 30.32177734375
+        }
+      ]
+    }
+  ],
+  "sourceAtEnd": {
+    "revision": "3949e6a9bfc76a5ffb910ab806579a95cd0f4b0e",
+    "files": {
+      "sowers/candy/mascot.js": "468ad0955f2a8a5c3ed29088cd49a2dd7b3cdd3667b1d8c2641242f24c4456f8",
+      "sowers/candy/silhouettes.mjs": "67566d2172ddff8559ac02f890a357def4ca993a902a1da639d0380c6a8c1624",
+      "sowers/main.js": "3a6c713fb94819a02e257fa13274a3176c65d9392a9714ddc714dde245376588",
+      "sowers/telemetry.mjs": "422e6cda86fe19232f3eaca330839e40a7ce3b64b964e202505c86a3ff45de18",
+      "tools/soak-sowers-mission.cjs": "2d013a1918c39b794c37d0830fbd0650607aca0bbf8e40ce29540307af40e1af",
+      "dist/assets/BufferGeometryUtils-DFxMWhFD.js": "c758cdd2fa5e8ee75a79eb3011e80a33b39d84596a5eae313be560591aa7d574",
+      "dist/assets/CREDITS.md": "a2d8015876e2f09b9f7f6ea40e543e6a7c74963b7eca1f8f4425c0a3c8819e9d",
+      "dist/assets/OrbitControls-Chjs0ogv.js": "f5ba0adaa332660685d0ad73f9d9a0aa03b7a5bf664c1db05375e6a3a176db60",
+      "dist/assets/animations-BeSGRINk.js": "3c86c8e29735c029160bf1a893e2f441e8b7ccb3ee2f29f44b654fcf9076d8c1",
+      "dist/assets/animations-OVXi71tR.css": "3c448813bf09d83f8bbf2564a8a1617323d8e7c09664b499b7663b85db45824a",
+      "dist/assets/assembly-B5EQR5zF.css": "eb7fa9c46e27090f2518db0278c04b352179985e1181e97d4d65e5938036990c",
+      "dist/assets/assembly-C_ILd61M.js": "7bd3090cdb73d468cd42ae81939a06a045431ab139debe9f8ce6112d2bc29ff2",
+      "dist/assets/avatar-DMMCtBD2.js": "9188d01c693a6c9c161d00598eeed863aaf48aa97cb1162a1c1c8428d89b7c91",
+      "dist/assets/crew.glb": "a4a9bbdb91f5a028e059d935d197de77b08eafc958832302f0cb414f99349ac6",
+      "dist/assets/design-CoTvFxb1.js": "90d6aaadc851e2bbe1664929253c64f2c09efb69e70a2d055d97998f149fd3d0",
+      "dist/assets/design-DhWBaqjY.css": "f59dbe0395ff553675f2a54bcb6c891af9dab2d10a46ed92a216dfe14a095ed9",
+      "dist/assets/dyson-CsVBwuq6.css": "2f828a7668e1649e2c77c73dd7dcdfdebe7c33cbfb33e850e829f10bdb0bac75",
+      "dist/assets/dyson-DTJR7WJv.js": "69fe3cb28ddd91c4abaec43dd6455ebf062b404fb1b53b784b1374ddc3b5c7c9",
+      "dist/assets/expansion-C79W2wsM.js": "b94d0b48319ea647e0586ab6f06eb528d8c6ade334624550c3225698bc310db9",
+      "dist/assets/faces-Cys6HgDS.js": "4762f125c62107bb14aab627b740ef8ee3915d25aa691d1be8ad9f1ce40d8fac",
+      "dist/assets/forest.glb": "8d7dfa511015e66d454c271efda29174981957220d63fc88ec0fabec5cdd224d",
+      "dist/assets/main-4PKrcCgX.js": "260ed9eef920d3c4448b931b78aba3e68f36764e048f3e55688f2fead95ba4ee",
+      "dist/assets/main-BEL866d5.css": "1c135dc4e9469940f4c123e9326b274e11771e208e7b6788735e7df495f11276",
+      "dist/assets/mascot-5TY9QILM.js": "c4e2439d09e889bfb11205c493b35b5543cc53ae978e5924299a1eabd4fe2547",
+      "dist/assets/sowers-BBDUq1uo.css": "1989ce0811a2d088b1b393d0d8ac01ba2a1b2e73496ba90832acf92e6b37b0a1",
+      "dist/assets/sowers-C8lDo0GE.js": "6281cf9177302e9c92e1eb96c8fddecdb3a10402cf71e4e2b8086326447a31c1",
+      "dist/assets/spacebase.glb": "7119c99d625876ec49c0c3126b3e96f00c025e1606035203a3e7f38f7813c388",
+      "dist/assets/studio-BVzBQkUE.css": "185d3932a32acfa50769c4b869f018209823be47f0948d7b7999e0b8405dad9b",
+      "dist/assets/studio-iuvG8N7X.js": "8075800efeaaead7d0b628b3ab41d5f24506aa5ebfb9ac6227a24ba534c07b04",
+      "dist/assets/three.module-CgZAih0L.js": "9595270fdca5a8933e663d5300230b35d9e4529db66da9b135a6619f2247effc"
+    }
+  },
+  "finishedAt": "2026-11-26T06:17:54.367Z",
+  "status": "passed"
+}

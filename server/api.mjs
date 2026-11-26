@@ -5,6 +5,8 @@ import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { loadSwarm, projectShells, scrollFor, SWARM_ROOT } from './swarm.mjs'
 import { loadSowersBroadcast } from './sowers-broadcast.mjs'
+import { loadSowersUsage } from './sowers-usage.mjs'
+import { loadSowersMemorials } from './sowers-memorials.mjs'
 import { openInTerminal, schemeHasHandler, schemeOf } from './lib/xdg.mjs'
 import {
   defaultHarness,
@@ -366,6 +368,12 @@ export async function apiMiddleware(req, res, next) {
   try {
     if (url.pathname === '/api/sowers/broadcast' && req.method === 'GET') {
       return send(res, 200, await loadSowersBroadcast())
+    }
+    if (url.pathname === '/api/sowers/usage' && req.method === 'GET') {
+      return send(res, 200, await loadSowersUsage())
+    }
+    if (url.pathname === '/api/sowers/memorials' && req.method === 'GET') {
+      return send(res, 200, await loadSowersMemorials())
     }
     if (url.pathname === '/api/swarm/health' && req.method === 'GET') {
       const swarm=await loadSwarm()

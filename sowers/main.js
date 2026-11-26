@@ -7,6 +7,13 @@ import { observedConstruction, constructionStages } from './progress.mjs'
 import { DESIGN_THREADS, mergeBroadcastThreads, visibleThreads } from './telemetry.mjs'
 import { shouldRender } from './render-budget.mjs'
 import { createSowerMark } from './candy/mark.js'
+import { createHopController } from './locomotion.mjs'
+import { createSowerPacket } from './packet.js'
+import { createSowerOutpost } from './outpost.js'
+import { createMemorialGarden } from './memorial-garden.js'
+import { drawMemorial } from './paint/core.mjs'
+import { magiObservedThreads, normalizeMagiObservation } from './magi-observation.mjs'
+import { mountUsageHUD } from './usage-hud.js'
 import './style.css'
 
 const $ = selector => document.querySelector(selector)
@@ -14,7 +21,7 @@ const params = new URLSearchParams(location.search)
 const avatarVariant = ['scout','seed','bud'].includes(params.get('shape')) ? params.get('shape') : 'scout'
 const app = $('#app'), host = $('#scene')
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
-let mode = params.get('preview') === '1' ? 'demo' : 'live'
+let mode = params.get('preview') === '1' ? 'demo' : params.get('magi')==='1'?'magi':'live'
 let threads = [], visible = [], selectedId = null, lastScan = 0, warnings = []
 let broadcast = false, follow = false, orbit = false, paused = reducedMotion, stale = false
 const entries = new Map(), slots = new Map()
@@ -32,6 +39,10 @@ let lastBroadcastThreads = [], broadcastConfigured = false
 let compact = innerWidth <= 700, compactFramedId = null
 let renderDirty=true,lastRender=-Infinity,wasHidden=false
 let updatingControls=false
+let magiObservation=null,lastMagiObservation=null,lastMagiWave=null
+let outpost,garden,memorials=[],archiveLoaded=false,packets=[],arrival=null
+const memorialTextures=new Map()
+const usageHUD=mountUsageHUD($('#usage-hud'))
 
 function element(tag, className, value) {
   const node = document.createElement(tag)
@@ -136,6 +147,8 @@ function setupScene() {
   const accent = mesh(new THREE.BoxGeometry(.32,.32,.05),'#f6edce',.45,3.75,.03)
   accent.rotation.z=Math.PI/4;hub.add(accent)
   scene.add(hub)
+  outpost=createSowerOutpost();scene.add(outpost)
+  garden=createMemorialGarden();garden.position.z=16;scene.add(garden)
   new ResizeObserver(resize).observe(host)
   resize()
   let down
@@ -153,6 +166,96 @@ function setupScene() {
   })
 }
 
+function clearPackets() {
+  for(const packet of packets){scene?.remove(packet.group);packet.dispose()}
+  packets=[];arrival=null
+}
+function packetSet(open=true) {
+  clearPackets()
+  for(let i=0;i<3;i++) {
+    const packet=createSowerPacket({number:i+1,color:[0xef844a,0x6ba99c,0xd3b157][i],seed:i,includeCandy:false})
+    packet.group.scale.setScalar(3);packet.group.position.set((i-1)*2.1,.03,3.5)
+    packet.setProgress(open?1:0);packet.group.visible=!open;scene.add(packet.group);packets.push(packet)
+  }
+}
+function routeToWork(entry) {
+  const origin=entry.group.position,world=entry.avatar.position.clone().add(origin)
+  // Reserved corridors pass in front of the stations, then beside the nest.
+  const points=entry.slot===1?[[world.x,5.5],[5,5.5],[5,-5.8],[origin.x-2.2,origin.z+4.2]]
+    :[[world.x,7.4],[origin.x-2.2,7.4],[origin.x-2.2,origin.z+4.2]]
+  entry.hop.setWaypoints(points.map(([x,z])=>({x:x-origin.x,z:z-origin.z,yaw:0})))
+  entry.routeMode='work';entry.nextHop=(animate.elapsed||0)+8+entry.slot*2
+}
+function startArrival() {
+  if(!renderer||paused||pageThreads.length!==3||!['magi','demo'].includes(mode))return
+  packetSet(false)
+  const ordered=[...entries.values()].sort((a,b)=>(a.thread.magiSlot??a.slot)-(b.thread.magiSlot??b.slot))
+  ordered.forEach((entry,i)=>{
+    const p=packets[i].group.position
+    entry.hop.reset({x:p.x-entry.group.position.x,z:p.z-entry.group.position.z,yaw:0})
+    entry.avatar.position.set(p.x-entry.group.position.x,.03,p.z-entry.group.position.z);entry.avatar.visible=false;entry.routeMode='arrival'
+  })
+  arrival={started:animate.elapsed||0,entries:ordered,returnCamera:true}
+  controls.target.set(0,1.2,3);camera.position.set(14,11,20);focusPending=false;setFollow(false)
+  notify(mode==='demo'?'Design preview · three fictional packet arrivals':'Replaying the recorded three-agent admission')
+  renderDirty=true
+}
+function syncProtocolVisuals() {
+  if(!outpost)return
+  const protocol=mode==='magi',show=protocol||mode==='demo'
+  outpost.visible=show;garden.visible=protocol
+  const readiness=mode==='demo'?{agents:true,dispenser:true,computer:true,campfire:true}:magiObservation?.readiness||{}
+  outpost.userData.setReadiness(readiness);outpost.userData.setPhase(magiObservation?.phase==='campfire'?'review':'work')
+  garden.userData.setReadiness(readiness);garden.userData.setPaused(paused);garden.userData.setReducedMotion(reducedMotion&&paused)
+  $('#protocol-controls').hidden=!show
+  $('#wave-label').textContent=mode==='demo'?'DESIGN PREVIEW':magiObservation?`MAGI / WAVE ${magiObservation.number}`:'MAGI / AWAITING OBSERVATION'
+  $('#wave-phase').textContent=mode==='demo'?'Fictional crew · real component preview':magiObservation?`${magiObservation.stale?'Last observed · ':''}${magiObservation.phase==='campfire'?'Campfire review':magiObservation.phase==='complete'?'Wave reviewed':magiObservation.phase==='validating'?'Inspecting completed artifacts':'Three distinct tasks'} · ${magiObservation.coordinator.model} / ${magiObservation.coordinator.effort}`:'A recorded three-agent admission will appear here.'
+  $('#arrival').disabled=paused||pageThreads.length!==3
+  const first=lastMagiWave===null
+  if(protocol&&magiObservation&&lastMagiWave!==magiObservation.id) {
+    lastMagiWave=magiObservation.id;packetSet(true)
+    if(!first&&!magiObservation.stale&&Date.now()-magiObservation.admittedAt<300000)startArrival()
+  } else if(mode==='demo'&&packets.length===0)packetSet(true)
+  if(!show)for(const packet of packets)packet.group.visible=false
+  usageHUD.setObservation(protocol?magiObservation:null)
+}
+async function pollMemorials() {
+  try {
+    const response=await fetch('/api/sowers/memorials',{cache:'no-store',signal:AbortSignal.timeout(10000)})
+    if(!response.ok)throw Error('Memorial archive unavailable')
+    const body=await response.json()
+    if(!Array.isArray(body.entries)||body.warnings?.length)throw Error('Memorial archive unavailable; retaining saved images')
+    memorials=body.entries
+    const entries=memorials.map(entry=>{
+      let texture=memorialTextures.get(entry.id)
+      if(!texture) {
+        const canvas=document.createElement('canvas');canvas.width=canvas.height=256
+        const ctx=canvas.getContext('2d');drawMemorial(ctx,entry,256)
+        ctx.globalCompositeOperation='destination-over';ctx.fillStyle='#fff9ed';ctx.fillRect(0,0,256,256)
+        texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;memorialTextures.set(entry.id,texture)
+      }
+      return {...entry,texture}
+    })
+    garden?.userData.setMemorials(entries,{initial:!archiveLoaded||paused});archiveLoaded=true
+    const list=$('#memorial-list');list.replaceChildren()
+    for(const entry of memorials) {
+      const button=element('button','',`Iteration ${entry.iteration}`)
+      button.onclick=()=>showMemorial(entry);list.append(button)
+    }
+    $('#memorial-empty').hidden=memorials.length>0;renderDirty=true
+  } catch {$('#memorial-empty').textContent=memorials.length?'Archive unavailable · saved images retained':'The first image arrives after verified work and a full preview.'}
+}
+function showMemorial(entry) {
+  const panel=$('#memorial-story');panel.replaceChildren(element('h2','',`Iteration ${entry.iteration}`),element('strong','',entry.symbol),element('p','',entry.task),element('p','',entry.explanation),element('small','',`${entry.agent} · ${new Date(entry.endedAt).toLocaleString()}`))
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=256;drawMemorial(canvas.getContext('2d'),entry,256);panel.prepend(canvas)
+  panel.hidden=false
+  const item=garden?.userData.entries.get(entry.id)
+  if(item&&controls) {
+    const point=item.group.position.clone().add(garden.position).add(new THREE.Vector3(0,1,0))
+    controls.target.copy(point);camera.position.copy(point).add(new THREE.Vector3(3,2.4,5));focusPending=false;setFollow(false);renderDirty=true
+  }
+}
+
 function resize() {
   renderDirty=true
   if(!renderer) return
@@ -162,8 +265,8 @@ function resize() {
   const nextCompact=innerWidth<=700
   if(nextCompact!==compact) {
     compact=nextCompact;compactFramedId=null
-    for(const entry of entries.values())entry.group.visible=!compact || entry.thread.id===selectedId
-    const hub=scene.getObjectByName('mission-marker');if(hub)hub.visible=!compact
+    for(const entry of entries.values())entry.group.visible=!compact || mode==='magi' || entry.thread.id===selectedId
+    const hub=scene.getObjectByName('mission-marker');if(hub)hub.visible=!compact&&mode==='live'
     if(compact)focusSelected()
     else {controls.target.set(0,0,0);camera.position.set(33,31,41);focusPending=false}
   }
@@ -188,7 +291,7 @@ function renderWorld() {
     const observation=observedConstruction(thread)
     let entry=entries.get(thread.id)
     if(!entry) {
-      let slot=slots.get(thread.id)
+      let slot=mode==='magi'?thread.magiSlot:slots.get(thread.id)
       if(slot===undefined || occupied.has(slot)) slot=positions.findIndex((_,i)=>!occupied.has(i))
       occupied.add(slot);slots.set(thread.id,slot)
       const [x,z]=positions[slot]
@@ -201,7 +304,8 @@ function renderWorld() {
       const ring=mesh(new THREE.RingGeometry(.8,.86,40),'#f9e6ac')
       ring.rotation.x=-Math.PI/2;ring.position.set(-2.2,.04,4.2);group.add(ring)
       const label=element('div','ground-label');host.append(label)
-      entry={group,base,expansion,avatar,ring,label,slot,thread,observation}
+      const hop=createHopController({x:-2.2,z:4.2,groundY:.03,hopDuration:.57+slot*.04,arcHeight:.38})
+      entry={group,base,expansion,avatar,ring,label,slot,thread,observation,hop,routeMode:'work',nextHop:2+slot*1.4}
       entries.set(thread.id,entry);scene.add(group)
     }
     entry.thread=thread;entry.observation=observation
@@ -209,7 +313,7 @@ function renderWorld() {
     entry.expansion.userData.setCheckpoints(thread.checkpoints)
     entry.label.textContent=thread.name.slice(0,24).toUpperCase()
     entry.ring.visible=thread.id===selectedId
-    entry.group.visible=!compact || thread.id===selectedId
+    entry.group.visible=!compact || mode==='magi' || thread.id===selectedId
     if(paused)for(let i=0;i<16;i++)entry.avatar.userData.animate?.(0,.1,{status:stale?'idle':thread.status,selected:thread.id===selectedId})
   }
 }
@@ -275,21 +379,23 @@ function update() {
   page=Math.min(page,Math.max(0,Math.ceil(visible.length/9)-1))
   pageThreads=visible.slice(page*9,(page+1)*9)
   if(!pageThreads.some(t=>t.id===selectedId)) selectedId=pageThreads[0]?.id || null
-  renderWorld();drawRoster();drawDetail()
+  renderWorld();drawRoster();drawDetail();syncProtocolVisuals()
+  app.classList.toggle('magi',mode==='magi')
+  $('#memorial-archive').hidden=mode!=='magi'
   if(compact && compactFramedId!==selectedId){focusSelected();compactFramedId=selectedId}
-  if(scene?.getObjectByName('mission-marker'))scene.getObjectByName('mission-marker').visible=!compact
+  if(scene?.getObjectByName('mission-marker'))scene.getObjectByName('mission-marker').visible=!compact&&mode==='live'
   $('#activity-count').textContent=visible.filter(t=>t.status==='working').length
   $('#checkpoint-count').textContent=visible.reduce((sum,t)=>sum+t.checkpoints.length,0)
-  $('#scene-caption').textContent=mode==='demo'?'MARS / DESIGN PREVIEW':'MARS / LOCAL AGENT OUTPOST'
-  $('#source-note').textContent=mode==='demo'?'Illustrative agents · fixed stages · no live work represented':'Live local sessions · task completion is shown only when measured'
+  $('#scene-caption').textContent=mode==='demo'?'MARS / DESIGN PREVIEW':mode==='magi'?'MARS / MAGI OUTPOST':'MARS / LOCAL AGENT OUTPOST'
+  $('#source-note').textContent=mode==='demo'?'Illustrative agents · fixed stages · no live work represented':mode==='magi'?'Recorded collaboration observations · saved Iteration images':'Live local sessions · task completion is shown only when measured'
   document.querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode))})
   $('#source-description').textContent=mode==='demo'?'Design preview: three fictional agents and fixed construction stages.':`Native local session records${broadcastConfigured?' plus configured checkpoint broadcast':'; checkpoint broadcast is not configured'}. Last scan ${lastScan?new Date(lastScan).toLocaleTimeString():'pending'}.`
-  $('#source-warnings').replaceChildren(...(mode==='live'?warnings:[]).map(warning=>element('li','',warning)))
-  $('#source-info').textContent=mode==='live' && warnings.length?'ⓘ !':'ⓘ'
+  $('#source-warnings').replaceChildren(...(mode!=='demo'?warnings:[]).map(warning=>element('li','',warning)))
+  $('#source-info').textContent=mode!=='demo' && warnings.length?'ⓘ !':'ⓘ'
 }
 
 async function poll() {
-  if(mode!=='live' || polling)return
+  if(mode==='demo' || polling)return
   polling=true
   const version=modeVersion
   try {
@@ -307,17 +413,20 @@ async function poll() {
       broadcastConfigured=Boolean(broadcastBody.configured)
       lastBroadcastThreads=broadcastBody.threads
     } catch(error) {
-      broadcastBody={threads:lastBroadcastThreads.map(thread=>({...thread,running:false,broadcastStale:true})),warnings:[`${error.message}. Any retained broadcast observation is historical.`]}
+      broadcastBody={threads:lastBroadcastThreads.map(thread=>({...thread,running:false,broadcastStale:true})),magi:lastMagiObservation?{...lastMagiObservation,stale:true}:null,warnings:[`${error.message}. Any retained broadcast observation is historical.`]}
     }
     if(!Array.isArray(body.threads))throw Error('Local observer returned an invalid session list')
-    if(mode!=='live' || version!==modeVersion)return
-    threads=mergeBroadcastThreads(body.threads,broadcastBody.threads || []);lastScan=Date.now();stale=false;warnings=[...(body.warnings || []),...(broadcastBody.warnings || [])]
+    if(mode==='demo' || version!==modeVersion)return
+    warnings=[...(body.warnings || []),...(broadcastBody.warnings || [])]
+    try {magiObservation=broadcastBody.magi?{...normalizeMagiObservation(broadcastBody.magi),observedAt:broadcastBody.magi.observedAt,stale:Boolean(broadcastBody.magi.stale)}:null;lastMagiObservation=magiObservation}
+    catch {magiObservation=lastMagiObservation?{...lastMagiObservation,stale:true}:null;warnings.push('MAGI observation is invalid; retaining historical participants.')}
+    threads=mode==='magi'?magiObservedThreads(magiObservation,body.threads):mergeBroadcastThreads(body.threads,broadcastBody.threads || []);lastScan=Date.now();stale=false
     $('#connection').textContent=warnings.length?'Local signal · source warning':'Local signal connected'
     $('#connection').className='live'
     $('#connection').title=warnings.join('\n')
     update()
   } catch(error) {
-    if(mode!=='live' || version!==modeVersion)return
+    if(mode==='demo' || version!==modeVersion)return
     stale=true
     $('#connection').textContent='Local signal unavailable'
     $('#connection').className='error'
@@ -330,7 +439,7 @@ async function poll() {
 function select(id) {
   selectedId=id;drawRoster();drawDetail()
   for(const entry of entries.values())entry.ring.visible=entry.thread.id===id
-  if(compact)for(const entry of entries.values())entry.group.visible=entry.thread.id===id
+  if(compact&&mode!=='magi')for(const entry of entries.values())entry.group.visible=entry.thread.id===id
   focusSelected()
 }
 function focusSelected() {
@@ -359,7 +468,7 @@ function setBroadcast(value) {
 
 function animate(timestamp=performance.now()) {
   requestAnimationFrame(animate)
-  if(mode==='live' && lastScan && Date.now()-lastScan>30000 && !stale){stale=true;$('#connection').textContent='Signal stale · last observation';$('#connection').className='error';drawDetail()}
+  if(mode!=='demo' && lastScan && Date.now()-lastScan>30000 && !stale){stale=true;$('#connection').textContent='Signal stale · last observation';$('#connection').className='error';drawDetail()}
   if(!renderer)return
   const controlDelta=Math.min((timestamp-(animate.lastCallback??timestamp))/1000,.05)
   animate.lastCallback=timestamp
@@ -376,20 +485,46 @@ function animate(timestamp=performance.now()) {
   lastRender=timestamp;renderDirty=false
   if(!paused)animate.elapsed=(animate.elapsed||0)+delta
   const elapsed=animate.elapsed || 0
+  if(arrival&&!paused) {
+    const age=elapsed-arrival.started
+    arrival.entries.forEach((entry,index)=>{
+      if(!entries.has(entry.thread.id))return
+      const progress=THREE.MathUtils.clamp((age-index*.24)/1.4,0,1)
+      packets[index]?.setProgress(progress);if(packets[index])packets[index].group.visible=progress<1
+      entry.avatar.visible=progress>.18
+      if(progress<1){entry.avatar.position.y=.03+Math.sin(progress*Math.PI)*.65}
+      else if(entry.routeMode==='arrival'){entry.avatar.position.y=.03;routeToWork(entry)}
+    })
+    if(age>2.3) {for(const entry of arrival.entries)entry.avatar.visible=true;arrival=null}
+  }
   for(const entry of entries.values()) {
     if(!entry.group.visible){entry.label.hidden=true;continue}
     const active=!stale && !entry.thread.broadcastStale && entry.thread.status==='working'
-    const phase=elapsed*.4+entry.slot*2
-    const moving=active && Math.sin(phase)>.55
+    let moving=false
     if(!paused) {
-      const x=-2.2+(moving?Math.sin(elapsed*1.3+entry.slot)*.7:0)
-      entry.avatar.position.x=THREE.MathUtils.damp(entry.avatar.position.x,x,5,delta)
-      entry.avatar.rotation.y=THREE.MathUtils.damp(entry.avatar.rotation.y,moving?Math.sin(elapsed*1.3+entry.slot)*.3:Math.sin(phase)*.14,5,delta)
+      const reviewing=mode==='magi'&&magiObservation?.phase==='campfire'&&!magiObservation.stale
+      if(reviewing&&entry.routeMode!=='campfire') {
+        const destination=[[-2.7,8.4],[0,10],[2.7,8.4]][entry.slot]
+        const origin=entry.group.position,current=entry.avatar.position.clone().add(origin)
+        entry.hop.setWaypoints([[current.x,9.4],[destination[0],9.4],destination].map(([x,z])=>({x:x-origin.x,z:z-origin.z,yaw:Math.atan2(-destination[0],7-destination[1])})))
+        entry.routeMode='campfire'
+      } else if(!reviewing&&entry.routeMode==='campfire')routeToWork(entry)
+      if(entry.routeMode!=='arrival'&&!entry.hop.waypointsRemaining&&active&&elapsed>entry.nextHop) {
+        const side=Math.sin(entry.thread.seed+elapsed*.2)>0?1:-1
+        entry.hop.setWaypoints([{x:-2.2+side*1.8,z:6.1+entry.slot*.12},{x:-2.2,z:4.2,yaw:0}])
+        entry.nextHop=elapsed+8+entry.slot*1.5
+      }
+      if(entry.routeMode!=='arrival') {
+        const pose=entry.hop.update(delta)
+        moving=pose.airborne;entry.avatar.position.set(pose.x,pose.y,pose.z);entry.avatar.rotation.y=pose.yaw;entry.avatar.rotation.z=pose.lean
+      }
       entry.avatar.userData.animate?.(elapsed,delta,{status:stale || entry.thread.broadcastStale?'idle':entry.thread.status,moving,selected:entry.thread.id===selectedId})
+      if(moving&&entry.thread.status==='complete') {const pose=entry.avatar.getObjectByName('candy-pose');if(pose)pose.position.y=0}
       entry.base.userData.animate?.(elapsed,delta)
     }
-    entry.ring.position.x=entry.avatar.position.x
+    entry.ring.position.x=entry.avatar.position.x;entry.ring.position.z=entry.avatar.position.z
   }
+  if(!paused){outpost?.userData.animate(elapsed,{paused:false,reducedMotion:false});garden?.userData.update(delta)}
   if(follow && entries.has(selectedId)) {
     const entry=entries.get(selectedId)
     desiredTarget.copy(entry.group.position).add(entry.avatar.position)
@@ -405,7 +540,7 @@ function animate(timestamp=performance.now()) {
   camera.updateMatrixWorld()
   for(const entry of entries.values()) {
     if(!entry.group.visible)continue
-    const labelPosition=entry.group.position.clone().add(new THREE.Vector3(0,.1,5.7)).project(camera)
+    const labelPosition=entry.group.position.clone().add(new THREE.Vector3(entry.avatar.position.x,.1,entry.avatar.position.z+1.2)).project(camera)
     entry.label.hidden=labelPosition.z>1 || labelPosition.z< -1
     entry.label.style.left=`${(labelPosition.x*.5+.5)*host.clientWidth}px`
     entry.label.style.top=`${(-labelPosition.y*.5+.5)*host.clientHeight}px`
@@ -423,9 +558,9 @@ $('#scope').addEventListener('change',()=>{page=0;update()})
 $('#previous').addEventListener('click',()=>{page--;update()})
 $('#next').addEventListener('click',()=>{page++;update()})
 document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{
-  mode=button.dataset.mode;modeVersion++;threads=mode==='demo'?DESIGN_THREADS:[];stale=false;selectedId=null;page=0
+  clearPackets();mode=button.dataset.mode;modeVersion++;threads=mode==='demo'?DESIGN_THREADS:[];stale=false;selectedId=null;page=0
   $('#connection').textContent=mode==='demo'?'Design preview · fictional agents':'Connecting to local agents'
-  $('#connection').className='';update();if(mode==='live')poll()
+  $('#connection').className='';update();if(mode!=='demo')poll()
 }))
 $('#overview').addEventListener('click',()=>{setFollow(false);focusPending=false;controls?.target.set(0,0,0);camera?.position.set(33,31,41)})
 $('#follow').addEventListener('click',()=>{setFollow(!follow);if(follow)focusSelected()})
@@ -433,14 +568,16 @@ $('#orbit').addEventListener('click',()=>{orbit=!orbit;$('#orbit').setAttribute(
 $('#motion').setAttribute('aria-pressed',String(paused))
 $('#motion').innerHTML=paused?'▶ <span>Resume motion</span>':'Ⅱ <span>Pause motion</span>'
 $('#motion').setAttribute('aria-label',paused?'Resume motion':'Pause motion')
-$('#motion').addEventListener('click',()=>{paused=!paused;$('#motion').setAttribute('aria-pressed',String(paused));$('#motion').innerHTML=paused?'▶ <span>Resume motion</span>':'Ⅱ <span>Pause motion</span>';$('#motion').setAttribute('aria-label',paused?'Resume motion':'Pause motion')})
+$('#motion').addEventListener('click',()=>{paused=!paused;$('#motion').setAttribute('aria-pressed',String(paused));$('#motion').innerHTML=paused?'▶ <span>Resume motion</span>':'Ⅱ <span>Pause motion</span>';$('#motion').setAttribute('aria-label',paused?'Resume motion':'Pause motion');syncProtocolVisuals()})
 $('#broadcast').addEventListener('click',()=>setBroadcast(!broadcast))
 $('#source-info').addEventListener('click',()=>{
   $('#source-notes').hidden=!$('#source-notes').hidden
   $('#source-info').setAttribute('aria-expanded',String(!$('#source-notes').hidden))
 })
 $('#exit-broadcast').addEventListener('click',()=>setBroadcast(false))
-addEventListener('keydown',event=>{if(event.key==='Escape')setBroadcast(false)})
+$('#arrival').addEventListener('click',startArrival)
+addEventListener('keydown',event=>{if(event.key==='Escape'){setBroadcast(false);$('#memorial-story').hidden=true}})
 if(mode==='demo') {threads=DESIGN_THREADS;$('#connection').textContent='Design preview · fictional agents'}
-update();poll();setInterval(poll,8000);animate()
+update();poll();void pollMemorials();setInterval(poll,8000);setInterval(pollMemorials,8000);animate()
+window.sowersMissionReview={entries,get magi(){return magiObservation},get outpost(){return outpost},get garden(){return garden},get packets(){return packets},get usage(){return usageHUD.snapshot},get renderer(){return renderer},get scene(){return scene},get paused(){return paused}}
 if(params.get('broadcast')==='1')setBroadcast(true)

@@ -1,6 +1,7 @@
 import fsp from 'node:fs/promises'
 import { constants } from 'node:fs'
 import path from 'node:path'
+import { normalizeMagiObservation } from '../sowers/magi-observation.mjs'
 
 const MAX_BYTES = 1024 * 1024
 const DEFAULT_MAX_AGE_MS = 30_000
@@ -128,6 +129,7 @@ export async function loadSowersBroadcast({ file = process.env.SOWERS_BROADCAST_
       ? 'Sowers broadcast observation is in the future; showing historical evidence only.'
       : 'Sowers broadcast observation is stale; showing historical evidence only.')
     result.observedAt = snapshot.observedAt
+    if (own(snapshot,'magi')) result.magi = {...normalizeMagiObservation(snapshot.magi),observedAt:snapshot.observedAt,stale}
     result.threads = threads.map(entry => ({ ...entry, running: stale ? false : entry.running,
       broadcastStale: stale, broadcastObservedAt: snapshot.observedAt }))
   } catch (error) {
