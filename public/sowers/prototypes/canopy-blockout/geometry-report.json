@@ -1,0 +1,34 @@
+{
+  "units": "mm",
+  "boundsMm": [
+    [
+      -12.0,
+      0.0,
+      0.0
+    ],
+    [
+      12.0,
+      30.0,
+      6.0
+    ]
+  ],
+  "widthMm": 24.0,
+  "heightMm": 30.0,
+  "depthMm": 6.0,
+  "volumeMm3": 3079.5067440925304,
+  "vertices": 1180,
+  "faces": 2356,
+  "finiteVertices": true,
+  "watertight": true,
+  "allEdgesTwoFaces": true,
+  "positiveVolume": true,
+  "windingConsistent": true,
+  "eulerNumber": 2,
+  "oneComponent": true,
+  "componentCount": 1,
+  "stlSha256": "8e182dc7db823137effbd306747166977f1d4045e142549c6847794205c46484",
+  "frontRelief": "face recess 0.72 mm; arch eyes rise 0.78 mm from recess floor; seed rises 0.55 mm",
+  "profile": "single polygon slab; flat back at z=0",
+  "generatorSha256": "3cd88f8aa3a1df6c43600f59b9187bfa25da2fe1bf05568a6dcacf0b8a021897",
+  "sourceSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+}

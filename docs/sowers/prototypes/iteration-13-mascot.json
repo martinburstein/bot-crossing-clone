@@ -1,0 +1,121 @@
+{
+  "iteration": 13,
+  "conceptId": "mascot-blockout",
+  "title": "Original 3D mascot blockout",
+  "status": "controlled prototype; not a canonical avatar replacement",
+  "source": {
+    "viewer": "sowers/prototype-mascot/index.html",
+    "entry": "sowers/prototype-mascot/main.js",
+    "rig": "sowers/prototype-mascot/rig.mjs",
+    "styles": "sowers/prototype-mascot/style.css",
+    "sha256": {
+      "index.html": "625a7a9d87863b1fe0b1240b0fab2ba4fb449965e1de6446e1793c68f25c58a0",
+      "main.js": "b3fb0adbca87277b35204c447c8ca7936df831dc033857521a999aa8d3199c3c",
+      "rig.mjs": "839eb7838aa4c7a5e3aa7c818b5fe65bc82c27640ed6f71697b7abb188d402f2",
+      "style.css": "4f140ea7fc57dda8dc54deed8b4cb552043ea961f9426a5429edd8cb8d62c5b5"
+    }
+  },
+  "construction": {
+    "engine": "Three.js via existing project dependency",
+    "geometry": "Original RoundedBoxGeometry, shallow ExtrudeGeometry, tapered torso extrusion, and hood-conforming stripe surface",
+    "uniqueGeometryCount": 19,
+    "hood": {
+      "dimensions": [
+        2.05,
+        1.62
+      ],
+      "widthToHeightRatio": 1.265,
+      "shareOfOverallHeight": 0.497
+    },
+    "palette": {
+      "cream": "#f3e4c8",
+      "orange": "#f17721",
+      "cocoa": "#4b3026"
+    },
+    "poses": [
+      "neutral",
+      "reach",
+      "hop"
+    ],
+    "views": [
+      "front",
+      "side",
+      "threequarter"
+    ],
+    "motion": "Paused by default; hop translates whole rig; no torso/head scale changes; reduced-motion preference disables playback."
+  },
+  "captures": [
+    {
+      "file": "public/sowers/prototypes/mascot-blockout/neutral-front.png",
+      "pose": "neutral",
+      "view": "front",
+      "source": "Browser WebGL canvas capture of original Three.js geometry",
+      "dimensions": [
+        1034,
+        600
+      ],
+      "sha256": "8cae5942ff7ede453fb9641ebc9132fe25ceaa7bb6b6b4e052ae976a320b56ca"
+    },
+    {
+      "file": "public/sowers/prototypes/mascot-blockout/reach-front.png",
+      "pose": "reach",
+      "view": "front",
+      "source": "Browser WebGL canvas capture of original Three.js geometry",
+      "dimensions": [
+        1034,
+        600
+      ],
+      "sha256": "2d7ba6374824771e0ccba766c9e4ca67978da3911142f4da995cdb3e1ce49f4f"
+    },
+    {
+      "file": "public/sowers/prototypes/mascot-blockout/neutral-threequarter.png",
+      "pose": "neutral",
+      "view": "threequarter",
+      "source": "Browser WebGL canvas capture of original Three.js geometry",
+      "dimensions": [
+        1034,
+        600
+      ],
+      "sha256": "0d4e4e7b08f9ffa00edcdf045f9f63199b520b2003eb56e25df0e6eafc0e302c"
+    },
+    {
+      "file": "public/sowers/prototypes/mascot-blockout/reach-threequarter.png",
+      "pose": "reach",
+      "view": "threequarter",
+      "source": "Browser WebGL canvas capture of original Three.js geometry",
+      "dimensions": [
+        1034,
+        600
+      ],
+      "sha256": "1baad45fd70bbb869001be2d46782e5266864b4acbdaa2f3008f4049e88fd4cc"
+    }
+  ],
+  "verification": {
+    "browser": "Chrome on local Vite development server",
+    "transformSamples": 9,
+    "finiteWorldTransforms": true,
+    "geometryIdentityStable": true,
+    "allPoseScalesInvariant": true,
+    "groundedNeutralMinY": 0,
+    "groundedReachMinY": 0,
+    "hopRootOffsetAtMidpoint": 0.62,
+    "hopGroundClearanceAtMidpoint": 0.588,
+    "minimumTorsoLegBoxOverlap": 0.085,
+    "minimumLegBootBoxOverlap": 0.24,
+    "attachmentBoundsCheckedAcrossPoses": true,
+    "controls": "Pose and camera controls repaint while paused; keyboard focus and scrubber retained.",
+    "accessibility": "Native buttons and range input, visible focus, reduced-motion playback disabled.",
+    "mobile": "Coordinator browser verified390px, reduced-motion default, no overflow/page errors; paused resize repaints the complete model.",
+    "evidenceBoundary": "No audience, market, manufacturing, material, or candy-performance inference."
+  },
+  "referenceBoundary": "Goat 4 and iteration 12 supplied preference cues only. This rig uses original geometry; no source-specific meshes or insignia.",
+  "coordinatorVerification": {
+    "transformSamples": 9,
+    "geometryObjects": 19,
+    "poseScalesInvariant": true,
+    "neutralAndReachGrounded": true,
+    "minimumAttachmentBoxOverlap": 0.085,
+    "boundsAreNotIntersectionProof": true,
+    "pausedResizeRepaintFixed": true
+  }
+}

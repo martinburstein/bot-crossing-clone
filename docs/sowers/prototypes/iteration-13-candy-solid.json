@@ -1,0 +1,77 @@
+{
+  "iteration": 13,
+  "title": "Canopy candy solid study",
+  "kind": "controlled-geometry-study",
+  "sources": {
+    "preferenceAnchor": "docs/sowers/prototypes/preference-anchor.md",
+    "characterConcept": "public/sowers/prototypes/iteration-11-mb.png",
+    "candyConcept": "public/sowers/prototypes/iteration-12-canopy-candy-views.png",
+    "generator": "tools/sowers-canopy-blockout.py",
+    "reusedGeometryHelpers": "tools/sowers-candy-form.py"
+  },
+  "sourceInterpretation": {
+    "contour": "Original authored sampled path; not traced from reference pixels",
+    "cowl": "Canopy interpreted in outer contour; front is a slab with face/eyes/seed relief, no folded sculpted cowl.",
+    "profile": "Constant-thickness slab with flat blank back",
+    "limbs": "Mitt tabs and boots integrated in the one outer contour"
+  },
+  "artifact": "public/sowers/prototypes/canopy-blockout/canopy-solid-mm.stl",
+  "viewer": "sowers/prototype-candy/index.html",
+  "units": "mm",
+  "dimensionsWHD": [
+    24,
+    30,
+    6
+  ],
+  "faceRelief": {
+    "recessMm": 0.72,
+    "archesRiseFromFloorMm": 0.78,
+    "archConstruction": "Thick stroked inverted-U with round caps and open lower gap",
+    "seedRiseFromFrontMm": 0.55,
+    "depthIncludesRelief": true
+  },
+  "validation": {
+    "finiteVertices": true,
+    "watertight": true,
+    "positiveVolume": true,
+    "consistentWinding": true,
+    "allEdgesTwoFaces": true,
+    "eulerNumber": 2,
+    "connectedComponents": 1,
+    "volumeMm3": 3079.5067440925304
+  },
+  "stlSha256": "8e182dc7db823137effbd306747166977f1d4045e142549c6847794205c46484",
+  "orthographicEvidence": {
+    "sourceMeshSha256": "8e182dc7db823137effbd306747166977f1d4045e142549c6847794205c46484",
+    "method": "Browser Three.js STLLoader of same exported STL; front +Z, side +X, back -Z orthographic cameras",
+    "captures": {
+      "front": {
+        "path": "public/sowers/prototypes/canopy-blockout/front-orthographic.png",
+        "sha256": "cc1ed64c5c486929bbea514b55be6ced9a2b2dfd6e1e7d167deac26ad41d13fc"
+      },
+      "side": {
+        "path": "public/sowers/prototypes/canopy-blockout/side-orthographic.png",
+        "sha256": "95c7d17cc14433d9b8949d3b3f31e3dc346b1855fcc668e1eca656fa8f5a1368"
+      },
+      "back": {
+        "path": "public/sowers/prototypes/canopy-blockout/back-orthographic.png",
+        "sha256": "8d2bb02a12f8e46d201a1ce8eac0f59fae9ea0b8e130a4bb084d3754ea8f803c"
+      }
+    }
+  },
+  "scopeLimitations": [
+    "Not a release master",
+    "No tooling, demolding, tolerance, shrink, supplier or food-contact proof",
+    "No physical sample or coating-readability validation",
+    "Smoothed display normals do not change the faceted exported STL"
+  ],
+  "coordinatorVerification": {
+    "volumeRecomputedMm3": 3079.5067440925304,
+    "allEdgesTwoFaces": true,
+    "connectedFaceGraph": true,
+    "eulerNumber": 2,
+    "reportHashMatches": true,
+    "mobile390x900": "Full contour visible after adaptive orthographic fit; no page errors",
+    "viewerMainSha256": "e554044caf015bf202dfdcac71ac5ba8d3f3c974c93795909ba7acccd3712254"
+  }
+}

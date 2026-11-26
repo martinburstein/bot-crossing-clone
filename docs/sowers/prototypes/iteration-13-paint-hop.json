@@ -1,0 +1,162 @@
+{
+  "iteration": 13,
+  "title": "Paint hop study",
+  "type": "code-native character motion study",
+  "status": "proposed poses and timing only; not a source animation",
+  "characterDirection": {
+    "preferenceAnchor": "Goat 4",
+    "family": "iteration-12 balanced Sower",
+    "cues": [
+      "cream rounded-square protective hood",
+      "cocoa face window and two broad pale arch eyes",
+      "orange crown stripe, boots, and one seed chest mark",
+      "compact cream torso and attached thick mittens"
+    ]
+  },
+  "renderer": {
+    "name": "drawSower(ctx, pose)",
+    "implementation": "Fixed Canvas 2D paths rendered at half resolution and nearest-neighbor upscaled; joint rotations, root translation and rotation",
+    "imageSmoothingEnabled": false,
+    "palette": {
+      "paper": "#fff8e8",
+      "suit": "#f5ead0",
+      "orange": "#f58232",
+      "cocoa": "#70402a",
+      "outline": "#392317",
+      "MarsRust": "#b75a32"
+    },
+    "invariants": [
+      "Head, torso, limbs, and face use the same paths for all six poses.",
+      "No body-part scaling or pose-specific anatomy redraws.",
+      "The ground marks remain in fixed scene coordinates.",
+      "Frames are rendered offscreen at 180 by 180 and enlarged 2x with image smoothing disabled.",
+      "Paused playback returns without scheduling another animation frame."
+    ]
+  },
+  "timingProposal": {
+    "millisecondsPerPose": 320,
+    "cycleMilliseconds": 1920,
+    "interpolation": "none; discrete proposed key poses",
+    "sourceAnimation": false,
+    "cycleMeaning": "Nominal cycle only; delayed animation frames can extend the actual time."
+  },
+  "poses": [
+    {
+      "index": 1,
+      "name": "Crouch",
+      "pose": "Planted boots, flexed knees, arms poised forward."
+    },
+    {
+      "index": 2,
+      "name": "Push",
+      "pose": "The root rises slightly as the legs extend."
+    },
+    {
+      "index": 3,
+      "name": "Ascent",
+      "pose": "Both boots leave the ground; arms and legs trail."
+    },
+    {
+      "index": 4,
+      "name": "Apex",
+      "pose": "Highest root position with an asymmetric follow-through."
+    },
+    {
+      "index": 5,
+      "name": "Landing",
+      "pose": "Boots return with bent knees and short impact cues."
+    },
+    {
+      "index": 6,
+      "name": "Settle",
+      "pose": "Planted upright stance, arms relaxed."
+    }
+  ],
+  "controls": {
+    "playPause": true,
+    "scrub": "six discrete positions; scrubbing pauses playback",
+    "reducedMotion": "prefers-reduced-motion opens on a paused crouch"
+  },
+  "sourcePins": [
+    {
+      "path": "sowers/prototype-paint-hop/index.html",
+      "sha256": "50855c6d29a86372a86a9066b596bf4df3454127cac26fc6932cfad15395ba2a"
+    },
+    {
+      "path": "sowers/prototype-paint-hop/main.js",
+      "sha256": "5fbb9bf724a4f1e440df2824bc5b32d602a18b32defbff7810b50296d7f7f620"
+    },
+    {
+      "path": "sowers/prototype-paint-hop/style.css",
+      "sha256": "0159916d80737ce4fe108a27bd92746ceff3f799a4d5cb24ea3e3483b30d2249"
+    },
+    {
+      "path": "public/sowers/prototypes/paint-hop/index.html",
+      "sha256": "50855c6d29a86372a86a9066b596bf4df3454127cac26fc6932cfad15395ba2a"
+    },
+    {
+      "path": "public/sowers/prototypes/paint-hop/main.js",
+      "sha256": "5fbb9bf724a4f1e440df2824bc5b32d602a18b32defbff7810b50296d7f7f620"
+    },
+    {
+      "path": "public/sowers/prototypes/paint-hop/style.css",
+      "sha256": "0159916d80737ce4fe108a27bd92746ceff3f799a4d5cb24ea3e3483b30d2249"
+    }
+  ],
+  "referencePins": [
+    {
+      "path": "public/sowers/prototypes/iteration-12-balanced.png",
+      "role": "Balanced character family and compact torso comparison; design cue only.",
+      "sha256": "f6eb5d63bbba7b50c8bc49647e438f9a1a52d1a9a8bad29c9c1cb42c3b70c6b3"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-12-hop-storyboard.png",
+      "role": "Prior hop proposal reviewed for continuity; geometry and poses redrawn in code.",
+      "sha256": "193fa1171dfae068329d3a7e31d258c04f7769765ce2d8bd88c9c3263df44faf"
+    },
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "Preference anchor; palette, hood, face, and single seed chest cue.",
+      "sha256": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7"
+    }
+  ],
+  "exports": [
+    {
+      "path": "public/sowers/prototypes/iteration-13-paint-hop-sheet.png",
+      "kind": "six-pose sheet",
+      "width": 1080,
+      "height": 720,
+      "format": "PNG",
+      "sha256": "78fea0e638cc62d85c8db8e297107e1ad0e5fd96733330eb1e34ca965172706d"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-13-paint-hop-neutral.png",
+      "kind": "settled neutral pose",
+      "width": 360,
+      "height": 360,
+      "format": "PNG",
+      "sha256": "05da5b7bbceff8bd8546191a1cfb0acd256f274f69feee2356bc5ca3b1fe730d"
+    }
+  ],
+  "verification": {
+    "nodeSyntaxCheck": "passed",
+    "liveSlider": "six distinct key poses inspected in order",
+    "playPause": "pause state observed; subsequent scrubbed pose remained static",
+    "renderer": "public copy loaded at /sowers/prototypes/paint-hop/index.html; six frames rendered and sheet exported from its half-resolution Canvas 2D renderer",
+    "mobileFit": "Coordinator browser verified390px; no horizontal overflow.",
+    "reducedMotion": "Coordinator emulated reduced motion and observed paused initial pose.",
+    "pageErrors": "Coordinator instrumented pageerror during playback and six-pose scrubbing on public and source routes; none observed."
+  },
+  "limitations": [
+    "This is a pose and timing proposal, not observed source animation.",
+    "Final character proportions and manufacturing properties are not established."
+  ],
+  "coordinatorVerification": {
+    "sixScrubPoses": true,
+    "pausedImageStable": true,
+    "neutralExport2x2BlockConsistency": 1.0,
+    "mobileWidth": 390,
+    "reducedMotionEmulated": true,
+    "pageErrors": []
+  }
+}

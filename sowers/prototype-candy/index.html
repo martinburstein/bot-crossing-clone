@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f1e5" />
+    <title>Sowers · Canopy candy solid study</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="importmap">
+      {"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}
+    </script>
+  </head>
+  <body>
+    <main class="study">
+      <header>
+        <p class="eyebrow">SOWERS / GEOMETRY STUDY 13</p>
+        <h1>One canopy candy. Three true views.</h1>
+        <p class="dek">Front, edge, and back are orthographic projections of the same watertight STL mesh.</p>
+        <span class="badge">GEOMETRY STUDY · NOT A RELEASE MASTER</span>
+      </header>
+      <section class="viewer" aria-label="Interactive canopy solid model">
+        <canvas id="model" aria-label="Rendered canopy candy solid"></canvas>
+        <div class="load-state" id="load-state">Loading the shared solid…</div>
+        <nav class="view-controls" aria-label="Orthographic view">
+          <button data-view="front" aria-pressed="true">Front</button>
+          <button data-view="side" aria-pressed="false">Side</button>
+          <button data-view="back" aria-pressed="false">Back</button>
+        </nav>
+        <p class="hint">Drag to inspect · scroll to zoom</p>
+      </section>
+      <aside class="facts">
+        <div><span>Nominal envelope</span><strong id="dimensions">24 × 30 × 6 mm</strong></div>
+        <div><span>Construction</span><strong>Single slab · flat back · one connected solid</strong></div>
+        <div><span>Front relief</span><strong>Recessed face · raised arches · one seed</strong></div>
+        <div><span>Source STL SHA-256</span><code id="hash">Loading…</code></div>
+      </aside>
+      <footer>Source concept: iteration-11 canopy and iteration-12 candy views. The illustrated cowl overhang is reinterpreted as broad planar relief. No underside, wraparound shell, strap, seam print, manufacturing or food-contact claim.</footer>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
