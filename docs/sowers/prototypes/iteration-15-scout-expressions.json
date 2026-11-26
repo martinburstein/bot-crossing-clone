@@ -1,0 +1,37 @@
+{
+  "iteration": 15,
+  "title": "Scout expressions",
+  "recipe": {"M": 34, "W": 33, "B": 33, "meaning": "authored art-direction weights inherited from iteration 12; not measurement or style attribution"},
+  "tool_mode": "built-in image_gen__imagegen",
+  "tool_calls": 2,
+  "input_references": [
+    {"path": "/Users/martinburstein/Downloads/goat4.png", "role": "Goat 4 preference anchor for palette, finish and kind capable helper personality"},
+    {"path": "public/sowers/prototypes/iteration-12-balanced.png", "role": "Exact balanced Scout identity and proportions"},
+    {"path": "public/sowers/prototypes/iteration-14-family-lineup.png", "role": "Supporting Scout identity continuity reference"}
+  ],
+  "repair_input_role": "First generated six-cell Scout expression sheet; repair changed selected eye graphics only.",
+  "labels_reading_order": [
+    "Content/default happy arches",
+    "Calmly focused",
+    "Curious/directional gaze",
+    "Patient waiting",
+    "Pleased/celebrating",
+    "Gently seeking attention"
+  ],
+  "review": {
+    "identity_consistent": true,
+    "grid": "2 rows by 3 columns",
+    "moods_distinct": "Default reads clearly; focused and waiting are distinct after repair; celebration is only mildly distinct from default; curious and seeking attention remain ambiguous.",
+    "ambiguity": "Top-right curious/directional gaze remains asymmetric but does not clearly direct both eyes to one side; bottom-right seeking attention shares a raised-versus-lowered eye quality. No recognition pass is claimed.",
+    "claim_limits": "Proposed visual states only; never inferred real agent activity or audience-tested recognition."
+  },
+  "output": {
+    "path": "public/sowers/prototypes/iteration-15-scout-expressions.png",
+    "width": 1536,
+    "height": 1024,
+    "format": "PNG",
+    "sha256": "877725d1c2c061a4cd8b33d513c0a5bd1f23afe6727a55398ccf3a9aad7978e8"
+  },
+  "exact_prompt": "Use case: stylized-concept\nAsset type: Sowers character expression concept sheet\nInput images: Image 1 is the user's Goat 4 preference anchor for Scout's cream/orange/cocoa palette, soft collectible finish and kind capable helper personality. Image 2 is the exact balanced Scout identity, especially its broad rounded protective hood, orange crown stripe, cocoa face window, cream arch eyes and body proportions. Image 3 is a supporting identity consistency reference for the same Scout. Do not copy any other characters or candy.\nPrimary request: create ONE clean six-portrait expression study of the SAME balanced Scout character, recipe M34/W33/B33 (authored art direction, not measured). Use a strict 2 rows by 3 columns grid, six equal bust portraits, centered and evenly spaced. In reading order: top-left content/default happy arches; top-middle calmly focused; top-right curious with directional gaze; bottom-left patient waiting; bottom-middle pleased/celebrating; bottom-right gently seeking attention.\nScene/backdrop: seamless warm cream background, no props. Soft polished collectible 3D render like the favorite Scout reference.\nSubject: repeated identical Scout heads and upper bodies, front-facing fixed camera and identical crop; broad rounded-square cream protective hood with gentle rounded rim, orange center crown stripe, single horizontal cocoa covered-face window, large simple pale graphic eyes, cream torso with same small orange seed chest mark visible. Preserve exact same hood dimensions, rim, stripe, face window, torso/body crop, materials, lighting, camera, placement and scale in every cell. Expression changes only in the large pale eye shapes and their direction/spacing within the unchanged face window. No mouth or nose; no human anatomy. Keep the protective-mask aura and cute capable helper personality.\nExpression design: make six broad high-contrast eye-shape changes readable at small viewing size, not tiny emojis. Happy uses two clear rounded upward arches. Focused uses calmly lowered broad upper eyelid shapes with neutral symmetry, no brow. Curious uses one subtly raised eye and both eyes looking to one side. Waiting uses relaxed level softened eye shapes, slightly lowered lids. Celebrating uses two expansive upward crescents. Seeking attention uses one eye slightly more open and an inviting asymmetry, still gentle. Keep all expressions gentle and non-threatening. No angry military brows, tears, menace, or exaggerated cartoon face.\nComposition/framing: precise even 2x3 contact sheet, same bust crop and scale in every cell, generous warm cream gutters, no overlapping cells. Entire repeated hood silhouette visible in each cell.\nLighting/mood: identical soft studio light and soft shadows across all six cells.\nColor palette/materials: warm cream shell, citrus orange crown stripe and chest seed, cocoa face window, pale cream eye graphics; smooth satin molded collectible material.\nConstraints: no candy, no additional characters, no floating icons, no letters, numbers, captions, labels, logos, UI or watermark. Do not vary head/body anatomy, hood shape, body crop, pose, camera, lighting, materials or colors between cells. This is a proposed visual state study, never depiction or evidence of actual agent activity or audience-tested recognition.",
+  "exact_targeted_repair_prompt": "Use case: precise-object-edit\nAsset type: Sowers expression concept sheet\nInput image: the existing six-cell Scout expression sheet. Preserve its exact 2x3 composition, every head, hood, body, camera, crop, palette, materials, lighting, spacing and background. Edit only the eye graphics in selected cells.\nPrimary request: make the six expression states more distinct while preserving the first/top-left happy arches and the fifth/bottom-middle celebrating crescents exactly as they are. Keep six portraits in reading order.\nIn cell 2 (top middle, calmly focused), replace the current downturned closed eyes with two broad, symmetrical, upright pale oval eyes, slightly narrowed at the top by a gentle upper lid shape; calm steady attention, no angry brows.\nIn cell 3 (top right, curious directional gaze), make both pale eye graphics visibly look toward the viewer's right by shifting both eye shapes to the right within the cocoa window, maintaining a clear matching pair and slight curious unevenness. The key is both eyes share the same rightward direction.\nIn cell 4 (bottom left, patient waiting), retain two symmetrical relaxed downward-softened closed eye arcs, clearly different from focused open oval eyes.\nIn cell 6 (bottom right, gently seeking attention), replace the current one-high/one-low curious look with a welcoming asymmetrical pair: one large bright upward arch and one smaller soft upward arch, both forward-facing and symmetrically located; distinct from the shared rightward gaze in cell 3.\nNo other edits. Large simple shapes, visible at small size. Maintain gentle capable helper mood, no mouth/nose, no brows, no extra elements, no text."
+}

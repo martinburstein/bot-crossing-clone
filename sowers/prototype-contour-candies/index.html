@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f1e5" />
+    <title>Sowers · Contour candies</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+  </head>
+  <body>
+    <main class="study">
+      <header>
+        <p class="eyebrow">SOWERS / GEOMETRY STUDY 15</p>
+        <h1>Three contours. One candy form.</h1>
+        <p class="dek">Helmet control, modest continuous cowl, and broad canopy share the same 24 × 30 × 6 mm solid envelope, face, crown band, seed, slab profile, and flat back.</p>
+        <span class="badge">MATCHED POSITIVE SOLIDS · GEOMETRY REVIEW ONLY · 0° BODY DRAFT</span>
+      </header>
+      <section class="controls" aria-label="Variant and view selection">
+        <div><label>Contour</label><div class="button-row" id="variants"></div></div>
+        <div><label>Orthographic view</label><div class="button-row" id="views"><button data-view="front" aria-pressed="true">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="back" aria-pressed="false">Back</button></div></div>
+        <label class="check"><input type="checkbox" id="flat" /> Flat inspection</label>
+      </section>
+      <section class="viewer" aria-label="Interactive STL inspection">
+        <canvas id="model" aria-label="Orthographic rendering of selected contour candy STL"></canvas>
+        <div class="load-state" id="load-state">Loading the selected STL…</div>
+        <p class="hint">Drag to inspect · scroll to zoom</p>
+      </section>
+      <section class="facts">
+        <div><span>Selected contour</span><strong id="factor">Loading…</strong></div>
+        <div><span>Shared envelope</span><strong>24 × 30 × 6 mm</strong></div>
+        <div><span>Recomputed exported volume</span><strong id="volume">Loading…</strong></div>
+        <div><span>Selected STL SHA-256</span><code id="hash">Loading…</code></div>
+      </section>
+      <footer>Outer silhouettes are authored interpretations from the Iteration 14 comparison artwork, not pixel-exact conversions. Broad canopy shoulder flare obscures mitten cues. The body has 0° draft to isolate shape; no release, food, tooling, material, supplier, tolerance, shrink, or manufacturing approval is implied.</footer>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

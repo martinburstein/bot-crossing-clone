@@ -15,4 +15,7 @@ All raster concept studies here used the built-in ImageGen tool, with inspected 
 |12|Paint-like hop storyboard|[JSON](iteration-12-hop-storyboard.json), [review](iteration-12-hop-storyboard.md)|
 |14|Three-character family lineup|[Exact prompt](iteration-14-family-lineup.md), [record](iteration-14-family-lineup.json)|
 
+|15|Scout six work-state expressions|[Initial + repair prompts](iteration-15-scout-expressions.json), [review](iteration-15-scout-expressions.md)|
+|15|Canopy/Pod helper gestures|[JSON](iteration-15-helper-gestures.json), [review](iteration-15-helper-gestures.md)|
+
 Public records retain deliverable hashes and exact prompt text. Raw generation paths, original user attachments and source receipts are preserved locally in the private provenance/reference folders and closeout backup.

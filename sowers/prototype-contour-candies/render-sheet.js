@@ -1,0 +1,9 @@
+import * as THREE from 'three'
+import { STLLoader } from 'three/addons/loaders/STLLoader.js'
+const report=await fetch('/sowers/prototypes/contour-candies/geometry-report.json').then(r=>r.json()),grid=document.querySelector('#grid')
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:true});renderer.setPixelRatio(1);renderer.setSize(340,252,false);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15
+const loader=new STLLoader(),labels=['FRONT','SIDE','BACK'],positions=[[0,15,65],[65,15,3],[0,15,-65]],target=new THREE.Vector3(0,15,3)
+function makeScene(g){const s=new THREE.Scene();s.background=new THREE.Color('#fffdf6');s.add(new THREE.HemisphereLight(0xfff4d8,0x6e5941,1.1));const k=new THREE.DirectionalLight(0xffffff,1.7);k.position.set(-25,40,45);s.add(k);const f=new THREE.DirectionalLight(0xffd188,.62);f.position.set(25,4,-32);s.add(f);s.add(new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0xe99329,roughness:.74,flatShading:false})));return s}
+for(const v of report.variants){const card=document.createElement('article');card.className='card';card.innerHTML=`<div class="title">${v.label.toUpperCase()}</div>`;const geometry=await loader.loadAsync('/'+v.stl);geometry.computeVertexNormals();const scene=makeScene(geometry)
+ for(let i=0;i<3;i++){const tile=document.createElement('div');tile.className='tile';tile.innerHTML=`<label>${labels[i]} / ORTHOGRAPHIC</label>`;const c=document.createElement('canvas');c.width=340;c.height=252;tile.append(c);card.append(tile);const camera=new THREE.OrthographicCamera(-14,14,17.5,-17.5,.1,200);camera.position.set(...positions[i]);camera.up.set(0,1,0);camera.lookAt(target);renderer.setSize(340,252,false);renderer.render(scene,camera);c.getContext('2d').drawImage(renderer.domElement,0,0)}grid.append(card)}
+document.body.dataset.ready='true'

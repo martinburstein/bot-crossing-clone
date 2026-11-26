@@ -1,0 +1,155 @@
+{
+  "iteration": 15,
+  "title": "Contour candy controlled comparison",
+  "kind": "controlled-character-contour-positive-solids",
+  "units": "mm",
+  "envelopeWHD": [
+    24.0,
+    30.0,
+    6.0
+  ],
+  "bodyProfile": "One shared constant XY outline through z=0..5.45 mm; common flat back at z=0; no draft in this shape-isolation comparison (0\u00b0).",
+  "sourceInterpretation": "Outer profiles are authored interpretations of the three Iteration 14 vector-art categories in a common 24\u00d730 mm design envelope. Their paths were re-authored from the published comparison artwork; this is not a pixel-exact conversion.",
+  "commonGeometry": {
+    "faceRecessMm": 0.72,
+    "faceFloorInsetMm": 0.24,
+    "archEyeRiseFromFloorMm": 0.78,
+    "seedRiseMm": 0.55,
+    "crownBandRiseMm": 0.24,
+    "band": "One common broad curved stripe relief approaching the crown boundary; same planform across all variants; non-pill profile.",
+    "back": "Flat blank plane",
+    "overallDraftDegrees": 0,
+    "frontReliefDraft": "Raised details use common inward relief offsets; no folded overhang."
+  },
+  "comparisonViews": {
+    "path": "public/sowers/prototypes/contour-candies/comparison.png",
+    "method": "Front, side and back orthographic views rendered from each exact final STL, common camera positions and opaque warm-cream ground.",
+    "sha256": "22afb991516fdf5fb39b684779a4086b397a4086bdfa3806fa8e2643c0dfcd68"
+  },
+  "sourcePins": {
+    "tools/sowers-contour-candies.py": "832a1bb16e151a2445bee0748f4c3ff5ae1c892e7063358bf3d6120c68e45029",
+    "tools/sowers-canopy-factors.py": "c724741f029eb651df69b829a9711c33068a38a6241eedb2ace984ba465c3eca",
+    "tools/sowers-candy-form.py": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d",
+    "docs/sowers/prototypes/iteration-14-canopy-hop.json": "3fc12e359caa29094df01103ea5f887f279c6e479853686161acf3de19aae3a4",
+    "docs/sowers/prototypes/preference-anchor.md": "77c687582bf84b7ec84d5d98efe0413c95e547b8ec2c9763e55fca663cf4ae60",
+    "public/sowers/prototypes/iteration-14-canopy-hop-neutral-comparison.png": "f20b3bc07333c82ea9b3ed0fc53a8bbc12d6d4afc77af8461f6db638e64798cb",
+    "sowers/prototype-contour-candies/index.html": "5bae94e78a8497f5a3950bc24343736249f262d3326b5466e218fbea75d655ad",
+    "sowers/prototype-contour-candies/main.js": "7dfe121fab3b1c87a421804ade4dbb400f13b18fb2c6388f4a5f67041e2a1ee2",
+    "sowers/prototype-contour-candies/style.css": "4544966c1efda2397d8feb8d5f3e6f9b238976383e93283efda4a4487aa4bede",
+    "sowers/prototype-contour-candies/render-sheet.html": "e6a815ff950bd8e7db93707f0b90a6e12eeb4e985338115bb334aedcd6171998",
+    "sowers/prototype-contour-candies/render-sheet.js": "2c8af1e592df5df98a5c5b4fd44954d49b1ccb4b5619032099439868bc129091",
+    "/Users/martinburstein/Downloads/goat4.png": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7"
+  },
+  "variants": [
+    {
+      "id": "helmet-control",
+      "label": "Helmet control",
+      "stl": "sowers/prototypes/contour-candies/helmet-control.stl",
+      "metrics": {
+        "boundsMm": [
+          [
+            -12.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 24.0,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 3060.325762165288,
+        "vertices": 1396,
+        "faces": 2788,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveRecomputedVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "eb49acc83ce4fe342852a66851200b31439c4dcc628e53e172782f4c57176154"
+      }
+    },
+    {
+      "id": "modest-cowl",
+      "label": "Modest continuous cowl",
+      "stl": "sowers/prototypes/contour-candies/modest-cowl.stl",
+      "metrics": {
+        "boundsMm": [
+          [
+            -12.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 24.0,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 2928.6446121685417,
+        "vertices": 1396,
+        "faces": 2788,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveRecomputedVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "7922dc3e08463f4668f12de5fb3f0d208274633f85f59f5d34a01b11feca9165"
+      }
+    },
+    {
+      "id": "broad-canopy",
+      "label": "Broad canopy",
+      "stl": "sowers/prototypes/contour-candies/broad-canopy.stl",
+      "metrics": {
+        "boundsMm": [
+          [
+            -12.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 24.0,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 2961.5302233207894,
+        "vertices": 1396,
+        "faces": 2788,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveRecomputedVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "55389f476feb25c5458135d3acdc60c87a6aeb4c03976ff915c43e36a3c6c45a"
+      }
+    }
+  ],
+  "observations": [
+    "The outer head-to-shoulder contour is the only intended variable.",
+    "Broad canopy shoulder flare obscures the hand/mitten cues; this is a design weakness of that contour in a single-color candy relief.",
+    "The supplied Goat 4 favorite has a distinct broad rounded-square helmet rim, crown band, horizontal cocoa face window with happy arches, central seed, visible side mittens and shallow boot notch. The helmet control retains the most explicit rim; the broad canopy loses mitten cues, which diverges from this preference image.",
+    "These are geometry-review positive solids only. No mold-release, material, food-contact or manufacturing proof."
+  ],
+  "limitations": [
+    "Hands and feet are part of the shared outer polygon; the shoulder silhouette can reduce hand visibility.",
+    "Faceted sampled vector curves and direct slab walls are authored geometry, not production tooling surfaces.",
+    "No draft is included; 0\u00b0 is explicitly chosen to isolate shape."
+  ]
+}

@@ -44,6 +44,7 @@ export default defineConfig({
         prototypeMix: 'sowers/prototype-mix/index.html',
         prototypeCanopyHop: 'sowers/prototype-canopy-hop/index.html',
         prototypeCandyFactors: 'sowers/prototype-candy-factors/index.html',
+        prototypeContourCandies: 'sowers/prototype-contour-candies/index.html',
       },
     },
   },

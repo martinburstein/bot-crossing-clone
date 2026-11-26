@@ -33,3 +33,7 @@ The [compact poster](iteration-12-prototype-poster.png) maps all seven points. T
 - [One candy solid](http://127.0.0.1:5301/sowers/prototype-candy/): front, side and back of the same24x30x6mm closed STL, not separately generated view illustrations.
 
 Iteration14 adds procedural mixtures, three canopy Paint contours and four stripe/draft candy factor variants. These remain isolated studies and do not replace the canonical Sower or candy master. Corpus, numeric geometry and synthetic design review do not establish consumer preference or manufacturing performance. See MAGI.md and the per-study records for acceptance and unresolved limitations.
+
+## Helper personalities / Iteration15
+
+The [expression and gesture gallery](../../../public/sowers/prototypes/personality.html) adds six Scout expressions and six Canopy/Pod helper poses. Some face pairs still need labels; no recognition study is claimed. [Three contour candy controls](http://127.0.0.1:5301/sowers/prototype-contour-candies/) compare authored helmet/cowl/canopy silhouettes using consistent meshes and views. These remain coarse one-color controls rather than finished candy replicas.

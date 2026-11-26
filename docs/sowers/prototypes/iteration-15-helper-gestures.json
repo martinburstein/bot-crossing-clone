@@ -1,0 +1,94 @@
+{
+  "iteration": 15,
+  "title": "Sowers helper gesture proposals",
+  "tool": {
+    "name": "image_gen__imagegen",
+    "mode": "built-in",
+    "operation": "single raster generation",
+    "paidCliOrApi": false,
+    "generatedImageId": "private-generation-identifier",
+    "generatedSourceOriginal": "Private generated source retained in local provenance; final asset pinned by SHA-256.",
+    "privateSourceCopy": ".cache/sowers-helper-gestures/iteration-15-generated-source.png",
+    "skill": "/Users/martinburstein/.codex/skills/.system/imagegen/SKILL.md"
+  },
+  "recipes": [
+    {
+      "character": "Canopy Keeper",
+      "weights": {
+        "M": 45,
+        "W": 10,
+        "B": 45
+      },
+      "meaning": "authored art-direction weights, not measured style attribution",
+      "poses": [
+        "curious inspection with modest head tilt",
+        "carefully handling one large seed with both visible mittens",
+        "reassuring open-handed wave"
+      ]
+    },
+    {
+      "character": "Pod Pal",
+      "weights": {
+        "M": 10,
+        "W": 45,
+        "B": 45
+      },
+      "meaning": "authored art-direction weights, not measured style attribution",
+      "poses": [
+        "Quiet Observer leaning toward one tiny seedling with one cupped hand and grounded feet",
+        "buoyant whole-character hop with limb follow-through",
+        "settled attentive stance with one welcoming hand"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "path": "public/sowers/prototypes/iteration-14-family-lineup.png",
+      "role": "identity anchors: center Canopy Keeper and right Pod Pal",
+      "sha256": "55da22ef42f463d0e372893f4d6506760fc50666f2f1e43c76b84455faa22df1"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-11-mb.png",
+      "role": "Canopy Keeper identity: integrated cowl, mittens and compact boots",
+      "sha256": "a93d84da2e5210b89772cd17e27b24d82245edacaee00e86a4b00fb481e22037"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-11-wb.png",
+      "role": "Pod Pal identity: vertical oval hood, tapered torso and rounded limbs",
+      "sha256": "e61c9d4f7cee66605b4e30ff472bb3d001d56b1940a064619110a112f5babe3e"
+    },
+    {
+      "source": "user goat4.png",
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "preference anchor: cream/orange/cocoa palette, arch eyes, crown stripe, seed chestmark and helper personality",
+      "sha256": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7"
+    }
+  ],
+  "output": {
+    "path": "public/sowers/prototypes/iteration-15-helper-gestures.png",
+    "width": 1536,
+    "height": 1024,
+    "format": "PNG",
+    "sha256": "32a47d5db12b5e6ff88a2276dffd7c1516c54441420e1ab93f7d61a8c27b1f72",
+    "description": "Exactly two rows by three columns. Three Canopy Keeper helper gestures above three Pod Pal gestures, with seed and seedling props in their specified poses. No text."
+  },
+  "exactPrompt": "Use case: stylized-concept\nAsset type: original Sowers character action proposal sheet\nPrimary request: Create one polished full-body six-pose helper gesture sheet, exactly 2 rows by 3 columns. The TOP ROW is the SAME Canopy Keeper in three different poses; the BOTTOM ROW is the SAME Pod Pal in three different poses. These are authored prototype art-direction recipes, not measured style attribution or audience evidence. Do not average the two identities.\nInput images: Image 1 is the iteration-14 family lineup; use its center Canopy Keeper and right Pod Pal as identity anchors. Image 2 is iteration-11 Canopy Keeper and is the identity reference for the upper-row character's broad shoulder-integrated cowl and compact boots. Image 3 is iteration-11 Pod Pal and is the identity reference for the lower-row character's tall vertical oval hood, visible tapered torso and medium thick rounded limbs. Image 4 is the user's Goat 4 preference anchor for warm cream/orange/cocoa colors, orange crownstripe, pale broad eyes, original seed chestmark and kind helper personality. Preserve each character's established identity, using the specified actions only.\nScene/backdrop: warm seamless cream studio background, soft grounded shadows, no scenery.\nSubject and layout: six equal clear cells, two rows and three columns, consistent neutral three-quarter-front camera and soft studio lighting, comparable character size. All six are full body, comfortably inside their cell with space around silhouette. Top row, same Canopy Keeper M45/W10/B45 in each cell: (1) curious inspection, modest head tilt and a gentle look toward the seed; (2) careful placing of exactly one large seed, both hands visible and clearly attached mittens handling it; (3) reassuring open-handed wave, at least one mitten distinctly raised and visible. Bottom row, same Pod Pal M10/W45/B45 in each cell: (4) Quiet Observer leaning gently toward exactly one tiny seedling with one cupped hand, feet grounded and relaxed; (5) buoyant whole-character hop with clear, natural limb follow-through and coherent body volume; (6) settled attentive stance with one welcoming hand raised, relaxed grounded feet.\nCanopy Keeper identity: broad softly rounded cowl integrated across shoulders, crown narrows gently then canopy widens at shoulders; keep the strong shoulder-wide silhouette and compact orange-accent boots. Short attached mittens remain visibly positioned outside the cowl/body contour; never hide both hands under the cloak.\nPod Pal identity: tall vertically oval hood clearly taller than wide with narrowing lower face, visible tapered torso, medium-thick rounded arms and broad grounded feet. Do not turn it into the broad canopy silhouette.\nEvery cell: original Sowers warm cream/orange/cocoa palette; orange crown stripe and boot accents, cocoa face window, pale broad happy arch eyes, one original orange seed chestmark. Keep key proportions and visible volume through poses, coherent connected anatomy, no jelly distortion, detached pieces, hidden hands, duplicated limbs or fused identities. A seed prop only in Canopy Keeper careful placing cell; a tiny seedling only in Pod Pal Quiet Observer cell. No other props.\nStyle/medium: polished soft 3D collectible concept render, soft matte molded forms, clean readable contours.\nComposition/framing: neat 2\u00d73 contact sheet, equal cells, slight consistent three-quarter angle, consistent scale; no borders or cell dividers.\nLighting/mood: consistent soft warm diffuse studio light, kind capable helper mood.\nColor palette: warm cream, citrus orange, cocoa; pale broad eyes.\nText (verbatim): none.\nConstraints: exactly six characters total, same Canopy Keeper across top three cells and same Pod Pal across bottom three cells. Actions are static pose proposals only; do not imply animation, rigging, agent execution, audience testing or manufacturing. Maintain character identity and face, stripe and chest mark in every cell.\nAvoid: labels, captions, numbers, lettering, logos, watermark, more than six characters, extra companions, tools, gear, straps, antenna, equipment, costume details, extra markings, omitted/obscured seed marks, extra props, inaccurate identity, muddled top/bottom identities, missing/hidden hands, cropped figures, extreme camera-angle variation, dramatic perspective, jelly bodies, detached parts, extra limbs, motion trails, multiple pose ghosting.",
+  "observations": [
+    "Exactly six full-body cells, three Canopy Keeper poses above three Pod Pal poses.",
+    "Canopy Keeper identity reads consistently through the broad shoulder cowl, seed mark and compact orange boots; Pod Pal remains distinct through its tall oval hood and visible tapered torso.",
+    "Each requested pose is legible. The top-middle pose visibly handles one large seed with two attached mittens; the lower-left pose leans toward one small seedling with a cupped hand; the lower-middle pose is a coherent airborne hop; waves show visible raised mittens.",
+    "All six preserve the cream/orange/cocoa palette, orange stripe and boots, pale arch eyes and chest seed mark. No text or logos."
+  ],
+  "uncertainties": [
+    "The Canopy Keeper seed is between the mittens rather than visibly touching the ground, so careful placement is suggested rather than shown at the instant of release.",
+    "The seedling reads clearly but is small at full-sheet scale.",
+    "The camera is a mild three-quarter view. Pose imagery does not establish animation, rigging, agent actions, market response or physical production."
+  ],
+  "privateProvenance": "Raw receipt retained locally in .cache/sowers-prototype-provenance/iteration-15-helper-gestures.raw.json",
+  "coordinatorReview": {
+    "identity": "Canopy and Pod remain distinct; gestures are visible in static art.",
+    "seedContact": "The seed appears at the floor plane between the mittens; planting into soil is not shown. Static contact/weight cannot be validated.",
+    "wave": "Raised mitten conveys a wave; an open palm is not articulated.",
+    "evidence": "Still pose concepts only, not animation, execution or recognition proof."
+  }
+}
