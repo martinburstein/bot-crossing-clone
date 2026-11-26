@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "observedAt": 1,
+  "threads": [
+    {
+      "id": "example:fictional-habitat-agent",
+      "title": "Fictional habitat assembly example",
+      "project": "Schema demonstration only",
+      "running": false,
+      "hasError": false,
+      "unread": false,
+      "assignmentState": "review",
+      "constructionProgress": 0.5,
+      "plan": {
+        "steps": [
+          { "title": "Prepare pad", "status": "completed" },
+          { "title": "Assemble habitat", "status": "pending" }
+        ]
+      },
+      "milestones": [
+        { "id": "pad", "title": "Pad prepared", "level": "minor", "accepted": true, "status": "accepted" }
+      ]
+    }
+  ]
+}

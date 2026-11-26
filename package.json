@@ -36,6 +36,7 @@
     "build": "npm run assets --silent && vite build",
     "start": "vite build && node server/serve.mjs",
     "serve": "node server/serve.mjs",
+    "sowers": "node tools/start-sowers.mjs",
     "assets": "node tools/build-assets.mjs",
     "test": "node --test \"test/**/*.test.mjs\""
   },

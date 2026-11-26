@@ -34,6 +34,7 @@ const PARENT_THREAD_ID = process.env.BOT_CROSSING_PARENT_THREAD_ID || ''
 
 const HEAD_BYTES = 128 * 1024
 const TAIL_BYTES = 64 * 1024
+const PUBLIC_TEXT_CHARS = 480
 /** Codex writes nothing when it is killed, so a stale `task_started` needs a time bound too. */
 const ACTIVE_WINDOW_MS = 30 * 60 * 1000
 
@@ -261,6 +262,36 @@ function readLifecycle(records) {
   return last
 }
 
+/** Explicit public-channel allowlist. Never inspect reasoning, arguments, or tool output. */
+function readPublicActivity(records) {
+  let last = null
+  for (const r of records) {
+    const p = r?.payload
+    if (r?.type !== 'response_item' || !p || typeof p !== 'object') continue
+    let kind, text
+    if (p.type === 'message' && p.role === 'assistant' && ['commentary', 'final'].includes(p.channel)) {
+      if (!Array.isArray(p.content)) continue
+      kind = p.channel === 'commentary' ? 'commentary' : 'message'
+      text = p.content.filter(part => part?.type === 'output_text' && typeof part.text === 'string')
+        .map(part => part.text).join(' ')
+    } else if (p.type === 'function_call' && typeof p.name === 'string' && /^[A-Za-z_][A-Za-z0-9_.:/-]{0,95}$/.test(p.name)) {
+      kind = 'tool'
+      text = p.name
+    } else continue
+    text = clean(text.replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ')).slice(0, PUBLIC_TEXT_CHARS)
+    if (text) last = { kind, text, at: Date.parse(r.timestamp || '') || 0 }
+  }
+  return last
+}
+
+/** Tail starts may bisect a JSON record. Only complete lines enter the public allowlist. */
+function tailPublicActivity(tail, startsAtZero) {
+  const first = startsAtZero ? 0 : tail.indexOf(10) + 1
+  const last = tail.lastIndexOf(10)
+  if ((!startsAtZero && first === 0) || last < first) return null
+  return readPublicActivity(jsonLines(tail.subarray(first, last).toString('utf8')))
+}
+
 /**
  * Long turns can put megabytes between task_started and EOF. Walk backward in small chunks
  * until the newest lifecycle event, rather than treating an absent tail marker as idle.
@@ -315,7 +346,7 @@ async function readRange(fh, start, length) {
 
 /** Advance only new bytes, retaining a bounded partial line across polls. */
 async function appendLifecycle(fh, previous, size) {
-  let { lifecycle, pending, oversized, completeOffset, activityAt = 0 } = previous
+  let { lifecycle, pending, oversized, completeOffset, activityAt = 0, activity = null } = previous
   let offset = previous.size
   while (offset < size) {
     const chunk = await readRange(fh, offset, Math.min(TAIL_BYTES, size - offset))
@@ -332,6 +363,7 @@ async function appendLifecycle(fh, previous, size) {
         if (!oversized) {
           const records = jsonLines(pending.toString('utf8'))
           lifecycle = readLifecycle(records) || lifecycle
+          activity = readPublicActivity(records) || activity
           activityAt = Math.max(activityAt, Date.parse(records.at(-1)?.timestamp || '') || 0)
         }
         pending = Buffer.alloc(0)
@@ -342,7 +374,7 @@ async function appendLifecycle(fh, previous, size) {
     }
     offset += chunk.length
   }
-  return { lifecycle, pending, oversized, completeOffset, activityAt }
+  return { lifecycle, pending, oversized, completeOffset, activityAt, activity }
 }
 
 /** Parsing is kept against mtime and size, so an unchanged transcript is read once. */
@@ -370,13 +402,14 @@ async function transcriptFacts(entry, needHead) {
       const latest = await latestLifecycle(fh, st.size)
       const tail = await readRange(fh, Math.max(0, st.size - HEAD_BYTES), Math.min(st.size, HEAD_BYTES))
       const newline = tail.lastIndexOf(10)
-      lifecycleState = { ...latest, pending: newline >= 0 ? tail.subarray(newline + 1) : tail,
+      lifecycleState = { ...latest, activity: tailPublicActivity(tail, st.size <= HEAD_BYTES), pending: newline >= 0 ? tail.subarray(newline + 1) : tail,
         oversized: newline < 0 && st.size > HEAD_BYTES,
         completeOffset: newline >= 0 ? st.size - tail.length + newline + 1 : 0 }
       if (lifecycleState.oversized) lifecycleState.pending = Buffer.alloc(0)
     }
     facts.lifecycle = lifecycleState.lifecycle
     facts.activityAt = lifecycleState.activityAt
+    facts.activity = lifecycleState.activity
     if (needHead) facts.meta = appended && cached.headReady ? cached.facts.meta : readHeadMeta(jsonLines(await readHead(entry.file, HEAD_BYTES)))
     const prefix = await readRange(fh, 0, Math.min(st.size, 4096))
     const checkpoint = await readRange(fh, Math.max(0, st.size - 128), Math.min(st.size, 128))
@@ -384,7 +417,7 @@ async function transcriptFacts(entry, needHead) {
       prefix, checkpoint, head: needHead, headReady: Boolean(facts.meta?.sessionMetaSeen && (facts.meta.prompt || st.size >= HEAD_BYTES)), facts })
   } catch {
     // Do not cache failures: an unchanged file must be retried after a transient sharing error.
-    return { lifecycle: null, meta: cached?.facts.meta || null }
+    return { lifecycle: null, meta: cached?.facts.meta || null, activity: cached?.facts.activity || null }
   } finally {
     await fh?.close().catch(() => {})
   }
@@ -446,6 +479,8 @@ async function scanThreads({ workerBindings = [] } = {}) {
       effort: row?.reasoning_effort || meta.effort || '',
       createdAt: num(row?.created_at_ms) || meta.createdAt || entry?.mtime || 0,
       lastActivityAt,
+      // Last observed public record remains history after completion; it does not imply running.
+      activity: facts.activity || null,
       // Codex records no focus history, so "have you looked at this" is unknowable — not false.
       lastFocusedAt: 0,
       unread: false,

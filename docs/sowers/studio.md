@@ -1,0 +1,9 @@
+# Sowers character studio
+
+Open `/sowers/studio/` on the Sowers viewer. This is a separate art direction study: its gesture buttons and temporary suit swatches do not read or write live worker state. It imports the production `createSower` and `createHelmet` without modifying either module. It uses the existing Three.js dependency and entirely local, procedural geometry; no downloaded visual assets, fonts, or external requests are needed.
+
+The warm ivory studio and circular turntable put the 1.84-unit scout near the camera, facing +Z with feet at y=0. Inspect the full silhouette, amber eye aperture, covered lower face, sprout badge and backpack through Front / Helmet / Back presets. Drag or focus the canvas and use arrow keys to orbit; scroll to zoom. Space pauses animation, 1–6 select gestures, W toggles walking in place, and R restores the front view. Buttons keep their normal keyboard behavior. With reduced motion enabled, the first pose is settled and paused; playback is an explicit opt-in. Paused state changes show a settled pose immediately.
+
+Gesture notes explain working, review, waiting, idle, complete and error as expressive art choices. Walking deliberately overrides the stationary gesture, and the caption says so. Suit swatches reconstruct only the local preview; they preserve the same sprout badge, ivory trim, amber visor and masked silhouette. Three equally weighted panels describe Wobbly Life charm, Mars Mission aura, and construction through observed progress as influences on this original design, without implying copied assets or verified live activity.
+
+Responsive layouts retain a large character view and move controls below it on phones. WebGL failure displays a readable message and disables the inactive controls. Studio state is ephemeral and never persisted.

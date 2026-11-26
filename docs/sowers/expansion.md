@@ -1,0 +1,15 @@
+# Checkpoint hardware
+
+`createCheckpointExpansion({seed='Sowers', color=0xf5823a}={})` from `sowers/expansion.js` returns a Three.js group. Add it beside the mission base under the same station parent; do not parent it to a scaled avatar. Call `group.userData.setCheckpoints(milestones)` with each complete current milestone snapshot. It returns the group for convenience.
+
+Every accepted checkpoint builds one original procedural battery bank, miniature solar array, relay, greenhouse dome, radiator or resource tank. No downloaded assets or copied commercial models are used. Seed and record identity select the hardware and small marking. Four 1.5 × 1.5 pads centered at X ±4.6, Z ±4 receive up to three levels. Geometry stays inside X ±5.35, Z ±4.75, with Y from 0 to 4.7. This reserves the main base, its solar outrigger and the forward avatar/entry path. The lower levels act as utility racks; upper modules remain at their original elevation when a lower checkpoint is retracted, rather than relocating evidence that survived the update.
+
+Finite numeric or nonempty string `id` is preferred. Otherwise a recursively sorted record-content key ignores acceptance/status/retraction/update metadata. Identical fallback records use occurrence suffixes; they are indistinguishable without source ids, so sources should give distinct checkpoints ids. Reordering the same records preserves the actual groups and transforms. Retraction/removal disposes only the matched hardware. New records fill free slots; previously hidden overflow can take a vacated slot. Existing survivors never move. Initial assignment sorts keys; layout thereafter reflects the sequence of evidence updates.
+
+Canonical records without acceptance metadata are accepted. `accepted:false`, pending/unaccepted/rejected/retracted statuses, a truthy `retractedAt` or `retracted` are excluded. Malformed input is an empty snapshot; nonfinite ids fall back to record contents, and invalid seed/color values receive safe defaults. No geometry is created for an empty snapshot.
+
+`userData.checkpointCount`, `displayedCount`, `overflowCount`, `limit` (12) and `footprint` describe the bounded display. Each child exposes `checkpointKey`, `slot` and `hardware`. Counts are checkpoints, never task-completion fractions. The main base should retain its unknown-progress scaffold baseline (0.12) unless explicit measured progress or a declared plan denominator exists. This module neither infers progress nor writes task/protocol state.
+
+Call `userData.dispose()` when removing a station; it releases geometry/material resources once, detaches the group and makes subsequent setters harmless. Retraction also releases its resources immediately.
+
+Validation: `node --test test/sowers-expansion.test.mjs` covers deterministic hardware, identity and transform stability, precise retraction disposal, bounded overflow, finite geometry, reserved-space clearance and final disposal. These are geometry checks; visual character and station integration are verified separately by the coordinator.

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f2eee5" />
+    <title>Sowers · Mission watch</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="scene" aria-label="Interactive three dimensional Sowers mission base"></div>
+      <header class="topbar">
+        <a class="brand" href="/sowers/" aria-label="Sowers home"><span class="brand-mark">✳</span> SOWERS<span class="edition">MISSION WATCH / 001</span></a>
+        <div class="top-actions"><a class="studio-link" href="/sowers/studio/">Meet a Sower ↗</a><span id="connection" role="status">Connecting to local agents</span><button id="source-info" aria-expanded="false" aria-controls="source-notes" aria-label="Observation sources and warnings">ⓘ</button><button id="broadcast" aria-pressed="false">Broadcast view <span>↗</span></button></div>
+      </header>
+      <section id="source-notes" class="source-notes" hidden aria-label="Observation sources"><h2>Observation sources</h2><p id="source-description">Connecting to local sessions.</p><ul id="source-warnings"></ul></section>
+      <main class="overlay">
+        <section class="intro"><div class="eyebrow">A LITTLE WORK. A NEW WORLD.</div><h1>Good things<br>are taking shape.</h1><p>Your agents, out in the field.<br>Every checkpoint leaves something behind.</p><a class="assembly-link" href="/sowers/assembly/">Explore base assembly ↗</a></section>
+        <aside class="crew-panel panel" aria-label="Agent roster">
+          <div class="panel-heading"><h2>On the surface</h2><span id="crew-count">00</span></div>
+          <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Find a Sower or project" aria-label="Find a Sower or project" /></label>
+          <div class="mode-picker" role="group" aria-label="Data source"><button data-mode="live" class="active">Local agents</button><button data-mode="demo">Design preview</button></div>
+          <label class="scope-label">Show <select id="scope" aria-label="Session scope"><option value="recent">Active + recent</option><option value="active">Working now</option><option value="all">All sessions</option></select></label>
+          <div id="roster"></div>
+          <div id="pagination" hidden><button id="previous" aria-label="Previous Sowers">←</button><span id="page-label"></span><button id="next" aria-label="Next Sowers">→</button></div>
+          <p class="panel-foot" id="roster-note">Read-only observation · updates every 8 seconds</p>
+        </aside>
+        <aside class="detail-panel panel" aria-label="Selected Sower">
+          <div class="eyebrow">FIELD TRANSMISSION</div><div id="detail"><h2>Waiting for a signal</h2><p>Local agent sessions will appear here.</p></div>
+        </aside>
+        <div class="scene-caption"><span class="live-dot"></span><span id="scene-caption">MARS / SOWER OUTPOST</span><span class="coordinates">24° N · 118° E</span></div>
+        <div class="scene-controls" role="group" aria-label="Camera controls"><button id="overview" aria-label="Overview" title="Show full base">⌖ <span>Overview</span></button><button id="follow" aria-label="Follow Sower" aria-pressed="false">◎ <span>Follow Sower</span></button><button id="orbit" aria-label="Orbit" aria-pressed="false">↻ <span>Orbit</span></button><button id="motion" aria-label="Pause motion" aria-pressed="false">Ⅱ <span>Pause motion</span></button></div>
+      </main>
+      <footer class="bottom-bar"><div><span class="footer-mark">✳</span><strong id="activity-count">0</strong><span>working</span><i></i><strong id="checkpoint-count">0</strong><span>reported checkpoints</span></div><p id="source-note">Live local sessions · task completion is shown only when measured</p><span class="tag">GROW WITH PURPOSE.</span></footer>
+      <button id="exit-broadcast" hidden>Exit broadcast <span>Esc</span></button>
+      <div id="notice" role="status" hidden></div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

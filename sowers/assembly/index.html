@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f4f0e6"><title>Sowers · Assembly study</title><link rel="stylesheet" href="./style.css"></head>
+<body>
+<header><a class="brand" href="/sowers/"><span aria-hidden="true">✳</span> SOWERS <small>FIELD NOTES / 003</small></a><span class="sandbox">DESIGN SANDBOX</span><a class="return" href="/sowers/">Return to colony ↗</a></header>
+<main>
+  <div class="heading"><div><p class="eyebrow">A PLACE TO BEGIN</p><h1>Something small.<br>Something worth building.</h1></div><p class="lede">Footings, a frame, a warm little light.<br> Explore how a Sower's outpost takes shape.</p></div>
+  <div class="workspace">
+    <section class="viewport" aria-label="Interactive fictional base assembly">
+      <div id="canvas-wrap"></div>
+      <div class="specimen"><span>OUTPOST / <b id="model-kind">HABITAT</b></span><span id="variant">ROOF VARIANT 01</span></div>
+      <div class="model-label"><span class="dot"></span> SCOUT INCLUDED FOR SCALE</div>
+      <div class="views" aria-label="Camera views"><button data-view="overview" class="active">Overview</button><button data-view="entry">Airlock</button><button data-view="plan">Above</button></div>
+      <p class="orbit-help">DRAG TO ORBIT · SCROLL TO ZOOM · ARROW KEYS ON MODEL</p>
+      <p id="render-message" role="status" hidden></p>
+    </section>
+    <aside class="controls" aria-label="Assembly controls">
+      <div class="card-heading"><p class="eyebrow">THE ASSEMBLY TABLE</p><span aria-hidden="true">✳</span></div>
+      <h2>A little outpost, your way.</h2>
+      <p class="muted">Fictional design controls. No live work, worker activity, or time estimates.</p>
+      <div class="seed-row"><label for="seed">Layout seed<input id="seed" maxlength="48" value="little-dawn-01" spellcheck="false"></label><button id="new-seed" title="Choose another seed">New ↗</button></div>
+      <fieldset class="kind-picker"><legend>Outpost purpose</legend><button data-kind="habitat" aria-pressed="true">Habitat</button><button data-kind="power" aria-pressed="false">Power</button><button data-kind="relay" aria-pressed="false">Relay</button></fieldset>
+      <label class="mode-label" for="mode">Evidence study<select id="mode"><option value="fraction">Manual assembly fraction</option><option value="checkpoints">Checkpoints only · unknown %</option></select></label>
+      <div class="fraction-heading"><label for="construction">Assembly fraction</label><output id="fraction" for="construction">100%</output></div>
+      <input id="construction" type="range" min="0" max="100" value="100" step="1" aria-describedby="fraction-note">
+      <p class="caption" id="fraction-note">A manually chosen model fraction, never generated progress.</p>
+      <fieldset class="stages"><legend>Inspect a physical stage</legend><button data-stage="0" aria-pressed="false"><span>01</span>Footings</button><button data-stage="1" aria-pressed="false"><span>02</span>Frame</button><button data-stage="2" aria-pressed="false"><span>03</span>Shell</button><button data-stage="3" aria-pressed="false"><span>04</span>Systems</button><button data-stage="4" aria-pressed="true"><span>05</span>Beacon</button></fieldset>
+      <div class="checkpoint-heading"><span>Fictional accepted checkpoints</span><output id="checkpoint-count">0</output></div>
+      <div class="checkpoint-actions"><button id="retract" disabled>− Retract last</button><button id="add">+ Add checkpoint</button></div>
+      <p class="caption" id="checkpoint-note" aria-live="polite">No extensions yet. Add a checkpoint to attach a hardware module.</p>
+      <div class="status" role="status"><span>COMPLETION</span><strong id="completion">100% · manually selected</strong></div>
+      <button id="motion" class="motion" aria-pressed="false">Pause scout motion</button>
+    </aside>
+  </div>
+  <section class="build-notes" aria-labelledby="phase-title"><div><p class="eyebrow">WHAT PHYSICALLY CHANGES</p><h2 id="phase-title">05 / A light comes on.</h2><p id="phase-description">The beacon arrives; temporary gantries step away. The outpost is ready for its next little story.</p></div><ul id="phase-parts"><li>Amber mast beacon installed</li><li>Temporary assembly gantry removed</li><li>Pressure shell, systems and access steps retained</li></ul><div class="evidence-note"><span>GROWTH ≠ COMPLETION</span><p>Accepted checkpoints attach hardware. Without a declared denominator, remaining work and completion stay unknown.</p></div></section>
+</main>
+<footer><span>Original procedural Sowers design · Fictional assembly study</span><span>1–5 stages · R reset view <a href="/sowers/studio/">Meet the scout ↗</a></span></footer>
+<script type="module" src="./main.js"></script>
+</body></html>
