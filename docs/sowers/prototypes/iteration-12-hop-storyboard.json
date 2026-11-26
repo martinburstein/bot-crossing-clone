@@ -1,0 +1,98 @@
+{
+  "iteration": 12,
+  "title": "Hop storyboard",
+  "type": "character pose design proposal",
+  "recipe": {
+    "M": 15,
+    "W": 70,
+    "B": 15,
+    "meaning": "Authored art-direction weights, not measured attribution."
+  },
+  "tool": {
+    "mode": "built-in image_gen.imagegen",
+    "skill": "/Users/martinburstein/.codex/skills/.system/imagegen/SKILL.md",
+    "paidCliOrApi": false,
+    "generationCalls": 1,
+    "generatedImageId": "01a21722-d869-7510-81b9-e013e63b55b1",
+    "generatedFile": ".cache/sowers-generation/01a21722-d869-7510-81b9-e013e63b55b1/source.png"
+  },
+  "references": [
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "Inspected visual preference anchor for palette, hood/face construction, and friendly character tone; not provided as an image input to generation.",
+      "sha256": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-10-wobbly-led.png",
+      "role": "Inspected visual reference for same original Sower identity and Wobbly-led proportions; not provided as an image input to generation.",
+      "sha256": "a94a9ef8bc40304adea253713898296146035a28f8892580854268a0239961f2"
+    }
+  ],
+  "referenceUse": "References informed the written character constraints only. No reference image was supplied to the generation tool or directly copied/edited.",
+  "output": {
+    "path": "public/sowers/prototypes/iteration-12-hop-storyboard.png",
+    "width": 1536,
+    "height": 1024,
+    "format": "PNG",
+    "mode": "RGB",
+    "sha256": "193fa1171dfae068329d3a7e31d258c04f7769765ce2d8bd88c9c3263df44faf"
+  },
+  "layout": {
+    "columns": 3,
+    "rows": 2,
+    "panelCount": 6,
+    "readingOrder": "left-to-right across top row, then left-to-right across bottom row",
+    "characterCountPerPanel": 1
+  },
+  "frames": [
+    {
+      "index": 1,
+      "pose": "Ready stance",
+      "description": "Boots planted, arms gently poised; the generated pose reads more upright than a deep crouch."
+    },
+    {
+      "index": 2,
+      "pose": "Push-off",
+      "description": "Legs bend and begin extending as the body lifts."
+    },
+    {
+      "index": 3,
+      "pose": "Ascending hop",
+      "description": "Both boots clear the soil; limbs trail slightly."
+    },
+    {
+      "index": 4,
+      "pose": "Apex",
+      "description": "Airborne pose with a small asymmetric arm and boot follow-through."
+    },
+    {
+      "index": 5,
+      "pose": "Landing",
+      "description": "Boots meet the soil with both legs bent and short impact marks."
+    },
+    {
+      "index": 6,
+      "pose": "Settled stance",
+      "description": "Relaxed, friendly upright pose with arms lowered."
+    }
+  ],
+  "review": {
+    "frameCountVerified": 6,
+    "poseProgression": "Ready/push-off/ascending/apex/landing/settled progression is distinct and readable.",
+    "identityConsistency": "Cream broad hood and rim, orange crown stripe and boots, cocoa face window, two pale arch eyes, one orange chest seed, compact cream torso, and attached thick limbs recur consistently.",
+    "limitations": [
+      "First pose is planted and poised but more upright than a deep crouch.",
+      "Broad rim/visor appears oversized in places.",
+      "The illustration is loosely painterly with softly textured cream paper rather than literal MS Paint; chunky outlines and flat fills remain.",
+      "This is a proposed pose design only, not observed source animation or executable timing.",
+      "The sheet does not establish rig mechanics, animation timing, final proportions, manufacturing properties, or production readiness."
+    ]
+  },
+  "exactPrompt": "Use case: illustration-story\nAsset type: one six-frame character pose storyboard sheet, proposed design only\nInput images: Goat 4 at /Users/martinburstein/Downloads/goat4.png and Iteration 10 Wobbly-led Sower at /Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-10-wobbly-led.png were inspected for identity only; they are not supplied as exact image inputs. Do not copy other figures or logos.\nPrimary request: Draw a single 2-row by 3-column storyboard sheet of the SAME original Sower character in six consecutive hopping poses, reading left to right across the top row, then left to right across the bottom row. The character is an M15/W70/B15 Wobbly-led Sower, retaining identical proportions, head/body volumes, colors, face and construction every frame. This is proposed pose design, not an observed source animation or executable timing sequence.\nScene/backdrop: warm cream paper with a few tiny rust ground strokes and sparse dots underfoot; simple quiet Mars soil cue only; no horizon clutter.\nSubject: exactly one character per panel; a small toy-like Sower with a broad softly rounded square cream hood, orange crown stripe, shallow broad cream protective rim, cocoa face window, two broad pale arch eyes, small cream torso, one small orange seed mark centered on chest, attached thick cream limbs, orange boots. Preserve a sturdy compact silhouette and the same head-to-body ratio in all six drawings. Hard edge contours and flat fill colors.\nPose sequence: 1 ready/crouch with feet planted and arms gently poised; 2 push-off with knees bent and body rising; 3 ascending hop, boots clearly off the ground, limbs beginning a small buoyant follow-through; 4 apex, slight asymmetry in the arms and feet from follow-through; 5 landing with both legs bent and boots meeting the soil; 6 settled friendly stance, upright and relaxed. Each pose must be distinct and flow as an understandable sequence. Keep head and torso rigid in shape; no squashing, stretching, slime or blob deformation.\nStyle/medium: classic MS Paint-like simple hand-drawn illustration; chunky hard-edge brush outlines; simple flat filled shapes; lightly pixel-stepped edges; clear imperfect linework with restrained hand wobble; friendly, spare storyboard page.\nComposition: exactly six equally sized clean rectangular panels in an even 2x3 grid, consistent character scale and camera, generous cream margins, one complete readable character per panel. Thin simple dark-brown panel dividers only.\nPalette: warm cream paper and suit, citrus orange stripe and boots and seed, cocoa face window, pale cream arch eyes, muted rust soil marks, dark brown outlines.\nText (verbatim): none.\nConstraints: no text, letters, numbers, captions, labels, logos, typography, watermarks, UI, gradients, polished 3D, second character, extra props, packages, scenery distractions, motion blur, shadowed rendering, plastic shine, sketch panels other than six, or frame count ambiguity. Keep exactly six panels, exactly one Sower per panel, all identity marks attached and consistent.",
+  "coordinatorVerification": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "193fa1171dfae068329d3a7e31d258c04f7769765ce2d8bd88c9c3263df44faf",
+    "review": "Full image inspected and same-wave peer challenge complete. Static concept evidence only."
+  }
+}

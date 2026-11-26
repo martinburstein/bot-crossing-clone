@@ -1,0 +1,52 @@
+{
+  "iteration": 12,
+  "concept_id": "canopy-candy-views",
+  "title": "Canopy candy front, side, and back concept views",
+  "recipe": {
+    "mars": 45,
+    "wobbly_life": 10,
+    "bot_crossing": 45,
+    "meaning": "inherited authored art-direction weights, not measured style attribution"
+  },
+  "tool": {
+    "name": "image_gen__imagegen",
+    "mode": "built-in",
+    "operation": "single raster generation",
+    "transparent_background": false
+  },
+  "references": [
+    {
+      "path": "public/sowers/prototypes/iteration-11-mb.png",
+      "role": "M45/W10/B45 canopy helper: broad orange canopy flaring into shoulders, shallow face and seed relief, attached tabs, broad boots; inspected and used as generation input"
+    },
+    {
+      "path": ".cache/sowers-reference-corpus/goat4.png",
+      "role": "fixed preference anchor for friendly arch-eye language and rounded softness; inspected and used as generation input"
+    }
+  ],
+  "output": {
+    "file": "public/sowers/prototypes/iteration-12-canopy-candy-views.png",
+    "width": 1774,
+    "height": 887,
+    "sha256": "b6814c816a4f3a2b64994ace7f2c577b13e76ee16382ce11adbfa7833c0e7011",
+    "description": "Warm cream concept sheet showing one uniform orange candy from the front, true side profile, and back; no labels or logos."
+  },
+  "observations": [
+    "Front view shows a broad rounded canopy flaring into shoulders, broad shallow recessed face window with arch reliefs, one seed relief, attached mitten tabs, and short broad boots with a shallow center notch.",
+    "Side view is markedly shallower than the front and reads as a rounded slab; one mitten is prominent and occludes part of the torso edge.",
+    "Back view is plain and rounded, with no face or seed; its broad canopy and boot silhouette broadly match the front.",
+    "All views are close in overall height, but canopy and boot contours and relief alignment vary subtly between them."
+  ],
+  "uncertainties": [
+    "AI-rendered views are concept illustrations, not verified orthographic projections or consistent manufacturing geometry.",
+    "Visible fine surface grain and highlights remain despite the requested smooth matte appearance.",
+    "The image does not establish physical dimensions, relief readability, tolerances, tooling, demolding, or manufacturing feasibility."
+  ],
+  "exactPrompt": "Use case: stylized-concept\nAsset type: concept-view sheet of one single-piece candy, for visual design exploration only\nInput images: Image 1, iteration-11-mb.png, is the M45/W10/B45 canopy helper reference: use its broad rounded orange canopy flaring into the shoulders, broad shallow cocoa-face-window relief, single seed chest relief, attached mitten tabs and broad boots. Image 2, goat4.png, is a fixed preference anchor for the friendly arch-eye language and overall rounded character softness. Do not reproduce its logo, lettering, layout, paired characters, sugar candy, or colors outside the requested orange candy.\nScene/backdrop: warm cream seamless studio background.\nSubject: Show the same single-piece orange candy in exactly three separate views, arranged left to right at equal overall height: front view, true side profile view, back view. Keep all three views of one identical conceptual object. The front candy has a broad rounded canopy flaring into shoulders, a broad shallow recessed face window with two large simple arch reliefs, one seed chest relief, short connected mitten tabs, and short broad boots with a shallow center notch. Make its profile shallow, a gently rounded slab rather than a full deep toy figurine. The back is plain rounded orange with no face and no seed. Preserve close hood/torso/leg proportions to the iteration-11 MB orange candy, while simplifying the silhouette for readable front/side/back comparison. Concept illustration only, not CAD or evidence of consistent manufacturing geometry.\nStyle/medium: clean soft 3D concept illustration, smooth opaque uniformly colored matte citrus-orange confection; no translucency, grain, glossy highlights, or sugar sparkle.\nComposition/framing: landscape triptych-like lineup on one uninterrupted warm cream background, three candies equal height and balanced with generous gaps; front facing directly forward; center object true side-on profile facing right; right object directly back-facing. Grounded subtle soft shadows. All three fully visible. No perspective drift between views.\nLighting/mood: gentle diffuse studio lighting, low contrast.\nColor palette: uniform citrus orange candy, warm cream background.\nMaterials/textures: smooth matte surface, broad shallow relief only.\nText (verbatim): none.\nConstraints: exactly three views of one candy design, front/true side/back; same equal overall height and close matching outer dimensions; plain back with no face or seed; smooth single connected silhouette with attached mitten tabs and connected boots.\nAvoid: labels, dimensions, arrows, text, logos, watermark, detached parts, holes, seams, gear, extra marks, sugar, sparkles, glossy reflections, translucent material, deep sculpted toy anatomy, inconsistent proportions, fourth view, duplicate front views.",
+  "coordinatorVerification": {
+    "width": 1774,
+    "height": 887,
+    "sha256": "b6814c816a4f3a2b64994ace7f2c577b13e76ee16382ce11adbfa7833c0e7011",
+    "review": "Full image inspected and same-wave peer challenge complete. Static concept evidence only."
+  }
+}

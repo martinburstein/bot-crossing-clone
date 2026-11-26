@@ -91,6 +91,36 @@
       "status": "accepted",
       "intent": "A vertically oval seed-pod hood, tapered torso and medium-length rounded mittens.",
       "critique": "Tall hood transfers clearly. Candy merges the arms more closely into the body, with a deeper foot notch."
+    },
+    {
+      "id": "balanced",
+      "iteration": 12,
+      "name": "Sower Scout",
+      "weights": [
+        34,
+        33,
+        33
+      ],
+      "image": "iteration-12-balanced.png",
+      "status": "accepted",
+      "intent": "A gently tapered protective hood, moderate limbs and a clear friendly face, balanced across all three roots.",
+      "critique": "Candy preserves the overall proportions better. Mittens remain large; the cowl and frontal pose still sit close to the favorite family."
+    }
+  ],
+  "supportingStudies": [
+    {
+      "id": "candy-views",
+      "iteration": 12,
+      "name": "Canopy candy / three views",
+      "image": "iteration-12-canopy-candy-views.png",
+      "caption": "M45/W10/B45. Front, side and back illustrations expose the profile question; they are not verified projections of one object."
+    },
+    {
+      "id": "hop-storyboard",
+      "iteration": 12,
+      "name": "Paint-style hop / six proposed poses",
+      "image": "iteration-12-hop-storyboard.png",
+      "caption": "M15/W70/B15. Readable pose progression, with some hood and body proportion drift. A fixed template is the next test."
     }
   ]
 }

@@ -1,0 +1,72 @@
+{
+  "iteration": 12,
+  "concept_id": "balanced",
+  "title": "Balanced protective seed-pod helper and candy concept",
+  "recipe": {
+    "M": 34,
+    "W": 33,
+    "B": 33,
+    "meaning": "Authored art-direction weights, not measured influence or style attribution."
+  },
+  "tool": {
+    "name": "image_gen__imagegen",
+    "mode": "built-in",
+    "operation": "one original raster generation",
+    "skill": "/Users/martinburstein/.codex/skills/.system/imagegen/SKILL.md",
+    "inputImages": 3,
+    "transparentBackground": false,
+    "paidCliOrApi": false
+  },
+  "references": [
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "Inspected and supplied as a preference anchor for palette, stripe, broad arch eyes and one seed chest mark."
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-11-mb.png",
+      "role": "Inspected and supplied for integrated protective cowl and compact mitten comparison."
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-11-mw.png",
+      "role": "Inspected and supplied for visible tapered torso, sturdy boots and leg-proportion comparison."
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-11-wb.png",
+      "role": "Inspected for seed-pod taper and broad mitten/foot connection; not supplied to generation."
+    }
+  ],
+  "referenceBoundary": "Use broad art-direction cues only. Preserve original character construction and mark; no source-specific geometry or insignia is reproduced.",
+  "output": {
+    "file": "public/sowers/prototypes/iteration-12-balanced.png",
+    "generatedSource": ".cache/sowers-prototypes/iteration-12-balanced-source.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "f6eb5d63bbba7b50c8bc49647e438f9a1a52d1a9a8bad29c9c1cb42c3b70c6b3",
+    "description": "Warm cream comparison sheet with one full-body cream/orange/cocoa Sower at left and one smooth opaque orange candy concept at right; no labels or logos."
+  },
+  "observations": [
+    "The protective cream hood narrows beneath the face and eases into the shoulder line; its silhouette is less flared than iteration-11-mb and has a gentle seed-pod taper.",
+    "The torso is plainly visible below the hood and leads to sturdy planted boots; the calm pose makes its proportions easy to read.",
+    "Broad orange crown stripe, cocoa face window, pale arch eyes and one orange seed chest mark preserve the requested Sowers cues.",
+    "The orange candy retains a similar visible hood, torso and leg ratio, including a readable torso, attached mittens and a shallow foot notch. Its broad shallow face and seed relief remain simple."
+  ],
+  "critique": {
+    "shapeVsPose": "The near-frontal planted pose reveals torso and leg proportions clearly, but the three-quarter turn is weak and the requested counterlean is barely visible. The hood-to-shoulder transition reads protective and smoothly tapered, although the cowl still spreads broadly across the shoulders.",
+    "candyFidelity": "The candy carries over the character's overall vertical proportions well and keeps its relief broad and sparse. Its silhouette is somewhat smoother and more merged through the lower torso and legs, so individual leg separation is less distinct than on the colored figure.",
+    "weaknesses": [
+      "The mitten ends are bulbous and larger than the moderate rounded mitten target.",
+      "The pose is almost frontal instead of an unmistakable three-quarter view.",
+      "The candy's legs merge more into its body than the character's; fidelity is strongest in overall ratios rather than detailed limb separation."
+    ]
+  },
+  "limitations": [
+    "This is concept art, not a physical sample; it does not validate dimensions, candy relief readability, tooling, tolerances, material behavior or manufacturability."
+  ],
+  "exactPrompt": "Use case: stylized-concept\nAsset type: one original Sowers character and single-candy concept sheet\nPrimary request: Create one cohesive friendly helper character concept for recipe M34 / W33 / B33 (Mars Mission / Wobbly Life / Bot Crossing). These are authored art-direction weights, not measurements or style attribution. Synthesize a protective cowl, moderately rounded sturdy limbs, and broad friendly face into a new original design.\nInput images: Image 1 (goat4.png) is the separate preference anchor only: warm cream/orange/cocoa palette, broad orange crown stripe, friendly broad pale arch eyes, and one seed chest mark. Image 2 (iteration-11-mb.png) supplies comparison context for its integrated canopy/cowl and compact mitten/leg forms; move toward more visible torso and legs. Image 3 (iteration-11-mw.png) supplies comparison context for a clearly visible tapered torso, sturdy boots, and readable long-leg proportions; keep limbs shorter and rounder than this. The inspected iteration-11-wb.png supplies comparison context for a gentle seed-pod taper and broad mitten/foot connections; it is not an image input. Do not copy exact character designs, insignia, or source-specific geometry.\nScene/backdrop: seamless warm cream studio background, very soft grounded shadows, no scenery.\nSubject: Exactly one full-body neutral three-quarter-front character on the left and ONE matching smooth opaque orange candy concept on the right, both fully visible and about equal height. The Sower has a broad protective hood that smoothly transitions into the shoulders, less flared than iteration-11-mb and gently tapered like a seed pod. Give it a modest rounded-square crown with a broad orange stripe; a compact cocoa face window with two broad pale arch eyes; no mouth. The torso is a clear simple helper torso tapering gently below the cowl. Use short-to-medium stout arms ending in moderately rounded mittens, attached by broad shallow webs, and medium-short sturdy legs ending in broad boots. The full stance is calm and planted, with only a slight counterlean that does not hide body proportions. One original simple orange seed mark centered on a plain cream chest. No costume panels or equipment.\nCandy: one single-piece, uniformly orange, opaque, smooth matte candy character echoing the same design and approximately the same visible hood/torso/leg ratios as the upright character. Preserve a similarly tall readable torso and distinct medium-short legs; do not compress it into a squat triangle or blob. Connected mittens attach with broad shallow webs, boots separated by one shallow foot notch. No holes, parts, thin bridges, or gaps. Only broad sparse shallow relief for hood rim, broad eye arches, crown stripe, seed chest mark and limb separation.\nStyle/medium: polished clean soft 3D collectible concept rendering, calm mobile presence, smooth molded surfaces, crisp readable silhouette.\nComposition/framing: landscape comparison sheet, character on left, single candy on right, straight-on three-quarter view, equal scale, no cropped feet or hood.\nLighting/mood: soft diffuse warm studio lighting, friendly calm presence.\nColor palette: warm cream, citrus orange, cocoa brown; pale cream eyes. Candy one uniform orange.\nMaterials/textures: smooth matte surfaces; candy opaque and smooth with no grain, glitter, sugar sparkle or translucency.\nText (verbatim): none.\nConstraints: Broad crownstripe and exactly one original seed chest mark. Protective hood-to-shoulder transition. Moderate rounded mittens and legs between compact and tall references. Friendly cocoa window and broad pale arch eyes. Keep clear compact helper torso, sturdy planted boots, shallow notch, broad connected mittens; maintain matching candy proportions.\nAvoid: labels, logos, text, watermark, extra candy or characters, copied insignia, Mars planet artwork, armor-like flank panels, straps, equipment lines, pockets, antennae, thin arms, inflated limb blobs, oversized head, tiny torso, hop, raised gesture, candy compression, holes, disconnected parts, deep cutouts, sugar sparkle, translucent or glossy candy.",
+  "coordinatorVerification": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "f6eb5d63bbba7b50c8bc49647e438f9a1a52d1a9a8bad29c9c1cb42c3b70c6b3",
+    "review": "Full image inspected and same-wave peer challenge complete. Static concept evidence only."
+  }
+}

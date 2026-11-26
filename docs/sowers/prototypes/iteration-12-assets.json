@@ -1,0 +1,32 @@
+[
+  {
+    "id": "balanced",
+    "asset": "public/sowers/prototypes/iteration-12-balanced.png",
+    "sha256": "f6eb5d63bbba7b50c8bc49647e438f9a1a52d1a9a8bad29c9c1cb42c3b70c6b3",
+    "size": [
+      1536,
+      1024
+    ],
+    "record": "docs/sowers/prototypes/iteration-12-balanced.json"
+  },
+  {
+    "id": "canopy-candy-views",
+    "asset": "public/sowers/prototypes/iteration-12-canopy-candy-views.png",
+    "sha256": "b6814c816a4f3a2b64994ace7f2c577b13e76ee16382ce11adbfa7833c0e7011",
+    "size": [
+      1774,
+      887
+    ],
+    "record": "docs/sowers/prototypes/iteration-12-canopy-candy-views.json"
+  },
+  {
+    "id": "hop-storyboard",
+    "asset": "public/sowers/prototypes/iteration-12-hop-storyboard.png",
+    "sha256": "193fa1171dfae068329d3a7e31d258c04f7769765ce2d8bd88c9c3263df44faf",
+    "size": [
+      1536,
+      1024
+    ],
+    "record": "docs/sowers/prototypes/iteration-12-hop-storyboard.json"
+  }
+]
