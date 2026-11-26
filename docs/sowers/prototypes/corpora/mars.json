@@ -1,0 +1,303 @@
+{
+  "id": "mars-mission",
+  "title": "Mars Mission character corpus",
+  "purpose": "Reference-only source corpus for original character prototype art direction.",
+  "sources": [
+    {
+      "id": "U1",
+      "type": "user_image",
+      "path": "/Users/martinburstein/Downloads/goat.png",
+      "status": "directly_viewed",
+      "scope": "Front view of masked Mars Mission figure; no side or back evidence."
+    },
+    {
+      "id": "U2",
+      "type": "user_image",
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "status": "directly_viewed",
+      "scope": "Separate preferred cream/orange/cocoa cute-helper anchor; not a measured mixture."
+    },
+    {
+      "id": "L1",
+      "type": "primary_official",
+      "url": "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4523183.pdf",
+      "localEvidence": "docs/sowers/references/lego-7693-official-page3.png",
+      "status": "official instructions and local page-3 rendering inspected",
+      "scope": "White helmet, amber visor, yellow head with black eye graphic, orange torso markings; does not establish all U1 details."
+    },
+    {
+      "id": "R1",
+      "type": "secondary_retail",
+      "url": "https://atlbrick.com/products/mars-mission-astronaut-with-helmet-and-balaclava-mm002-1",
+      "status": "listing text inspected; photographic reference previously visually checked",
+      "scope": "mm002 masked figure visual corroboration; not official LEGO source."
+    },
+    {
+      "id": "H1",
+      "type": "local_research_note",
+      "path": "docs/sowers/research.md",
+      "status": "read",
+      "scope": "Prior catalog access limitations and source history."
+    }
+  ],
+  "traits": [
+    {
+      "id": "M01",
+      "category": "helmet_silhouette",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Large rounded ivory shell with domed top and projecting lower rim around the face."
+        },
+        {
+          "sourceId": "L1",
+          "class": "primary_corroboration",
+          "literal": "Page 3 depicts a white helmet."
+        }
+      ],
+      "translation": "Broad soft pressure hood with a deep smooth opening; original sculpt, no copied interlocking geometry.",
+      "blend": {
+        "high": "Keep pale enclosing head silhouette.",
+        "medium": "Soften into plush proportions.",
+        "low": "May replace with bare face."
+      }
+    },
+    {
+      "id": "M02",
+      "category": "visor",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Amber/gold visor raised above the opening."
+        },
+        {
+          "sourceId": "L1",
+          "class": "primary_corroboration",
+          "literal": "Amber hinged visor shown."
+        },
+        {
+          "sourceId": "R1",
+          "class": "secondary_corroboration",
+          "literal": "Raised amber visor visible in mm002 listing photograph."
+        }
+      ],
+      "translation": "Distinct warm visor brow/crown panel; original sculpt, not toy hinge replica.",
+      "blend": {
+        "high": "Retain raised warm cap accent.",
+        "medium": "Reduce to a small brow band.",
+        "low": "May omit; avoid accidentally closing the dark face screen."
+      }
+    },
+    {
+      "id": "M03",
+      "category": "face_covering",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Light gray lower-face panel, dark perimeter, dotted marks, yellow eye aperture."
+        },
+        {
+          "sourceId": "R1",
+          "class": "secondary_corroboration",
+          "literal": "Gray printed covering with dark border and yellow eye opening."
+        }
+      ],
+      "translation": "Pale respirator/balaclava field, charcoal seam and compact eye window, redrawn as simple original marks.",
+      "blend": {
+        "high": "Preserve covered face and visible eyes.",
+        "medium": "Simplify to cocoa/charcoal mask and eye slit.",
+        "low": "May expose face or omit mask system."
+      }
+    },
+    {
+      "id": "M04",
+      "category": "expression",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Yellow rounded-rect eye window with sharply angled dark brows and eyes."
+        }
+      ],
+      "translation": "Flexible alert, curious, briefly determined eye acting; do not copy exact brow artwork or require anger.",
+      "blend": {
+        "high": "Keep readable eyes.",
+        "medium": "Soften brows to friendly attentive arcs.",
+        "low": "Expression may become minimal."
+      }
+    },
+    {
+      "id": "M05",
+      "category": "torso",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Predominantly white torso with orange chest harness/device and dark technical edging."
+        },
+        {
+          "sourceId": "L1",
+          "class": "primary_corroboration",
+          "literal": "White torso carries orange markings."
+        },
+        {
+          "sourceId": "R1",
+          "class": "secondary_corroboration",
+          "literal": "Orange harness visible on white suit."
+        }
+      ],
+      "translation": "Cream torso, bold orange chest panel, restrained dark seams and invented equipment layout.",
+      "blend": {
+        "high": "White/cream field and orange chest focal point.",
+        "medium": "Reduce linework, retain orange center.",
+        "low": "Allow nonwhite body treatment."
+      }
+    },
+    {
+      "id": "M06",
+      "category": "chest_equipment",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Round orange central instrument with a small dark graphic and narrow shoulder straps."
+        }
+      ],
+      "translation": "One clear circular mission tool and two simple straps; invented non-letterform icon.",
+      "blend": {
+        "high": "Central tool plus harness cue.",
+        "medium": "One badge-like instrument.",
+        "low": "Omit detailed chest equipment."
+      }
+    },
+    {
+      "id": "M07",
+      "category": "arms",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "White rounded arms hang nearly straight down and end in open C-shaped toy grips."
+        }
+      ],
+      "translation": "Short soft sleeves/arms with readable mitten hands; avoid toy grip geometry.",
+      "blend": {
+        "high": "Pale limbs.",
+        "medium": "Rounded mitts with relaxed angle.",
+        "low": "May use alternate limb forms."
+      }
+    },
+    {
+      "id": "M08",
+      "category": "legs",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Plain short white legs separated by a narrow dark center gap; little visible foot detail."
+        }
+      ],
+      "translation": "Compact sturdy lower body, simple boots and readable stance.",
+      "blend": {
+        "high": "Simple light legs.",
+        "medium": "Optional warm boot sole.",
+        "low": "Lower-body silhouette can vary."
+      }
+    },
+    {
+      "id": "M09",
+      "category": "palette",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Mostly white/ivory with amber visor, orange chest gear, gray covering, black linework and yellow eyes."
+        },
+        {
+          "sourceId": "L1",
+          "class": "primary_corroboration",
+          "literal": "White helmet and torso, amber visor, yellow head, orange torso marks."
+        },
+        {
+          "sourceId": "U2",
+          "class": "separate_user_preference",
+          "literal": "Cream/orange/cocoa concept with gentle face; not a measured recipe."
+        }
+      ],
+      "translation": "Cream base, orange signal accent, cocoa/charcoal face contrast, amber highlight; U2 informs warmth only.",
+      "blend": {
+        "high": "Keep Goat4 cream/orange/cocoa invariant across all recipes. The Mars palette remains a source observation, not a blend-dependent palette instruction.",
+        "medium": "Keep Goat4 cream/orange/cocoa invariant across all recipes. The Mars palette remains a source observation, not a blend-dependent palette instruction.",
+        "low": "Keep Goat4 cream/orange/cocoa invariant across all recipes. The Mars palette remains a source observation, not a blend-dependent palette instruction."
+      }
+    },
+    {
+      "id": "M10",
+      "category": "pose_aura",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "direct_observation",
+          "literal": "Static upright front-facing neutral stance; no motion shown."
+        }
+      ],
+      "translation": "Suggested readiness: steady idle, small head turns, careful steps, tool check, light buoyant recovery; interpretation, not observed canon.",
+      "blend": {
+        "high": "Composed explorer posture.",
+        "medium": "Add playful follow-through.",
+        "low": "Avoid aggressive combat staging."
+      }
+    },
+    {
+      "id": "M11",
+      "category": "presence",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "interpretation",
+          "literal": "Enclosed helmet and visible eyes suggest protected but personable presence."
+        },
+        {
+          "sourceId": "U2",
+          "class": "separate_user_preference",
+          "literal": "Gentle curved eyes and rounded helper proportions suggest approachable warmth."
+        }
+      ],
+      "translation": "Let eye shape and timing carry friendliness while retaining covered-face explorer identity.",
+      "blend": {
+        "high": "Friendly presence through eyes.",
+        "medium": "Cute helper warmth.",
+        "low": "May reduce mask emphasis."
+      }
+    },
+    {
+      "id": "M12",
+      "category": "unknowns",
+      "evidence": [
+        {
+          "sourceId": "U1",
+          "class": "unknown",
+          "literal": "Front image only; rear pack, shell profile, scale, materials, joint range and exact marking variant are not established."
+        }
+      ],
+      "translation": "Leave hidden construction open; invent original solutions only as needed.",
+      "blend": {
+        "high": "No inferred dimensions.",
+        "medium": "No inferred dimensions.",
+        "low": "No inferred dimensions."
+      }
+    }
+  ],
+  "constraints": [
+    "Do not infer dimensions, measured ratios, materials or unseen geometry.",
+    "Goat 4 is a separate palette/personality anchor, not a measured mixture.",
+    "Keep source observations, official corroboration, secondary retail corroboration, interpretation and unknowns distinguishable.",
+    "Do not require an angry expression; preserve covered-face explorer presence as the key identity cue.",
+    "Candy simplification must retain helmet rim, separate visor accent, eye aperture, mask boundary, orange torso focal point and rounded limbs.",
+    "Avoid merging visor into an orange blob, turning face into unreadable dark slab, erasing eye/mask contrast, or using texture that obscures simple gear shapes.",
+    "All source imagery remains reference-only; no runtime textures, logos, copied artwork or copied toy geometry."
+  ]
+}

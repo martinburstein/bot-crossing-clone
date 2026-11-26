@@ -1,0 +1,23 @@
+[
+  {
+    "id": "mw",
+    "iteration": 11,
+    "asset": "public/sowers/prototypes/iteration-11-mw.png",
+    "sha256": "9363ea89dc85360b857a01af313e25e639bf426a7534488ab79871a801c110fb",
+    "record": "docs/sowers/prototypes/iteration-11-mw.json"
+  },
+  {
+    "id": "mb",
+    "iteration": 11,
+    "asset": "public/sowers/prototypes/iteration-11-mb.png",
+    "sha256": "a93d84da2e5210b89772cd17e27b24d82245edacaee00e86a4b00fb481e22037",
+    "record": "docs/sowers/prototypes/iteration-11-mb.json"
+  },
+  {
+    "id": "wb",
+    "iteration": 11,
+    "asset": "public/sowers/prototypes/iteration-11-wb.png",
+    "sha256": "e61c9d4f7cee66605b4e30ff472bb3d001d56b1940a064619110a112f5babe3e",
+    "record": "docs/sowers/prototypes/iteration-11-wb.json"
+  }
+]

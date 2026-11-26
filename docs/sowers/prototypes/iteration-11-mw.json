@@ -1,0 +1,80 @@
+{
+  "iteration": 11,
+  "title": "M45/W45 Sower protective scout baseline with single-color candy study",
+  "recipe": {
+    "M": 45,
+    "W": 45,
+    "B": 10,
+    "meaning": "Authored art-direction weights; not measured influence or style attribution."
+  },
+  "tool": {
+    "name": "image_gen__imagegen",
+    "mode": "built-in image_gen",
+    "operation": "one original raster generation",
+    "transparentBackground": false,
+    "skill": "/Users/martinburstein/.codex/skills/.system/imagegen/SKILL.md",
+    "paidCliOrApi": false,
+    "generatedImageId": "01a2171b-a00d-7842-bc4e-a3c3cd6b4db1"
+  },
+  "references": [
+    {
+      "path": "/Users/martinburstein/Downloads/goat.png",
+      "role": "Inspected; broad Mars protective hood/brow/mask form cue only; not supplied to generation."
+    },
+    {
+      "path": "/Users/martinburstein/Downloads/goat3.png",
+      "role": "Generation input; broad Bot Crossing friendly helper presence only."
+    },
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "Generation input; separate preferred cream/orange/cocoa palette, pale arch eyes, crown stripe, single seed chest mark, friendly personality."
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/.cache/sowers-reference-corpus/goat2-inspection.png",
+      "role": "Generation input; broad rounded-limb/pose context only; no copied source imagery."
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-10-mars-led.png",
+      "role": "Inspected for comparison; not supplied to generation."
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-10-wobbly-led.png",
+      "role": "Generation input for comparison; avoid its hop/reach pose and retain a distinct neutral baseline."
+    }
+  ],
+  "referenceBoundary": "The cited source materials provide broad visual cues only. No exact face art, proportions, branded mesh, logos, outfit graphics, toy connectors, or source-specific geometry are reproduced. goat3.png and goat2-inspection.png contain visible original source branding; neither is reproduced.",
+  "output": {
+    "path": "public/sowers/prototypes/iteration-11-mw.png",
+    "generatedSource": "private-generation-source (deliverable SHA-256 recorded)",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "9363ea89dc85360b857a01af313e25e639bf426a7534488ab79871a801c110fb"
+  },
+  "observations": [
+    "Full neutral standing three-quarter-front character at left; arms relaxed at sides with small gaps, both feet planted.",
+    "Broad enclosing rounded hood, shallow projecting orange brow, curved lower mask rim, cocoa face, pale broad happy arch eyes, cream/orange/cocoa palette.",
+    "Shoulders are narrower than the hood; torso is plainly visible and tapered; limbs are longer and thicker than Goat 4; one orange seed/leaf chest mark.",
+    "The candy at right is one smooth spark-free orange silhouette with broad relief and connected limbs. It avoids thin bridges and detached parts.",
+    "No text or logos appear in the generated sheet; warm cream studio background and soft shadows."
+  ],
+  "critique": {
+    "strengths": [
+      "Neutral pose makes the new longer limb and less squat torso proportions visible independently of action.",
+      "The head/brow/mask construction is legible and recognizably distinct from iteration-10 Mars leaning/display and Wobbly hopping/reaching poses.",
+      "The character body has one focal seed mark and no strap lines, pockets, circular tool, or layered torso panels. Candy surface has no sugar sparkle or obvious translucency."
+    ],
+    "shortcomings": [
+      "The orange character side accents occupy broad strips along the torso and read more like large flank panels than the prompt\u2019s limited accents. They remain simple and do not subdivide the torso into nested panels.",
+      "The candy compresses the torso and legs into a squat continuous mass, so the matching torso ratio and the character\u2019s long-limb distinction do not carry across as clearly as requested.",
+      "The candy is softly shaded and reads closer to matte gummy than fully flat matte; it is still smooth, untextured, and non-translucent."
+    ],
+    "uncertainty": "Visual concept art only. Candy relief readability, actual scale, tooling, material, tolerances, and manufacturability are unvalidated."
+  },
+  "exactPrompt": "Use case: original stylized character concept for the Sowers project.\nAsset type: one clean landscape character and candy study sheet.\nPrimary request: create one new original Sower mobile protective scout, art direction M45/W45/B10. These recipe weights are authored direction, not measurement. Make a baseline form clearly distinct from the Wobbly-led iteration-10 sheet: neutral upright standing pose, arms relaxed at sides with small visible gaps, both feet planted, no gesture. Make the proportions legible without action pose.\nReference use: goat.png informs only broad protective explorer hood/brow/mask idea; goat3.png and goat2-inspection inform only broad friendly helper character energy and simple rounded limbs; goat4.png is the required separate preference anchor for warm cream/orange/cocoa, pale broad arch eyes, crown stripe and one seed chest mark. The Wobbly-led iteration-10 sheet is comparison only: establish a different baseline silhouette and do not reuse its hop/reach pose. Do not copy source proportions, exact faces, clothing, logos, graphics, branded meshes, toy joints or any trademark/source-specific geometry.\nScene/backdrop: plain uninterrupted warm cream studio background, very soft grounding shadows, no props.\nComposition: character on left, full figure visible from hood to feet; exactly one matching single orange candy object on right. Balanced clean landscape product concept sheet. No other figures or candy.\nCharacter silhouette: protective scout with a broad enclosing rounded-square hood, clearly enclosing the face. A shallow projecting orange brow sits over the face opening; subtle shallow lower-mask curve frames the lower face. Friendly cocoa face opening, two large pale broad arch eyes, no mouth. Hood is generous and protective, shoulders visibly narrower than hood. Torso is simple, tapered and substantially more visible than a squat toy torso. Limbs are visibly longer and thick, sturdy rounded tapered forms, with clean separation from torso. Neutral vertical posture. Arms hang at the sides with slight air gaps, hands as simplified integrated mittens. Legs distinct and planted in simple broad boots. Geometric construction should be clear, composed of readable designed masses, not blobby or chibi. Preserve cream as main shell/body, orange accent crown stripe and limited broad side accents, cocoa face. One small original orange seed/leaf chest mark centered on an otherwise plain uninterrupted cream torso. No strap lines, no harness, no panels within panels, no pockets, no circular tools, no additional chest graphic.\nCandy adaptation: one smooth solid orange matte candy in a calm upright pose to the right; one continuous connected mitten-web figure with broad thick limb connections and shallow boot notch. Preserve the same main hood-to-torso ratios and the broad head, narrow shoulders, tapered visible torso. Use only shallow broad sculpted relief for the hood/brow, two broad eye arches and a single seed chest mark. A simplified connected single piece, not a copy of the colored character, no thin bridges, no disconnected parts, no tiny details.\nStyle/material: refined, premium soft 3D concept illustration with clear geometric form, smooth matte surfaces, warm soft lighting, crisp readable edges. The candy is smooth broad orange matte, not translucent, no sugar sparkle, no gloss glitter.\nConstraints: no text, letters, labels, logos, watermark, frame, diagrams, extra graphics, scene details, antenna, toy connector features, identifiable copied details, straps, pockets, circular devices, multiple layers of paneling, blobby forms, exaggerated squat proportions, dynamic pose, raised arms, hopping, running, floating, translucency or sugar texture.",
+  "coordinatorVerification": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "9363ea89dc85360b857a01af313e25e639bf426a7534488ab79871a801c110fb",
+    "review": "Full image inspected; formal same-wave peer challenge complete. Exploratory concept only."
+  }
+}

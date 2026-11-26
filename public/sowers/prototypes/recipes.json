@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "axes": [
+    "Mars Mission",
+    "Wobbly Life",
+    "Bot Crossing"
+  ],
+  "meaning": "Authored design weights, not measured style attribution",
+  "anchor": "Goat 4 cream / citrus orange / cocoa palette and cute helper personality",
+  "recipes": [
+    {
+      "id": "m70",
+      "iteration": 10,
+      "name": "Field Scout",
+      "weights": [
+        70,
+        15,
+        15
+      ],
+      "image": "iteration-10-mars-led.png",
+      "status": "accepted",
+      "intent": "Protective hood, raised brow, compact utility body; calm covered-face presence.",
+      "critique": "Protective brow and lower mask distinguish the explorer. Candy sparkle and extra torso lines compete with the seed; simplify in later studies."
+    },
+    {
+      "id": "w70",
+      "iteration": 10,
+      "name": "Hop Helper",
+      "weights": [
+        15,
+        70,
+        15
+      ],
+      "image": "iteration-10-wobbly-led.png",
+      "status": "accepted",
+      "intent": "Round head, reaching limbs and buoyant body pose; connected candy adaptation.",
+      "critique": "Strong hop and open gesture. A neutral view is still needed to judge underlying proportions separately from pose."
+    },
+    {
+      "id": "b70",
+      "iteration": 10,
+      "name": "Pocket Companion",
+      "weights": [
+        15,
+        15,
+        70
+      ],
+      "image": "iteration-10-bot-led.png",
+      "status": "accepted",
+      "intent": "Near-round helmet, large friendly face and small compact body.",
+      "critique": "Rounder hood and larger face read clearly, but the overall architecture remains close to Goat 4."
+    },
+    {
+      "id": "mw",
+      "iteration": 11,
+      "name": "Trail Tender",
+      "weights": [
+        45,
+        45,
+        10
+      ],
+      "image": "iteration-11-mw.png",
+      "status": "accepted",
+      "intent": "Protective hood with a narrower torso and visibly longer limbs.",
+      "critique": "Candy shortens the torso and legs substantially; broad flank accents still read as suit panels."
+    },
+    {
+      "id": "mb",
+      "iteration": 11,
+      "name": "Canopy Keeper",
+      "weights": [
+        45,
+        10,
+        45
+      ],
+      "image": "iteration-11-mb.png",
+      "status": "accepted",
+      "intent": "A rounded canopy sweeps into the shoulders, creating a wider original upper-body outline.",
+      "critique": "Canopy integration is strongest at head and shoulders; the lower body remains separate. Candy keeps the signature outline."
+    },
+    {
+      "id": "wb",
+      "iteration": 11,
+      "name": "Pod Pal",
+      "weights": [
+        10,
+        45,
+        45
+      ],
+      "image": "iteration-11-wb.png",
+      "status": "accepted",
+      "intent": "A vertically oval seed-pod hood, tapered torso and medium-length rounded mittens.",
+      "critique": "Tall hood transfers clearly. Candy merges the arms more closely into the body, with a deeper foot notch."
+    }
+  ]
+}

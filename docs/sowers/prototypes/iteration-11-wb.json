@@ -1,0 +1,75 @@
+{
+  "iteration": 11,
+  "title": "Wobbly/Bot mixed Sower prototype \u2014 seed-pod hood",
+  "recipe": {
+    "M": 10,
+    "W": 45,
+    "B": 45,
+    "meaning": "Authored art-direction weights, not measured style attribution."
+  },
+  "tool": {
+    "mode": "built-in image_gen.imagegen",
+    "skill": "/Users/martinburstein/.codex/skills/.system/imagegen/SKILL.md",
+    "paidCliOrApi": false,
+    "generatedImageId": "01a2171c-0753-7010-9781-70bdca572cde",
+    "generatedFile": "private-generation-source (deliverable SHA-256 recorded)"
+  },
+  "references": [
+    {
+      "path": "/Users/martinburstein/Downloads/goat.png",
+      "role": "inspected context/source-family cue only; not supplied to generator"
+    },
+    {
+      "path": "/Users/martinburstein/Downloads/goat3.png",
+      "role": "inspected context/source-family cue only; not supplied to generator"
+    },
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "generation input Image 2; palette, pale arch eyes, crown stripe, seed identity preference anchor"
+    },
+    {
+      "path": ".cache/sowers-reference-corpus/goat2-inspection.png",
+      "role": "inspected Wobbly reference; not supplied to generator"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-10-wobbly-led.png",
+      "role": "generation input Image 1; continuity and avoid prior wide hood/hop"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-10-bot-led.png",
+      "role": "inspected comparison; not supplied to generator"
+    }
+  ],
+  "referenceUse": "Broad art-direction cues only; preserve original geometry, face and seed mark.",
+  "exactPrompt": "Use case: stylized-concept\nAsset type: one clean original Sowers character-and-candy concept sheet\nPrimary request: Create one original character study with a paired single-color candy form. Art-direction recipe M10/W45/B45 (Mars Mission / Wobbly Life / Bot Crossing); these are authored influence weights, not measured attribution. Let broad rounded masses and friendly sparse expression lead; use a subtle protective brow and a clear helpful face, while making the silhouette a new vertically elongated seed-pod hood with a visible tapered torso. The whole neutral pose should let us judge proportions without a hop.\nInput images: Image 1 is iteration-10 Wobbly-led Sower, for continuity and to explicitly move beyond its horizontal wide hood and airborne pose; do not copy exact design. Image 2 is Goat 4, the separate preference anchor for warm cream/orange/cocoa, broad pale arch eyes, orange crown stripe, and original seed chestmark; do not copy its wide rounded-square hood, outfit paneling, or exact face art.\nScene/backdrop: seamless warm cream studio background, subtle grounding shadows, uncluttered.\nSubject and composition: landscape sheet. Left: one full-body neutral standing three-quarter-front original Sower, arms relaxed slightly away from torso to show silhouette, feet planted, friendly slightly curious posture. Right: one matching single orange candy concept, front or slight three-quarter, clearly echoing this exact base design. Equal visual clarity, no duplicate characters or variants.\nCharacter: tall vertically oval seed-pod/acorn protective hood tapering gently toward the jaw, visibly taller than wide, neither spherical orb nor wide squircle. A restrained shallow protective brow integrated into the rim, not a heavy mask or gear. Tall narrow cocoa oval face window with two broad pale arch eyes. Broad orange stripe running over the crown. Cream is the main hood and body, with restrained orange side accents and feet, cocoa face. Below the head, show a distinct visible torso that gently tapers toward the waist; do not merge hood into a blob. Arms medium-length, thick smooth attached mitten forms. Two broad planted feet with one shallow center notch. One small original orange seed mark on a clean uncluttered cream torso. Friendly, slightly curious expression and neutral enough pose to assess proportions independently of action. Smooth cohesive original geometry. No straps, suit panels, pockets, antenna, pointed ears, or gear.\nCandy: exactly one uniformly orange, smooth matte candy character, no sugar sparkle, translucency, coating speckles or distracting highlights. Its connected front/three-quarter silhouette must echo the vertical seed-pod hood, tapered torso, thick connected arms and shallow foot notch. Broad shallow relief only for the protective brow, tall narrow face window, broad pale-eye shapes translated as orange relief, crown stripe, and single seed chestmark. No disconnected parts, thin bridges, deep cutouts or fine detail. Make the form clearly distinct from a round orb or squircle.\nStyle/medium: polished soft 3D product concept illustration, restrained matte surfaces, clean readable contour, soft studio light.\nText: none. No labels, lettering, logos, watermark, packaging, props.\nAvoid: hop, running, raised dramatic gesture, spherical head, broad rounded-square helmet, oversized horizontal visor, heavy mask, extra chest marks, sugar crystal texture, candy translucency, microdetail, seams within seams, copied source characters, extra figures, multiple candies.",
+  "output": {
+    "path": "public/sowers/prototypes/iteration-11-wb.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "e61c9d4f7cee66605b4e30ff472bb3d001d56b1940a064619110a112f5babe3e"
+  },
+  "critique": {
+    "strengths": [
+      "Clearly vertically oval/acorn-like hood, taller than wide, tapering toward lower face; unlike iteration 10 Bot round hood and Goat 4 wide rounded-square hood.",
+      "Visible narrowing torso separates from hood; planted neutral stance helps judge base proportions without iteration 10 Wobbly hop.",
+      "Tall narrow cocoa face window, broad cream arch eyes, crown stripe and one seed chestmark preserve preference cues.",
+      "Candy repeats hood taper, torso, connected thick arms and shallow foot notch as one smooth orange form, without sugar sparkle or translucent coating."
+    ],
+    "limitations": [
+      "Three-quarter turn is mild and face remains near frontal.",
+      "Broad orange torso-side accents can read as suit inserts; simplifying them could make the torso more uninterrupted.",
+      "Generated candy concept does not establish physical geometry, manufacturing feasibility, tolerances or coating readability."
+    ]
+  },
+  "uncertainty": [
+    "Generation does not guarantee exact geometric correspondence between character and candy.",
+    "Whether broad orange side accents feel like costume panels is a subjective design judgment.",
+    "No production or physical candy claims are supported."
+  ],
+  "coordinatorVerification": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "e61c9d4f7cee66605b4e30ff472bb3d001d56b1940a064619110a112f5babe3e",
+    "review": "Full image inspected; formal same-wave peer challenge complete. Exploratory concept only."
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "corpusId": "wobbly-life",
+  "title": "Wobbly Life visual reference corpus",
+  "purpose": "Record actionable, source-grounded Wobbly Life character cues for original Sower art direction.",
+  "sources": [
+    {
+      "id": "wobbly-goat2-reference",
+      "kind": "user-provided-image",
+      "location": ".cache/sowers-reference-corpus/goat2-inspection.png",
+      "originalLocation": "/Users/martinburstein/Downloads/goat2.png",
+      "note": "User-provided reference, decoded to PNG for inspection; original payload was AVIF despite its filename. Reference-only; do not use as runtime texture or copy the character mesh."
+    },
+    {
+      "id": "wobbly-official-page",
+      "kind": "official-text",
+      "url": "https://www.rubberbandgames.com/wobbly-life/",
+      "publisher": "RubberBandGames",
+      "evidence": [
+        { "quote": "Open-world sandbox filled with mini-games, toys, secrets and SO MUCH more", "section": "Information" },
+        { "quote": "+50 unique missions & jobs with exclusive rewards to unlock, alone or with friends", "section": "Information" },
+        { "quote": "+250 clothes items to show-off in your wobbly look", "section": "Information" }
+      ],
+      "note": "Corroborates play, job, toy and outfit context only; it does not establish body proportions, anatomy, facial design or specific movement mechanics."
+    },
+    {
+      "id": "wobbly-official-fishing-screenshot",
+      "kind": "official-image",
+      "url": "https://www.rubberbandgames.com/wp-content/uploads/2025/02/ss_8533c7ff4fb40e3722907b49547dae0222290301.1920x1080.jpg",
+      "publisher": "RubberBandGames",
+      "note": "Official gameplay screenshot, inspected directly in browser; reference-only, not a source for copied geometry or textures."
+    },
+    {
+      "id": "wobbly-official-snow-screenshot",
+      "kind": "official-image",
+      "url": "https://www.rubberbandgames.com/wp-content/uploads/2025/02/ss_2d77aaf37e4a6f06f23a0e7104b31d403e296f7a.1920x1080.jpg",
+      "publisher": "RubberBandGames",
+      "note": "Official gameplay screenshot, inspected directly in browser; reference-only, not a source for copied geometry or textures."
+    },
+    {
+      "id": "wobbly-goat4-preference-anchor",
+      "kind": "user-provided-image",
+      "location": ".cache/sowers-reference-corpus/goat4.png",
+      "note": "Separate preferred Sowers cream/orange/cocoa palette and cute-helper personality anchor. Retain as a preference reference; do not assign a measured Wobbly blend ratio."
+    }
+  ],
+  "traits": [
+    {
+      "id": "rounded-unified-silhouette",
+      "category": "silhouette",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference"],
+      "visualEvidence": "The large foreground figure has a smooth, rounded head that flows into a compact torso without a visible neck; the overall outline is broad at the upper body and narrows into separated legs.",
+      "interpretation": "A compact, soft toy-like body reads before fine anatomy.",
+      "originalSowerTranslation": "Use a distinct but softly joined head-and-body silhouette with rounded transitions; create a new Sower contour rather than copying the source figure."
+    },
+    {
+      "id": "minimal-dot-face",
+      "category": "head-face",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference"],
+      "visualEvidence": "The foreground yellow face shows two small, dark, round eyes and no clearly visible mouth, nose, brows or other facial marks.",
+      "interpretation": "Sparse facial information keeps the expression open and readable at a distance.",
+      "originalSowerTranslation": "Keep the face calm and legible with very few marks; use original eye spacing and avoid importing a specific Wobbly face."
+    },
+    {
+      "id": "simple-tapered-torso",
+      "category": "torso",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference"],
+      "visualEvidence": "The main figure's torso is a smooth, lightly tapered mass with no visible garment seams or exposed mechanical joints.",
+      "interpretation": "Large uninterrupted color areas support a clean, readable character block.",
+      "originalSowerTranslation": "Build the Sower torso from a few broad color fields and rounded surfaces; express helper identity with a new chest mark or accessory, not copied graphics."
+    },
+    {
+      "id": "long-tubular-arms",
+      "category": "limb-articulation",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference"],
+      "visualEvidence": "Both arms extend well away from the torso in the foreground pose. They look smooth and tube-like, with no visible elbows, fingers or separate hand shapes.",
+      "interpretation": "The long simple arm outline is a major contributor to the open pose and can create deep gaps beside the body.",
+      "originalSowerTranslation": "Borrow the clarity of a simple arm silhouette but make Sower limb lengths and endpoints original; ensure the arm-to-body gap remains readable in front, side and candy views."
+    },
+    {
+      "id": "separated-simple-legs",
+      "category": "limb-articulation",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference"],
+      "visualEvidence": "The two legs are separated by a visible triangular opening and end in broad, simplified feet without distinct shoes or toes on the main character.",
+      "interpretation": "A clear gap makes the stance legible, while a low-detail foot keeps the lower silhouette uncomplicated.",
+      "originalSowerTranslation": "Preserve a readable leg split in the chosen pose and simplify feet into sturdy original forms; do not recreate the reference's exact stance."
+    },
+    {
+      "id": "yellow-orange-shading",
+      "category": "palette",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference"],
+      "visualEvidence": "The large figure is saturated yellow, with orange-gold shading around side and lower contours; the eyes are near-black. The surrounding image contains bright green land and pale blue sky, so background colors should not be mistaken for the character palette.",
+      "interpretation": "Warm hue shifts separate rounded forms while keeping the character immediately visible against the scene.",
+      "originalSowerTranslation": "Use the goat4 cream/orange/cocoa preference anchor for Sower's base colors, and treat Wobbly's yellow-to-orange value separation only as a broad shading cue."
+    },
+    {
+      "id": "open-raised-arm-pose",
+      "category": "gesture-motion",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference"],
+      "visualEvidence": "In this still image the main character holds both arms high and outward, with legs apart and the face directed toward the viewer.",
+      "interpretation": "The static gesture reads as welcoming or celebratory, but one frame cannot demonstrate a motion cycle, joint mechanics or a general personality.",
+      "originalSowerTranslation": "Use an open-arm greeting as one optional Sower pose, then define distinct original poses for tending, carrying or helping; do not claim this still proves Wobbly animation behavior."
+    },
+    {
+      "id": "costume-variation",
+      "category": "wardrobe-context",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-goat2-reference", "wobbly-official-fishing-screenshot", "wobbly-official-snow-screenshot"],
+      "visualEvidence": "The supplied still includes a hard hat, reflective-looking vest and dark trousers; the official fishing screenshot shows two different head accessories; the snow screenshot shows two back-facing characters with distinct winter hats and outfits.",
+      "interpretation": "Outfits and headwear vary over a recurring rounded base character.",
+      "originalSowerTranslation": "Keep Sower role variation detachable and original: a simple helper accessory or color block can signal a task without changing the base character silhouette."
+    },
+    {
+      "id": "official-wardrobe-variety",
+      "category": "wardrobe-context",
+      "evidenceType": "official-text-corroboration",
+      "sourceIds": ["wobbly-official-page"],
+      "visualEvidence": "The official page says the game has more than 250 clothing items.",
+      "interpretation": "Official text supports broad outfit variety but does not describe the construction of any particular outfit shown in the screenshots.",
+      "originalSowerTranslation": "Allow Sower outfit accents to change while retaining a stable original base form."
+    },
+    {
+      "id": "poses-in-play-scenes",
+      "category": "gesture-motion",
+      "evidenceType": "direct-image-observation",
+      "sourceIds": ["wobbly-official-fishing-screenshot", "wobbly-official-snow-screenshot"],
+      "visualEvidence": "The fishing screenshot catches two characters behind a boat rail with rods angled out across the water; the snow screenshot catches two characters facing away, one standing on a snowy path and one partly down in the snow.",
+      "interpretation": "The stills show distinct activity poses and viewpoints, not how a character transitions between them or what rigging is used.",
+      "originalSowerTranslation": "Develop a few clear, original Sower helper poses such as carrying or reaching, and judge each from front and back; do not infer motion timing from these frames."
+    },
+    {
+      "id": "toy-sandbox-context",
+      "category": "character-context",
+      "evidenceType": "official-text-corroboration",
+      "sourceIds": ["wobbly-official-page"],
+      "visualEvidence": "The official page describes an open-world sandbox with mini-games and toys, and missions and jobs.",
+      "interpretation": "The character design is presented in a playful activity-rich setting; this contextual evidence does not establish any particular character anatomy or motion.",
+      "originalSowerTranslation": "Give the Sower a clear helper action or prop in concept art, but design original props and avoid treating context as evidence for a copied body feature."
+    }
+  ],
+  "blendBehaviors": {
+    "high": [
+      "Round, simplified character masses and an immediately readable pose.",
+      "Very sparse facial marks and broad, uninterrupted color regions."
+    ],
+    "medium": [
+      "Smooth transitions between head, torso and limbs while retaining an original Sower silhouette.",
+      "Warm light-to-shadow color shifts informed by Wobbly's yellow/orange rendering and the separate goat4 cream/orange/cocoa preference anchor."
+    ],
+    "low": [
+      "Wobbly-specific long, extended limb proportions, since they create candy-thin bridges and pronounced arm/torso undercuts.",
+      "Any specific Wobbly face, outfit, model or source-scene detail."
+    ]
+  },
+  "candyConstraints": [
+    {
+      "id": "long-arm-bridge",
+      "risk": "The reference's long, slim arm silhouette can become a fragile bridge or a narrow connection in a candy simplification.",
+      "guidance": "Shorten or thicken the Sower arm, or bring it closer to the torso while preserving a visible arm contour. Treat this as a design readability cue, not manufacturing validation."
+    },
+    {
+      "id": "arm-torso-undercut",
+      "risk": "A deep gap beneath an outward arm creates an undercut in a simplified solid form and can visually disconnect the arm.",
+      "guidance": "Use a shallow rounded recess or close the gap with a broad transition. Keep enough separation in the illustration to read the pose."
+    },
+    {
+      "id": "leg-gap-undercut",
+      "risk": "A deep triangular opening between separated legs can leave a thin waist of material or an exaggerated undercut in a candy study.",
+      "guidance": "Reduce the gap depth and round its apex; preserve a clear leg split without carrying the reference pose literally."
+    },
+    {
+      "id": "small-face-relief",
+      "risk": "Tiny dot eyes or shallow face marks may disappear when the figure is simplified.",
+      "guidance": "Use fewer, larger, deeper-relief marks in concept studies while retaining original Sower facial placement."
+    }
+  ],
+  "unknowns": [
+    "The supplied still does not establish how the character walks, waves, bends, falls or articulates at joints.",
+    "The official page text cited here does not specify character geometry, limb proportions, palette rules or animation mechanics.",
+    "No anatomy measurements, physical candy tolerances or manufacturing validation are inferred from these references."
+  ]
+}

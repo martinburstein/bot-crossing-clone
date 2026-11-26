@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sowers — the blend garden</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fcf4e9;color:#4b3024;font:17px/1.55 ui-rounded,'Arial Rounded MT Bold',system-ui,sans-serif}button{font:inherit;color:inherit;cursor:pointer}a{color:#a73e0b}header,main,footer{max-width:1550px;margin:auto;padding:30px 42px}header{padding-bottom:8px}.eyebrow{font-size:12px;letter-spacing:3px;font-weight:800;color:#b84415}h1{font-size:clamp(34px,4.8vw,66px);letter-spacing:-2px;line-height:1.1;margin:12px 0}h1 em{color:#e95811;font-style:normal}p{margin:10px 0}h2{font-size:25px;line-height:1.2;margin:8px 0}.intro{max-width:850px;color:#765747}.anchor{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:15px 20px;border:2px solid #ead3b9;border-radius:18px;margin-top:22px;background:#fffaf2}.swatch{height:21px;width:21px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:5px;box-shadow:inset 0 0 0 1px #0001}.anchor span{white-space:nowrap}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:start}.panel{background:#fffaf4;border:2px solid #ebd5bd;border-radius:25px;padding:23px;min-width:0}.map svg{width:100%;display:block;overflow:visible}.map text{fill:#604435;font-family:system-ui,sans-serif}.map .grid{stroke:#c3a98c;stroke-width:1;opacity:.4}.map .edge{stroke:#b48a60;stroke-width:3;fill:#f5e5cf}.map .tick{font-size:16px;fill:#92745b}.map .corner{font-size:23px;font-weight:800}.map .axis-note{font-size:16px}.point{cursor:pointer;outline:none}.point .halo{fill:#fff8ec;stroke:#dc8e52;stroke-width:2}.point .dot{fill:#d9520c}.point[aria-pressed=true] .halo,.point:focus .halo{fill:#ffe0be;stroke:#b33a0a;stroke-width:5}.point text{font-size:20px;fill:#4b3024;font-weight:800;text-anchor:middle;pointer-events:none}.point .point-label{font-size:16px;font-weight:600}.map-note,.small{font-size:13px;color:#80614e}.recipe-head{display:flex;align-items:start;justify-content:space-between;gap:12px}.round{background:#ffead1;color:#a53c08;border-radius:18px;padding:5px 11px;font-size:13px;font-weight:800;white-space:nowrap}.weights{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.weight{background:#f5e5d3;border-radius:11px;padding:8px 12px;font-size:14px}.weight strong{font-size:23px}.hero-image{width:100%;aspect-ratio:1.5;object-fit:contain;display:block;background:#fcf5ec;border-radius:17px}.image-note{font-size:12px;color:#8b6a52;margin-top:5px}.recipe-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.recipe-buttons button{border:1px solid #d4b69b;border-radius:11px;padding:8px 12px;background:#fff8ef;font-size:13px}.recipe-buttons button[aria-pressed=true]{background:#e96017;color:#fff;border-color:#c8470c}.recipe-buttons button:focus-visible{outline:3px solid #6d3923;outline-offset:3px}.recipe-buttons button:disabled{cursor:default;opacity:.45}.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:42px}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{overflow:hidden;background:#fffaf3;border:2px solid #ead2b9;border-radius:20px;padding:16px}.card img{width:100%;aspect-ratio:1.5;object-fit:contain;border-radius:12px;background:#fcf5ec}.card h3{font-size:19px;margin:9px 0 2px}.card p{font-size:13px;margin:5px 0}.card .ratio{color:#a34617;font-weight:800;letter-spacing:1px}.card button{border:0;background:transparent;padding:0;text-align:left;width:100%}.card button:focus-visible{outline:3px solid #b84415;outline-offset:4px}.sources{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:25px}.sources div{background:#f5e9d9;border-radius:15px;padding:18px;font-size:14px}.sources strong{display:block;margin-bottom:8px}footer{font-size:13px;color:#80614e;padding-top:8px;padding-bottom:45px}.empty{height:260px;display:flex;align-items:center;justify-content:center;color:#93745c;border-radius:15px;background:#f3e6d6}.sheet-mode .layout{grid-template-columns:1fr 1fr}.sheet-mode header{padding-top:30px}.sheet-mode .gallery{grid-template-columns:repeat(3,minmax(0,1fr))}.sheet-mode .recipe-buttons{display:none}@media(max-width:900px){header,main,footer{padding-left:20px;padding-right:20px}.layout{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.sources{grid-template-columns:1fr}.panel{padding:15px}}@media(max-width:500px){.gallery{grid-template-columns:1fr}.anchor{font-size:13px;gap:9px}h1{letter-spacing:-1px}.weights{gap:5px}.weight{padding:7px 9px}}@media print{body{background:#fff}.recipe-buttons{display:none}.layout{grid-template-columns:1fr 1fr}.panel,.card{break-inside:avoid}header,main,footer{padding:15px}.gallery{grid-template-columns:repeat(3,1fr)}}
+</style>
+<header>
+  <div class="eyebrow">SOWERS / DESIGN ITERATIONS</div>
+  <h1>The blend <em>garden.</em></h1>
+  <p class="intro">A soil-style triangle for finding our little helper. Each point is a deliberate mix of explorer presence, playful movement and friendly bot charm.</p>
+  <div class="anchor"><b>Goat 4 stays at the roots.</b><span><i class="swatch" style="background:#f5e4cd"></i>Warm cream</span><span><i class="swatch" style="background:#fb771e"></i>Citrus orange</span><span><i class="swatch" style="background:#65432f"></i>Cocoa</span><span>+ cute, capable helper</span></div>
+</header>
+<main>
+  <div class="layout">
+    <section class="panel map" aria-labelledby="map-title">
+      <div class="eyebrow">COMPOSITION MAP</div><h2 id="map-title">Three influences. Always 100%.</h2>
+      <svg id="triangle" viewBox="0 0 1000 920" role="group" aria-labelledby="triangle-title triangle-desc"><title id="triangle-title">Sowers character recipe triangle</title><desc id="triangle-desc">Mars Mission at the top, Wobbly Life at the lower left, Bot Crossing at the lower right. Select a numbered prototype point to inspect its character and candy concept.</desc><path class="edge" d="M500 80L90 790H910Z"/><g id="grid"></g><g aria-hidden="true"><text class="corner" x="500" y="30" text-anchor="middle">M / MARS MISSION</text><text class="axis-note" x="500" y="55" text-anchor="middle">Protected explorer presence</text><text class="corner" x="90" y="840" text-anchor="start">W / WOBBLY LIFE</text><text class="axis-note" x="90" y="866">Playful shape + pose</text><text class="corner" x="910" y="840" text-anchor="end">B / BOT CROSSING</text><text class="axis-note" x="910" y="866" text-anchor="end">Friendly helper read</text></g><g id="points"></g></svg>
+      <p class="map-note">Recipe percentages are art-direction weights. Grid lines step by 10%. Goat 4 is a shared preference anchor, separate from the three axes.</p>
+    </section>
+    <section class="panel" aria-labelledby="selected-name" aria-live="polite">
+      <div class="recipe-head"><div><div class="eyebrow" id="selected-id">PROTOTYPE</div><h2 id="selected-name">Preparing the studies</h2></div><span class="round" id="selected-iteration">Iteration 10</span></div>
+      <div class="weights" id="weights"></div>
+      <div id="hero"><div class="empty">The three artists are developing their first forms.</div></div>
+      <div class="image-note">Generated character + one-color candy concept</div>
+      <p id="intent"></p><p class="small" id="critique"></p>
+      <div class="recipe-buttons" id="recipe-buttons" aria-label="Choose a prototype"></div>
+    </section>
+  </div>
+  <div class="section-head"><h2>Same roots, different little helpers.</h2><span class="small" id="count"></span></div>
+  <div class="gallery" id="gallery"></div>
+  <div class="sources"><div><strong>M / Mars Mission</strong>Covered-face presence, protective brow and quiet equipment structure. <a href="https://www.lego.com/cdn/product-assets/product.bi.core.pdf/4523183.pdf">Official reference</a></div><div><strong>W / Wobbly Life</strong>Simple rounded masses, reaching poses and room for physical comedy. <a href="https://www.rubberbandgames.com/wobbly-life/">Official reference</a></div><div><strong>B / Bot Crossing</strong>Round head, readable expression and an approachable work companion. <a href="https://emra.ai/product/bot-crossing">Official reference</a></div></div>
+</main>
+<footer>Built from three reviewed reference corpora before blending. New Sowers concepts retain the original seed mark. Candy studies compare shape and relief; they do not establish manufacturing performance. Design Iteration labels are separate from the existing memorial archive.</footer>
+<script type="module">
+import {recipePoint,gridLines,validateWeights} from './ternary.mjs';
+const ns='http://www.w3.org/2000/svg';
+const make=(name,attrs,parent)=>{const e=document.createElementNS(ns,name);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);parent.append(e);return e};
+const data=await fetch('./recipes.json').then(r=>{if(!r.ok)throw Error('Recipe file unavailable');return r.json()});
+const accepted=data.recipes.filter(r=>r.status==='accepted');data.recipes.forEach(r=>validateWeights(r.weights));
+for(const line of gridLines()){make('line',{class:'grid',x1:line.from[0],y1:line.from[1],x2:line.to[0],y2:line.to[1]},document.querySelector('#grid'))}
+for(const n of [20,40,60,80]){const p=recipePoint([n,100-n,0]);const e=make('text',{class:'tick',x:p[0]-18,y:p[1]+5,'text-anchor':'end'},document.querySelector('#grid'));e.textContent=n+' M'}
+const hero=document.querySelector('#hero'), names=['M','W','B'];
+function select(recipe){
+ document.querySelector('#selected-id').textContent='PROTOTYPE '+recipe.id.toUpperCase();document.querySelector('#selected-name').textContent=recipe.name;document.querySelector('#selected-iteration').textContent='Iteration '+recipe.iteration;
+ const weights=document.querySelector('#weights');weights.replaceChildren();recipe.weights.forEach((n,i)=>{const e=document.createElement('span');e.className='weight';const strong=document.createElement('strong');strong.textContent=n+'%';e.append(strong,' '+names[i]);weights.append(e)});
+ hero.replaceChildren();const img=new Image();img.className='hero-image';img.src=recipe.image;img.alt=recipe.name+', original Sowers character and one-color candy concept';hero.append(img);
+ document.querySelector('#intent').textContent=recipe.intent;document.querySelector('#critique').textContent=recipe.critique||'';
+ document.querySelectorAll('[data-recipe]').forEach(e=>e.setAttribute('aria-pressed',String(e.dataset.recipe===recipe.id)));
+ const url=new URL(location.href);url.searchParams.set('study',recipe.id);history.replaceState(null,'',url);
+}
+for(const [i,r]of accepted.entries()){
+ const p=recipePoint(r.weights),g=make('g',{class:'point',transform:`translate(${p[0]} ${p[1]})`,role:'button',tabindex:'0','aria-label':r.name+': '+r.weights.map((n,j)=>n+'% '+data.axes[j]).join(', '),'aria-pressed':'false','data-recipe':r.id},document.querySelector('#points'));
+ make('circle',{class:'halo',r:33},g);make('circle',{class:'dot',r:7,cy:-8},g);make('text',{y:20},g).textContent=String(i+1).padStart(2,'0');make('text',{class:'point-label',y:58},g).textContent=r.weights.join(' / ');
+ g.addEventListener('click',()=>select(r));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(r)}});
+ const button=document.createElement('button');button.textContent=String(i+1).padStart(2,'0')+' '+r.name;button.dataset.recipe=r.id;button.setAttribute('aria-pressed','false');button.addEventListener('click',()=>select(r));document.querySelector('#recipe-buttons').append(button);
+ const article=document.createElement('article');article.className='card';const b=document.createElement('button');b.setAttribute('aria-label','Inspect '+r.name);b.addEventListener('click',()=>{select(r);document.querySelector('#selected-name').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'})});const image=new Image();image.src=r.image;image.alt=r.name+' character and candy concept';b.append(image);const title=document.createElement('h3');title.textContent=String(i+1).padStart(2,'0')+' / '+r.name;b.append(title);article.append(b);const ratio=document.createElement('p');ratio.className='ratio';ratio.textContent=r.weights.map((n,j)=>names[j]+n).join(' · ');article.append(ratio);const note=document.createElement('p');note.textContent=r.intent;article.append(note);document.querySelector('#gallery').append(article);
+}
+document.querySelector('#count').textContent=accepted.length+' reviewed studies';
+if(accepted.length)select(accepted.find(r=>r.id===new URL(location.href).searchParams.get('study'))||accepted[0]);
+if(new URL(location.href).searchParams.has('sheet'))document.body.classList.add('sheet-mode');
+</script>
+</html>

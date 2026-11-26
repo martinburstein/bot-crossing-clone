@@ -1,0 +1,61 @@
+{
+  "iteration": 10,
+  "title": "Mars-led Sowers character and candy raster prototype",
+  "recipe": {
+    "M": 70,
+    "W": 15,
+    "B": 15,
+    "meaning": "Authored art-direction recipe, not measurement or empirical style attribution."
+  },
+  "tool": {
+    "name": "image_gen__imagegen",
+    "mode": "built-in",
+    "operation": "single raster generation",
+    "transparent_background": false
+  },
+  "references": [
+    {
+      "index": 1,
+      "path": "/Users/martinburstein/Downloads/goat.png",
+      "role": "Mars explorer form and aura"
+    },
+    {
+      "index": 2,
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/.cache/sowers-reference-corpus/goat2-inspection.png",
+      "role": "Wobbly gentle body-tilt reference"
+    },
+    {
+      "index": 3,
+      "path": "/Users/martinburstein/Downloads/goat3.png",
+      "role": "Bot Crossing friendly helper face/presence"
+    },
+    {
+      "index": 4,
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "Sowers cream/orange/cocoa palette and friendly personality preference anchor"
+    }
+  ],
+  "output": {
+    "file": "public/sowers/prototypes/iteration-10-mars-led.png",
+    "generatedSource": "private-generation-source (deliverable SHA-256 recorded)",
+    "description": "Warm cream backdrop, full three-quarter-front character left, paired single orange candy concept right, no text/logos."
+  },
+  "observations": [
+    "Broad structured protective hood and raised orange brow/crown distinguish the silhouette.",
+    "Shallow cream lower-mask contour frames a compact cocoa face window with pale friendly arches.",
+    "Compact sturdy utility torso, original orange seed/leaf chest mark, short connected mittens and broad boots.",
+    "Gentle tilt and open raised-arm helper display gesture.",
+    "Gummy retains brow, face relief, seed chest, mitten forms and split boots."
+  ],
+  "knownWeaknesses": [
+    "Sugar sparkle and broad strap-like torso lines crowd the gummy relief; these may merge at small scale.",
+    "The image does not establish candy-scale legibility, physical geometry, tolerances, tooling or demolding."
+  ],
+  "prompt": "Use case: stylized-concept\nAsset type: original Sowers character and single-color candy product-concept sheet\nPrimary request: Create one polished concept sheet for a new original friendly Sowers explorer/helper. This is a Mars-leading art direction recipe of M70 / W15 / B15 (authorial recipe, not a measurement). Distinctly translate a calm covered-face Mars explorer into an original character while keeping Goat 4's warm preference palette and friendly helper personality.\nInput images: Image 1 (/Users/martinburstein/Downloads/goat.png) is Mars explorer form/aura reference only: broad protective helmet, raised visor/brow, covered lower face and eye opening. Image 2 (/Users/martinburstein/Documents/ChatGPT/Sowers/.cache/sowers-reference-corpus/goat2-inspection.png) is Wobbly pose reference only: subtle flexible body tilt. Image 3 (/Users/martinburstein/Downloads/goat3.png) is Bot Crossing helper-face/soft friendly presence reference only. Image 4 (/Users/martinburstein/Downloads/goat4.png) is the required palette and friendly Sowers preference anchor: warm cream shell/body, orange accents, cocoa face, pale curved happy eyes, small original seed/leaf chest mark.\nScene/backdrop: clean warm cream studio backdrop, simple soft floor shadow, no scenery.\nSubject: Place one full-body three-quarter-front standing character prominently on the left, and one paired single orange candy concept on the right. Character has a broad structured protective hood with a distinct raised orange brow/crown accent, shallow cream lower-mask contour around a narrower cocoa face window, friendly pale arched eyes, compact sturdy utility torso, one original orange seed/leaf chest mark, short connected mitten arms and simple boots. Give the body a gentle Wobbly-like tilt and an open friendly helper display gesture. Candy is a single orange gummy silhouette that keeps the signature raised brow, seed chest relief, mittens and split boots in broad connected relief.\nStyle/medium: refined soft 3D collectible character concept render, warm matte molded-resin appearance for character; glossy translucent orange gummy concept for candy.\nComposition/framing: balanced landscape product-concept sheet, full figures fully visible, character left, candy right, clear separation, consistent scale and readable face and chest. No extra variants or secondary character.\nLighting/mood: soft warm studio lighting, calm, alert, approachable and gently helpful.\nColor palette: warm cream, citrus orange and cocoa brown; pale cream eyes. Keep orange restrained as clear broad accents.\nMaterials/textures: smooth rounded surfaces, broad clean forms, restrained material texture; candy has subtle sugar sparkle only where it does not hide raised forms.\nText (verbatim): none.\nConstraints: make the silhouette distinct from Goat 4 by using the more protective structured hood and narrower compact eye window, not by recoloring alone. The expression is friendly and attentive, never angry. Keep lower mask contour shallow and cream. Character has a slight body tilt. Candy design is one simplified single orange piece and must still show broad raised brow/seed/boots cues.\nAvoid: any text, logos, watermarks, yellow face, angry brows, copied planet marks, copied source geometry or exact facial artwork, LEGO C-grip hands, studs, antennae, fine straps, disconnected mitten islands, extra candy pieces, extra characters, excessive sugar that obscures the relief, deep narrow undercuts, fragile details, clutter.",
+  "coordinatorVerification": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "3b2a5b55b0db02cf07a47ee8354e907703b3a7dd563d76fe49245672751fdf59",
+    "review": "Full image inspected; same-wave peer challenge complete. Accepted as exploratory concept, not final design or manufacturing proof."
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "corpus_id": "bot-crossing",
+  "title": "Bot Crossing visual and behavior corpus",
+  "scope": "Reference-derived character direction for original Sower prototypes; not a product recreation or measured style classifier.",
+  "sources": [
+    {
+      "id": "user-goat3",
+      "kind": "user_still_observation",
+      "path": "/Users/martinburstein/Downloads/goat3.png",
+      "observation": "Two small white robot-like astronauts on a tiled sci-fi world. Each has a round white helmet/body mass, glossy black circular face screen, tiny white curved eyes and smile, a short thin crown antenna ending in a white ball, rounded short limbs, and soft toy-like proportions. Background includes turquoise machinery and white/red structures."
+    },
+    {
+      "id": "user-goat4",
+      "kind": "user_preference_anchor",
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "observation": "Separate Sowers Scout character anchor: cream body, vivid orange crown stripe and side panels, cocoa-brown visor, simple cream smiling eyes, compact rounded body and limbs. Its candy study is an orange gummy concept. Retain this palette and approachable helper personality as a preference; no color ratios or Bot Crossing attribution inferred."
+    },
+    {
+      "id": "official-product",
+      "kind": "official_corroboration",
+      "url": "https://emra.ai/product/bot-crossing",
+      "observation": "Official page describes a 3D world where bots work across projects; a bot needing a decision raises a question mark and waves; users can click bots to chat. It describes persistent project plots and a flyable world. This supports role and motion affordances, not detailed character geometry."
+    },
+    {
+      "id": "local-astronauts",
+      "kind": "local_code_reference",
+      "path": "src/agents/astronauts.js",
+      "observation": "Local implementation builds procedural helmet, visor, face, pack, antenna, tip and lamp around an animated crew rig; supports state trims, status faces, walking/running, working, waving, and attention badge behavior. This corroborates this clone's implementation only, not every public or commercial Bot Crossing version."
+    },
+    {
+      "id": "local-faces",
+      "kind": "local_code_reference",
+      "path": "src/agents/faces.js",
+      "observation": "Local face atlas includes idle, blink, happy, work, thinking, wait, alert, error, sleep, wink, love, cheer, boot and sad expression frames."
+    },
+    {
+      "id": "local-crew",
+      "kind": "local_code_reference",
+      "path": "src/agents/crew.js",
+      "observation": "Local rig maps idle, walking, running, hammering, working, cheering, jump, wave, sit, hit, spawn and interact clips; the mannequin head is omitted in favor of the custom helmet/face."
+    }
+  ],
+  "traits": [
+    {
+      "id": "bc-01",
+      "region": "silhouette",
+      "evidence_type": "user_still_observation",
+      "evidence": "In goat3, two characters read as compact upright figures, with large round head/helmet masses and smaller bodies; the white silhouette remains legible against dark blue floor.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Build an original seedling-sized helper with an oversized rounded hood/head and a short, stable body; keep the silhouette readable at thumbnail scale.",
+      "blend": {
+        "high": "Use the large-head/small-body ratio as a broad proportion cue.",
+        "medium": "Combine with Mars suit utility while retaining soft toy proportions.",
+        "low": "Avoid copying the specific helmet outline or exact body proportions."
+      }
+    },
+    {
+      "id": "bc-02",
+      "region": "helmet_shell",
+      "evidence_type": "user_still_observation",
+      "evidence": "Goat3 shows a smooth, nearly spherical white helmet shell; no hard panel seams are prominent at this viewing size.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Prefer a smooth, softly beveled protective hood with one or two original broad seams, not a detailed replica.",
+      "blend": {
+        "high": "Retain one smooth protective head enclosure.",
+        "medium": "Use soft hood volume with a distinctive agricultural brim or seed pod contour.",
+        "low": "Drop helmet mimicry and use a fabric cowl or leaf hood."
+      }
+    },
+    {
+      "id": "bc-03",
+      "region": "face_screen",
+      "evidence_type": "user_still_observation",
+      "evidence": "Each goat3 face is a dark, nearly circular glossy screen inset in the white helmet, with high-contrast white marks.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Use a small dark face window or seed-sensor panel with expressive, simple marks; design its shape and bezel originally.",
+      "blend": {
+        "high": "A high-contrast expressive face panel is a useful broad cue.",
+        "medium": "Translate into a dark soil-sensor window with botanical eye motifs.",
+        "low": "Use a non-screen embroidered or sculpted face."
+      }
+    },
+    {
+      "id": "bc-04",
+      "region": "expression",
+      "evidence_type": "user_still_observation",
+      "evidence": "The visible faces show two upward-curving eye marks and a small curved smile, conveying friendly attention rather than realism.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Give the helper a readable, optimistic expression using a few broad shapes; support alternate curious, focused and sleepy expressions.",
+      "blend": {
+        "high": "Keep simple friendly graphic expressions.",
+        "medium": "Mix an upbeat default with Wobbly-like slapstick reactions.",
+        "low": "Avoid screen-face graphics; express emotion through posture and carved features."
+      }
+    },
+    {
+      "id": "bc-05",
+      "region": "antenna",
+      "evidence_type": "user_still_observation",
+      "evidence": "Both goat3 characters have a thin stalk rising from the helmet crown and a small spherical tip.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "If useful, use one thick, short sprout-like sensor with a broad tip; keep it robust and avoid a fragile thin stalk.",
+      "blend": {
+        "high": "A single crown marker may communicate helper identity.",
+        "medium": "Replace the antenna with a sturdy leaf or seedling nub.",
+        "low": "Omit crown protrusions entirely."
+      },
+      "risk": "Thin stalks and tiny tips can read as fragile, disappear at small sizes, and create candy demolding or breakage problems."
+    },
+    {
+      "id": "bc-06",
+      "region": "torso",
+      "evidence_type": "user_still_observation",
+      "evidence": "The lower white mass is compact and rounded, visually continuous with the suit; a small dark circular chest mark is visible on one figure.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Make a compact rounded tunic/torso with a large simple chest emblem such as a seed, leaf, or pocket, leaving broad uninterrupted surfaces.",
+      "blend": {
+        "high": "Use a compact torso with one clear chest focal point.",
+        "medium": "Add a work apron or seed pouch as an original gardening adaptation.",
+        "low": "Use layered clothing shapes instead of a suit-like body."
+      }
+    },
+    {
+      "id": "bc-07",
+      "region": "limbs",
+      "evidence_type": "user_still_observation",
+      "evidence": "Arms and legs in goat3 appear short, rounded and separated into soft limb forms. The still does not establish joint mobility or range.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Propose original short, soft limbs with mitten hands and broad boots. Any articulation, elbow or knee design is a new Sower implementation choice.",
+      "blend": {
+        "high": "Short, soft limbs create a cute helper read.",
+        "medium": "Use flexible limbs for physical comedy while retaining mitten hands.",
+        "low": "Use root-like feet and broader leaf-shaped hands."
+      }
+    },
+    {
+      "id": "bc-08",
+      "region": "palette",
+      "evidence_type": "user_preference_anchor",
+      "evidence": "Goat4 (not the Bot Crossing still) shows cream, orange and cocoa as the user's preferred character palette; goat3 itself appears predominantly white with black face screens.",
+      "source_ids": [
+        "user-goat3",
+        "user-goat4"
+      ],
+      "sower_translation": "Treat cream/orange/cocoa as a separate Sowers preference anchor. Map cream to the main body, orange to one or two broad accents, and cocoa to the face window only as a qualitative direction; do not claim measured ratios.",
+      "blend": {
+        "high": "Keep the separate Goat4 cream/orange/cocoa palette invariant; change form and pose rather than source palette.",
+        "medium": "Keep the separate Goat4 cream/orange/cocoa palette invariant; change form and pose rather than source palette.",
+        "low": "Keep the separate Goat4 cream/orange/cocoa palette invariant; change form and pose rather than source palette."
+      }
+    },
+    {
+      "id": "bc-09",
+      "region": "surface_and_detail",
+      "evidence_type": "design_interpretation",
+      "evidence": "The still is small and softly rendered; broad smooth masses dominate, while tiny joints and chest marks are secondary.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Favor clean matte surfaces, rounded edges and a few large details. Do not spend silhouette budget on tiny bolts, seams or small text.",
+      "blend": {
+        "high": "Keep broad clean surfaces and sparse accents.",
+        "medium": "Add tactile fabric or planted-seed texture only in larger readable zones.",
+        "low": "Use handcrafted surface texture but keep micro-detail out."
+      },
+      "risk": "Very small raised marks can vanish in candy and add weak, thin features that are difficult to demold."
+    },
+    {
+      "id": "bc-10",
+      "region": "helper_personality",
+      "evidence_type": "design_interpretation",
+      "evidence": "The smiling, tiny astronaut forms in goat3 read as cheerful companions; this is inferred from the still, not a Bot Crossing product promise.",
+      "source_ids": [
+        "user-goat3"
+      ],
+      "sower_translation": "Make the character a patient, curious garden helper: pleased to notice progress, calm when waiting, and gently alert when a choice is needed.",
+      "blend": {
+        "high": "Friendly, legible helper demeanor.",
+        "medium": "Add playful clumsiness without making the helper seem careless.",
+        "low": "Make the role quiet and contemplative, with warmth in pose rather than a grin."
+      }
+    },
+    {
+      "id": "bc-11",
+      "region": "attention_behavior",
+      "evidence_type": "official_corroboration",
+      "evidence": "Official product page says a bot needing a decision raises a question mark above its head and starts waving to get attention.",
+      "source_ids": [
+        "official-product"
+      ],
+      "sower_translation": "Prototype a clear pause-and-wave pose with a broad, detachable-looking sprout/question cue; Sower may use a leaf-shaped attention marker rather than a copied icon.",
+      "blend": {
+        "high": "Keep the stop-and-wave communication beat.",
+        "medium": "Use a raised leaf or hand gesture, with no floating punctuation.",
+        "low": "Use a planted sign or head tilt instead of waving."
+      }
+    },
+    {
+      "id": "bc-12",
+      "region": "work_motion",
+      "evidence_type": "local_code_reference",
+      "evidence": "Local astronaut rig provides walk/run and hammering/working loops; astronauts can move around their project site. This is local implementation evidence, not an official claim about all product versions.",
+      "source_ids": [
+        "local-astronauts",
+        "local-crew"
+      ],
+      "sower_translation": "Allow broad walk, carry, tend and pause poses; any tool should be oversized, blunt, and original to the garden role.",
+      "blend": {
+        "high": "A visible hand-work loop supports a productive helper identity.",
+        "medium": "Translate hammering to watering, tending or seed placement.",
+        "low": "Keep hands empty; communicate work through purposeful travel and inspection."
+      }
+    },
+    {
+      "id": "bc-13",
+      "region": "expression_range",
+      "evidence_type": "local_code_reference",
+      "evidence": "Local face atlas supports distinct idle, blink, happy, work, think, wait, alert, error, sleep, wink, love, cheer, boot and sad states.",
+      "source_ids": [
+        "local-faces"
+      ],
+      "sower_translation": "Plan a small set of face states with chunky marks: content, curious, focused, waiting, surprised and tired. Treat these as animation opportunities, not mandatory facial decals.",
+      "blend": {
+        "high": "Use expression changes to make work state readable.",
+        "medium": "Combine screen expressions with body acting and Wobbly-like surprise.",
+        "low": "Keep face fixed and let silhouette/gesture carry emotion."
+      }
+    },
+    {
+      "id": "bc-14",
+      "region": "scale_and_readability",
+      "evidence_type": "official_context_and_design_inference",
+      "evidence": "Official page describes orbit-to-plot navigation. Multi-scale character readability is our design inference and test requirement, not an official character specification.",
+      "source_ids": [
+        "official-product"
+      ],
+      "sower_translation": "Prioritize a distinct head-body outline, one broad color block and one clear gesture; keep important identity cues visible when reduced.",
+      "blend": {
+        "high": "Use one or two large identifiers instead of fine detail.",
+        "medium": "Let the garden tool or leaf crest act as the distant identifier.",
+        "low": "Simplify to a distinct silhouette without reliance on a face display."
+      }
+    }
+  ],
+  "unknowns": [
+    "The goat3 still is user-supplied imagery, not independently verified official Bot Crossing key art; exact origin/version is unknown.",
+    "The official page supports behavior and world context but its accessible text does not establish exact bot mesh geometry, material values, proportions or rig design.",
+    "Local source code describes this repository's implementation only. It must not be treated as a complete representation of the commercial service or every product revision.",
+    "No physical dimensions, material measurements, palette ratios, manufacturing tests, or candy tolerances are established by this corpus."
+  ],
+  "originality_and_candy_notes": [
+    "Use references for broad visual principles only; do not copy the Bot Crossing mesh, exact face, helmet, pack, antenna, insignia, or source assets.",
+    "Keep any future candy study as a concept image, not manufacturing evidence.",
+    "Avoid thin antennae, narrow limb gaps, tiny knobs, floating fine details and deep narrow undercuts; favor rounded, connected masses and broad raised marks.",
+    "Goat4 cream/orange/cocoa and its helper character remain a separate user preference anchor; no measured palette share is inferred."
+  ]
+}

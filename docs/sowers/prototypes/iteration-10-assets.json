@@ -1,0 +1,26 @@
+[
+  {
+    "id": "mars-led",
+    "iteration": 10,
+    "asset": "public/sowers/prototypes/iteration-10-mars-led.png",
+    "sha256": "3b2a5b55b0db02cf07a47ee8354e907703b3a7dd563d76fe49245672751fdf59",
+    "record": "docs/sowers/prototypes/iteration-10-mars-led.json",
+    "review": "coordinator full-image inspected; same-wave peer review complete"
+  },
+  {
+    "id": "wobbly-led",
+    "iteration": 10,
+    "asset": "public/sowers/prototypes/iteration-10-wobbly-led.png",
+    "sha256": "a94a9ef8bc40304adea253713898296146035a28f8892580854268a0239961f2",
+    "record": "docs/sowers/prototypes/iteration-10-wobbly-led.json",
+    "review": "coordinator full-image inspected; same-wave peer review complete"
+  },
+  {
+    "id": "bot-led",
+    "iteration": 10,
+    "asset": "public/sowers/prototypes/iteration-10-bot-led.png",
+    "sha256": "eabda7ef6186931c38731af069a6e9f406970d4763cc6dc266f0a19d3963dc08",
+    "record": "docs/sowers/prototypes/iteration-10-bot-led.json",
+    "review": "coordinator full-image inspected; same-wave peer review complete"
+  }
+]

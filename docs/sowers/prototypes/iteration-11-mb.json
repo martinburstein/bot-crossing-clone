@@ -1,0 +1,69 @@
+{
+  "iteration": 11,
+  "concept_id": "mb",
+  "title": "Integrated seed canopy Sower character and candy concept",
+  "recipe": {
+    "mars": 45,
+    "wobbly_life": 10,
+    "bot_crossing": 45,
+    "meaning": "authored art-direction weights, not measured style attribution"
+  },
+  "tool": {
+    "name": "image_gen__imagegen",
+    "mode": "built-in",
+    "operation": "single raster generation",
+    "transparent_background": false
+  },
+  "references": [
+    {
+      "path": "/Users/martinburstein/Downloads/goat.png",
+      "role": "Mars protective brow and explorer face containment; inspected and used as generation input"
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/.cache/sowers-reference-corpus/goat2-inspection.png",
+      "role": "Wobbly gentle pose and counterlean; inspected and used as generation input"
+    },
+    {
+      "path": "/Users/martinburstein/Downloads/goat3.png",
+      "role": "Bot Crossing friendly helper face and presence; inspected, not used as generation input"
+    },
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "role": "fixed Sowers cream/orange/cocoa palette and friendly personality preference anchor; inspected and used as generation input"
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-10-mars-led.png",
+      "role": "prior Sowers concept inspected and used as a contrast reference to avoid repeating separate helmet-over-torso composition"
+    },
+    {
+      "path": "/Users/martinburstein/Documents/ChatGPT/Sowers/public/sowers/prototypes/iteration-10-bot-led.png",
+      "role": "prior Sowers concept inspected and used as a contrast reference to avoid repeating round helmet over tiny torso composition"
+    }
+  ],
+  "output": {
+    "file": "public/sowers/prototypes/iteration-11-mb.png",
+    "generatedSource": "private-generation-source (deliverable SHA-256 recorded)",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "a93d84da2e5210b89772cd17e27b24d82245edacaee00e86a4b00fb481e22037",
+    "description": "Warm cream studio sheet; full cream/orange/cocoa character at left and paired single orange candy at right; no text or logos."
+  },
+  "observations": [
+    "The cream shell tapers over the crown and widens into a broad cowl that spans the upper chest and shoulder outline; this gives the silhouette a more integrated canopy read than the prior round helmet and tiny torso archetype.",
+    "Broad orange crown stripe and projecting cowl edge translate a protective brow; the smaller cocoa face window, cream arch eyes and original orange seed chestmark preserve the preference anchor.",
+    "Short mittens attach at the lower cowl sides. Candy repeats the canopy outline with broad face, seed and boot relief as one connected orange form.",
+    "The pose is nearly frontal despite a requested three-quarter-front view, and the lower orange waist/boot mass remains distinct beneath the cowl."
+  ],
+  "uncertainties": [
+    "The canopy integration is visibly stronger through the shoulders, but the distinct lower waist means the figure is not literally one continuous shell from crown to boots.",
+    "Candy highlights and slight surface grain are visible despite the matte opaque direction; no pronounced sugar sparkle or translucency appears.",
+    "This visual concept does not establish dimensions, physical candy-scale legibility, tolerances, tooling, demolding, or manufacturing feasibility."
+  ],
+  "exactPrompt": "Use case: stylized-concept\nAsset type: one original Sowers character and single-candy concept sheet\nPrimary request: Create one original friendly Sower concept sheet for recipe M45 / W10 / B45. These are authored art-direction weights, not measurements. Mars contributes protective brow/face containment, Wobbly contributes only a slight counterlean, Bot contributes warm friendly helper expression. Goat 4 remains a separate and fixed preference anchor.\nInput images: Image 1 (goat.png) is Mars explorer brow and protected face reference only. Image 2 (goat2-inspection.png) is a gentle pose and counterlean reference only. Image 3 (goat4.png) is the preferred cream/orange/cocoa palette, pale happy eyes, broad orange crown stripe and original seed chestmark reference. Images 4 and 5 (iteration-10-mars-led.png, iteration-10-bot-led.png) are prior Sowers concepts to avoid repeating: particularly the conventional separate helmet over a tiny torso. Goat3.png was also inspected as Bot helper-face/presence reference but is not used as an image input; use only that friendly presence cue.\nScene/backdrop: clean warm cream studio background and soft grounded shadows, no scenery.\nSubject: Show exactly one full-body neutral standing three-quarter-front original character on the left and exactly one same-character single orange candy concept on the right. The character's defining form is a wide rounded SEED CANOPY COWL: a single continuous cream shell with gently tapered crown that flares broadly into and integrates the head and upper body, owning the shoulder outline. It is not a round helmet stacked on a small torso. Broad smooth cheek guards frame a smaller cocoa face window set inside this same cowl; use two pale friendly broad arch eyes, no mouth. Translate a Mars protective brow into a broad orange crown stripe and cowl edge, while keeping the face kind. Add one original orange seed chestmark integrated into the cowl/body. Short attached mitten arms emerge at the lower cowl sides. Under the shell, a short simple torso mass leads to stable broad boots. A very slight counterlean only.\nCandy: one uniform solid orange matte candy beside the figure. Echo the distinctive connected canopy/shoulder outline, with broad shallow face, seed and boot relief; no thin limb gaps or antenna. Keep it one simple connected silhouette.\nStyle/medium: polished soft 3D collectible concept render; character smooth matte molded-resin, candy smooth opaque matte confection with broad subtle relief.\nComposition/framing: landscape studio product concept sheet, balanced spacing, both full figures visible at similar scale, character left and candy right.\nLighting/mood: soft warm diffuse studio light, calm and friendly.\nColor palette: warm cream, citrus orange, cocoa brown; pale cream eyes. Candy is one uniform orange.\nMaterials/textures: clean smooth surfaces. Candy is opaque and matte, no sugar sparkle, translucency, grain or glitter.\nText (verbatim): none.\nConstraints: silhouette must be dominated by one integrated canopy/shoulder shell, not another helmet stacked above a tiny torso. Keep torso one clean mass; no straps, pockets, equipment or extra insignia. Arms are short attached mittens at lower cowl sides; boots broad and stable. Original Sowers design only.\nAvoid: text, logos, watermark, copied mesh/connectors/face graphics, pointed ears, cat/rabbit shapes, fragile crest, antenna, separate round helmet and tiny torso archetype, oversized spherical head, narrow neck, narrow body, tiny limb blobs, harness, equipment, pockets, extra marks, separate candy parts, thin gaps, sugar sparkle, translucency, glossy candy, microdetail.",
+  "coordinatorVerification": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "a93d84da2e5210b89772cd17e27b24d82245edacaee00e86a4b00fb481e22037",
+    "review": "Full image inspected; formal same-wave peer challenge complete. Exploratory concept only."
+  }
+}

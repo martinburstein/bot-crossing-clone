@@ -1,0 +1,49 @@
+{
+  "iteration": 10,
+  "title": "Wobbly-led Sower prototype",
+  "recipe": {
+    "M": 15,
+    "W": 70,
+    "B": 15,
+    "meaning": "Authored art-direction weights, not measured attribution."
+  },
+  "tool": {
+    "mode": "built-in image_gen.imagegen",
+    "skill": "/Users/martinburstein/.codex/skills/.system/imagegen/SKILL.md",
+    "paidCliOrApi": false,
+    "generatedImageId": "01a21715-9735-7621-9846-a9f215be07e1",
+    "generatedFile": "private-generation-source (deliverable SHA-256 recorded)"
+  },
+  "references": [
+    "/Users/martinburstein/Downloads/goat.png",
+    "/Users/martinburstein/Downloads/goat3.png",
+    "/Users/martinburstein/Downloads/goat4.png",
+    ".cache/sowers-reference-corpus/goat2-inspection.png"
+  ],
+  "referenceUse": "Broad art-direction cues only; do not copy exact character, mesh, logos, outfit graphics, proportions, or facial art.",
+  "output": {
+    "path": "public/sowers/prototypes/iteration-10-wobbly-led.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "a94a9ef8bc40304adea253713898296146035a28f8892580854268a0239961f2"
+  },
+  "critique": {
+    "strengths": [
+      "Buoyant whole-body hop with one clearly bent knee and open reaching gesture.",
+      "Soft protective hood, simple cocoa face window and pale arch eyes retain the preferred helpful character language.",
+      "Cream/orange/cocoa palette, orange helmet stripe, bib side panels and boot ends, with one original seed chest mark.",
+      "Candy adapts the pose into one connected orange mass with broad arm connection, shallow joined-foot notch, and broad readable relief."
+    ],
+    "limitations": [
+      "Generated concept art is not proof of candy manufacturing feasibility, tooling, dimensions, or tolerances.",
+      "The candy is a simplified front/three-quarter concept, not a validated physical sample."
+    ]
+  },
+  "exactPrompt": "Use case: stylized-concept\nAsset type: one clean product concept sheet for original Sowers character direction\nInput images: Images 1\u20133 are visual references only for broad palette/personality and contextual source-family cues; Image 4 is the separate preferred cream/orange/cocoa palette and friendly helper anchor. Do not copy any exact figure, logo, face art, mesh, outfit graphics, or proportions.\nPrimary request: Create a polished single-sheet concept showing one original Sower character and its paired single-color orange candy concept. Art-direction recipe M15/W70/B15 (Mars Mission / Wobbly Life / Bot Crossing), weights are not measured visual ratios. Wobbly-leading, but original and distinctly different from the preference anchor.\nScene/backdrop: uninterrupted warm cream studio backdrop, subtle soft grounding shadows, spacious clean layout. No text, lettering, logos, labels, borders, diagrams or extra props.\nSubject and composition: left side: one full-body three-quarter-front Sower, large enough to read clearly. Right side: one matching single-color orange candy concept, front-facing or slight three-quarter, clearly adapted as a coherent candy relief rather than a duplicate render. No duplicate characters or candy variants.\nCharacter design: mobile original Sower with a round soft protective hood/head, shallow projecting cocoa brow and simple cocoa face window with two friendly pale arch eyes. Narrow shoulders and small torso; limbs longer and thicker-rounded than the compact Goat 4 anchor but sturdy, smooth and attached. Show a whole-body buoyant hop with one knee bent, the other foot lifting, and an open friendly reaching gesture. Use disciplined geometric shape construction with clear silhouette separations; no blobby cluster. Maintain Goat 4 family palette: warm cream main surfaces, citrus orange helmet stripe, broad bib side panels and boot ends, cocoa face window. Put one small original orange seed mark at center chest. Avoid copied planet/device marks, printed suit graphics, or exact facial art. No antenna, no yellow mesh or source-specific costume.\nCandy adaptation: exactly one solid orange candy concept beside the character. Reshape the dynamic pose into a single connected rounded front silhouette: arm drawn close to body with a thick broad web connection, short joined feet with a shallow rounded gap, no narrow bridges or undercuts. Retain readable round hood, simple face window and original seed chest mark as broad shallow relief. Preserve the open reaching gesture in a compact, integrated contour; no thin limbs, disconnected hands, antenna, fragile details, sugar surface texture, packaging, or manufacturing claims. It must feel like an intentionally simplified connected candy figure, not the same posed toy coated in sugar.\nStyle/medium: premium soft 3D product concept illustration, restrained smooth matte surfaces, gentle warm studio light, crisp readable edges, charming and polished. This is exploratory concept art, not a manufacturing proof. Keep scale, finish and layout visually balanced.",
+  "coordinatorVerification": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "a94a9ef8bc40304adea253713898296146035a28f8892580854268a0239961f2",
+    "review": "Full image inspected; same-wave peer challenge complete. Accepted as exploratory concept, not final design or manufacturing proof."
+  }
+}
