@@ -1,0 +1,70 @@
+{
+  "iteration": 14,
+  "title": "Sowers family lineup",
+  "tool": "built-in image_gen__imagegen",
+  "mode": "generate from four inspected references",
+  "asset": "public/sowers/prototypes/iteration-14-family-lineup.png",
+  "width": 1536,
+  "height": 1024,
+  "sha256": "55da22ef42f463d0e372893f4d6506760fc50666f2f1e43c76b84455faa22df1",
+  "promptFile": "docs/sowers/prototypes/iteration-14-family-lineup.md",
+  "references": [
+    {
+      "path": "public/sowers/prototypes/iteration-12-balanced.png",
+      "role": "Scout identity",
+      "sha256": "f6eb5d63bbba7b50c8bc49647e438f9a1a52d1a9a8bad29c9c1cb42c3b70c6b3"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-11-mb.png",
+      "role": "Canopy Keeper identity",
+      "sha256": "a93d84da2e5210b89772cd17e27b24d82245edacaee00e86a4b00fb481e22037"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-11-wb.png",
+      "role": "Pod Pal identity",
+      "sha256": "e61c9d4f7cee66605b4e30ff472bb3d001d56b1940a064619110a112f5babe3e"
+    },
+    {
+      "source": "user goat4.png",
+      "role": "favorite palette and helper personality",
+      "sha256": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7"
+    }
+  ],
+  "recipes": [
+    {
+      "character": "Scout",
+      "weights": [
+        34,
+        33,
+        33
+      ]
+    },
+    {
+      "character": "Canopy Keeper",
+      "weights": [
+        45,
+        10,
+        45
+      ]
+    },
+    {
+      "character": "Pod Pal",
+      "weights": [
+        10,
+        45,
+        45
+      ]
+    }
+  ],
+  "recipeMeaning": "authored direction weights, not measured style attribution",
+  "observations": [
+    "Exactly three distinct characters and their three candy counterparts.",
+    "Cream/orange/cocoa family and arch eyes/seed/crown cues are consistent.",
+    "Broad Scout, shoulder canopy and tall seed-pod contours remain distinct."
+  ],
+  "limitations": [
+    "View is near frontal rather than strong three-quarter.",
+    "Sugar dust is more conspicuous than requested and can obscure smaller relief.",
+    "Candy proportions are simplified, not exact dimensional transfers or manufactured samples."
+  ]
+}

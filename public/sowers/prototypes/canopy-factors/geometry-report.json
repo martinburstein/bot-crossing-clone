@@ -1,0 +1,702 @@
+{
+  "iteration": 14,
+  "title": "Canopy candy controlled factor experiment",
+  "kind": "controlled-geometry-factor-study",
+  "units": "mm",
+  "dimensionsWHD": [
+    24,
+    30,
+    6
+  ],
+  "sourceControl": "Iteration 13 authored contour, normalized to shared 24\u00d730 mm XY envelope",
+  "sourcePins": {
+    "iteration13Generator": {
+      "path": "tools/sowers-canopy-blockout.py",
+      "sha256": "3cd88f8aa3a1df6c43600f59b9187bfa25da2fe1bf05568a6dcacf0b8a021897"
+    },
+    "iteration13GeometryReport": {
+      "path": "docs/sowers/prototypes/iteration-13-candy-solid.json",
+      "sha256": "c055e36acd03c680f1b9403ad3b41ae39d4008540159bd5fdb69ebf8ccbba88f"
+    },
+    "generator": {
+      "path": "tools/sowers-canopy-factors.py",
+      "sha256": "c724741f029eb651df69b829a9711c33068a38a6241eedb2ace984ba465c3eca"
+    },
+    "canonicalHelper": {
+      "path": "tools/sowers-candy-form.py",
+      "sha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+    },
+    "viewerHtml": {
+      "path": "sowers/prototype-candy-factors/index.html",
+      "sha256": "950eca31249227ba4a4b776804e87f5dc702d0844e6b18e9ba622a33887f7d62"
+    },
+    "viewerMain": {
+      "path": "sowers/prototype-candy-factors/main.js",
+      "sha256": "61ca080a56592cb1d7b7015ae4a5cf38e105642d48719c2fdf6d06348c69c739"
+    },
+    "viewerStyles": {
+      "path": "sowers/prototype-candy-factors/style.css",
+      "sha256": "194f96d3745ca05b75669c9e919f2590a07a90d0ad7432528ce4c6ddbc5720bd"
+    },
+    "comparisonRendererHtml": {
+      "path": "sowers/prototype-candy-factors/render-sheet.html",
+      "sha256": "18250336193b587cb79ae7e5a6579e79adb4715b27a2534a4d2b5284d04365e9"
+    },
+    "comparisonRendererMain": {
+      "path": "sowers/prototype-candy-factors/render-sheet.js",
+      "sha256": "a0cfb15d3bcf45b30ca3b99714f6b7b2f145cba3396eae4003df428462ec6574"
+    }
+  },
+  "bodyDepthMm": 5.45,
+  "outerDraftDefinition": "True parallel normal offsets from common back control contour toward front at nominal 0\u00b0/2\u00b0 over the 5.45 mm body wall depth; no XY scaling",
+  "factors": [
+    "crown stripe absent/present",
+    "outerwall draft nominal 0\u00b0/2\u00b0"
+  ],
+  "commonFeatures": {
+    "faceRecessMm": 0.72,
+    "archesRiseFromFloorMm": 0.78,
+    "seedRiseFromFrontMm": 0.55,
+    "depthIncludesRelief": true,
+    "back": "shared 24\u00d730 mm flat blank"
+  },
+  "stripeGeometry": {
+    "type": "rounded raised crown relief",
+    "heightMm": 0.24,
+    "planformWidthMm": 4.7,
+    "verticalSpanMm": 4.45,
+    "notColorPatch": true
+  },
+  "comparisonSheet": {
+    "path": "public/sowers/prototypes/canopy-factors/factor-comparison.png",
+    "sha256": "df83c344214cbc876e0d0166420dd330f6e6ee563e350bfd8d30da9173521c92",
+    "method": "Three.js WebGL orthographic render of each exact final STL; front and side per variant; common framing"
+  },
+  "variants": [
+    {
+      "id": "stripe-absent_draft-0deg",
+      "stripe": "absent",
+      "nominalOuterDraftDegrees": 0.0,
+      "bodyDepthMm": 5.45,
+      "frontNormalOffsetMm": 0.0,
+      "body": {
+        "boundsMm": [
+          [
+            -12.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 24.0,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 3079.5067440925304,
+        "vertices": 1180,
+        "faces": 2356,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "8432fd5a1501a824c90542898fb16c1fa654b6670fad68d4f741104bbdb95d99"
+      },
+      "bodyProfileEvidence": {
+        "method": "parallel polygon normal offsets at common z=0 back and z=5.45 mm front; serialized loft rings plus independently intersected final-STL sections",
+        "offsetLaw": "d(z) = z \u00d7 tan(\u03b8), for 0 \u2264 z \u2264 5.45 mm",
+        "sections": [
+          {
+            "zMm": 0,
+            "insetMm": 0,
+            "sectionMethod": "generator loft ring and STL section"
+          },
+          {
+            "zMm": 5.45,
+            "insetMm": 0.0,
+            "sectionMethod": "generator loft ring and STL section"
+          }
+        ],
+        "measuredSTLSections": [
+          {
+            "zMm": 0.05,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364203,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746430404e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 1.0,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364205,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746394995e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 2.725,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364201,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746394995e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 4.5,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364201,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746394995e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 5.35,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 508.03525001545665,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746430404e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          }
+        ],
+        "nested": true,
+        "measuredNominalAngleDegrees": 0.0
+      },
+      "face": {
+        "floorMm": 4.73,
+        "openingMm": 5.45,
+        "depthMm": 0.72,
+        "floorInsetMm": 0.24,
+        "openingInsetMm": 0.0,
+        "construction": "iteration 13 direct two-ring loft; cut extends 0.03 mm past front datum"
+      },
+      "stl": "public/sowers/prototypes/canopy-factors/stripe-absent_draft-0deg.stl",
+      "sourcePins": {
+        "generatorPath": "tools/sowers-canopy-factors.py",
+        "generatorSha256": "c724741f029eb651df69b829a9711c33068a38a6241eedb2ace984ba465c3eca",
+        "canonicalHelperPath": "tools/sowers-candy-form.py",
+        "canonicalHelperSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+      }
+    },
+    {
+      "id": "stripe-absent_draft-2deg",
+      "stripe": "absent",
+      "nominalOuterDraftDegrees": 2.0,
+      "bodyDepthMm": 5.45,
+      "frontNormalOffsetMm": 0.19031819373002515,
+      "body": {
+        "boundsMm": [
+          [
+            -12.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 24.0,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 3030.308282459966,
+        "vertices": 1180,
+        "faces": 2356,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "2d118c112455c755ca9220f6af0473b668737f28e4852161bc357be3f4dcc78b"
+      },
+      "bodyProfileEvidence": {
+        "method": "parallel polygon normal offsets at common z=0 back and z=5.45 mm front; serialized loft rings plus independently intersected final-STL sections",
+        "offsetLaw": "d(z) = z \u00d7 tan(\u03b8), for 0 \u2264 z \u2264 5.45 mm",
+        "sections": [
+          {
+            "zMm": 0,
+            "insetMm": 0,
+            "sectionMethod": "generator loft ring and STL section"
+          },
+          {
+            "zMm": 5.45,
+            "insetMm": 0.19031819373002515,
+            "sectionMethod": "generator loft ring and STL section"
+          }
+        ],
+        "measuredSTLSections": [
+          {
+            "zMm": 0.05,
+            "expectedNormalInsetMm": 0.0017460384745873866,
+            "measuredOuterSectionAreaMm2": 571.467011906333,
+            "expectedOffsetAreaMm2": 571.4670163439137,
+            "outerBoundaryHausdorffToExpectedMm": 8.659110177337744e-07,
+            "boundsMm": [
+              [
+                -11.998250795005687,
+                0.0017472312055721183
+              ],
+              [
+                11.998250795005687,
+                29.998253078574542
+              ]
+            ]
+          },
+          {
+            "zMm": 1.0,
+            "expectedNormalInsetMm": 0.03492076949174773,
+            "measuredOuterSectionAreaMm2": 568.3318148395401,
+            "expectedOffsetAreaMm2": 568.3318181415309,
+            "outerBoundaryHausdorffToExpectedMm": 8.000832574013219e-07,
+            "boundsMm": [
+              [
+                -11.965015900113723,
+                0.03494462411144236
+              ],
+              [
+                11.965015900113723,
+                29.965061571490843
+              ]
+            ]
+          },
+          {
+            "zMm": 2.725,
+            "expectedNormalInsetMm": 0.09515909686501257,
+            "measuredOuterSectionAreaMm2": 562.6165549693186,
+            "expectedOffsetAreaMm2": 562.6165562297267,
+            "outerBoundaryHausdorffToExpectedMm": 8.174505632992318e-07,
+            "boundsMm": [
+              [
+                -11.904668327809896,
+                0.09522410070368044
+              ],
+              [
+                11.904668327809896,
+                29.904792782312544
+              ]
+            ]
+          },
+          {
+            "zMm": 4.5,
+            "expectedNormalInsetMm": 0.15714346271286478,
+            "measuredOuterSectionAreaMm2": 556.7054747179425,
+            "expectedOffsetAreaMm2": 556.7054739050698,
+            "outerBoundaryHausdorffToExpectedMm": 8.353212682312229e-07,
+            "boundsMm": [
+              [
+                -11.842571550511755,
+                0.15725080850149062
+              ],
+              [
+                11.842571550511755,
+                29.842777071708788
+              ]
+            ]
+          },
+          {
+            "zMm": 5.35,
+            "expectedNormalInsetMm": 0.18682611678085034,
+            "measuredOuterSectionAreaMm2": 490.2674546934106,
+            "expectedOffsetAreaMm2": 553.8639824185309,
+            "outerBoundaryHausdorffToExpectedMm": 8.50300648537869e-07,
+            "boundsMm": [
+              [
+                -11.81283506560842,
+                0.18695373899621662
+              ],
+              [
+                11.81283506560842,
+                29.813079407476003
+              ]
+            ]
+          }
+        ],
+        "nested": true,
+        "measuredNominalAngleDegrees": 2.0
+      },
+      "face": {
+        "floorMm": 4.73,
+        "openingMm": 5.45,
+        "depthMm": 0.72,
+        "floorInsetMm": 0.24,
+        "openingInsetMm": 0.0,
+        "construction": "iteration 13 direct two-ring loft; cut extends 0.03 mm past front datum"
+      },
+      "stl": "public/sowers/prototypes/canopy-factors/stripe-absent_draft-2deg.stl",
+      "sourcePins": {
+        "generatorPath": "tools/sowers-canopy-factors.py",
+        "generatorSha256": "c724741f029eb651df69b829a9711c33068a38a6241eedb2ace984ba465c3eca",
+        "canonicalHelperPath": "tools/sowers-candy-form.py",
+        "canonicalHelperSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+      }
+    },
+    {
+      "id": "stripe-present_draft-0deg",
+      "stripe": "present",
+      "nominalOuterDraftDegrees": 0.0,
+      "bodyDepthMm": 5.45,
+      "frontNormalOffsetMm": 0.0,
+      "body": {
+        "boundsMm": [
+          [
+            -12.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 24.0,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 3083.7838037728584,
+        "vertices": 1276,
+        "faces": 2548,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "6da3f319e0870e6afa9674684b763abbee501d1daf9d9011e7c097819f85cb84"
+      },
+      "bodyProfileEvidence": {
+        "method": "parallel polygon normal offsets at common z=0 back and z=5.45 mm front; serialized loft rings plus independently intersected final-STL sections",
+        "offsetLaw": "d(z) = z \u00d7 tan(\u03b8), for 0 \u2264 z \u2264 5.45 mm",
+        "sections": [
+          {
+            "zMm": 0,
+            "insetMm": 0,
+            "sectionMethod": "generator loft ring and STL section"
+          },
+          {
+            "zMm": 5.45,
+            "insetMm": 0.0,
+            "sectionMethod": "generator loft ring and STL section"
+          }
+        ],
+        "measuredSTLSections": [
+          {
+            "zMm": 0.05,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364203,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746430404e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 1.0,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364205,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746394995e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 2.725,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364201,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746394995e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 4.5,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 571.6317795364201,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746394995e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          },
+          {
+            "zMm": 5.35,
+            "expectedNormalInsetMm": 0.0,
+            "measuredOuterSectionAreaMm2": 508.03525001545665,
+            "expectedOffsetAreaMm2": 571.6317840339897,
+            "outerBoundaryHausdorffToExpectedMm": 8.714269746430404e-07,
+            "boundsMm": [
+              [
+                -12.0,
+                0.0
+              ],
+              [
+                12.0,
+                30.0
+              ]
+            ]
+          }
+        ],
+        "nested": true,
+        "measuredNominalAngleDegrees": 0.0
+      },
+      "face": {
+        "floorMm": 4.73,
+        "openingMm": 5.45,
+        "depthMm": 0.72,
+        "floorInsetMm": 0.24,
+        "openingInsetMm": 0.0,
+        "construction": "iteration 13 direct two-ring loft; cut extends 0.03 mm past front datum"
+      },
+      "stl": "public/sowers/prototypes/canopy-factors/stripe-present_draft-0deg.stl",
+      "sourcePins": {
+        "generatorPath": "tools/sowers-canopy-factors.py",
+        "generatorSha256": "c724741f029eb651df69b829a9711c33068a38a6241eedb2ace984ba465c3eca",
+        "canonicalHelperPath": "tools/sowers-candy-form.py",
+        "canonicalHelperSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+      }
+    },
+    {
+      "id": "stripe-present_draft-2deg",
+      "stripe": "present",
+      "nominalOuterDraftDegrees": 2.0,
+      "bodyDepthMm": 5.45,
+      "frontNormalOffsetMm": 0.19031819373002515,
+      "body": {
+        "boundsMm": [
+          [
+            -12.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            30.0,
+            6.0
+          ]
+        ],
+        "widthMm": 24.0,
+        "heightMm": 30.0,
+        "depthMm": 6.0,
+        "volumeMm3": 3034.585342140294,
+        "vertices": 1276,
+        "faces": 2548,
+        "finiteVertices": true,
+        "watertight": true,
+        "allEdgesTwoFaces": true,
+        "positiveVolume": true,
+        "windingConsistent": true,
+        "eulerNumber": 2,
+        "connectedComponents": 1,
+        "stlSha256": "f6f02de70cd1f91c5e7f8b60da5c064a25be23fec272b60c596b52400304ee20"
+      },
+      "bodyProfileEvidence": {
+        "method": "parallel polygon normal offsets at common z=0 back and z=5.45 mm front; serialized loft rings plus independently intersected final-STL sections",
+        "offsetLaw": "d(z) = z \u00d7 tan(\u03b8), for 0 \u2264 z \u2264 5.45 mm",
+        "sections": [
+          {
+            "zMm": 0,
+            "insetMm": 0,
+            "sectionMethod": "generator loft ring and STL section"
+          },
+          {
+            "zMm": 5.45,
+            "insetMm": 0.19031819373002515,
+            "sectionMethod": "generator loft ring and STL section"
+          }
+        ],
+        "measuredSTLSections": [
+          {
+            "zMm": 0.05,
+            "expectedNormalInsetMm": 0.0017460384745873866,
+            "measuredOuterSectionAreaMm2": 571.467011906333,
+            "expectedOffsetAreaMm2": 571.4670163439137,
+            "outerBoundaryHausdorffToExpectedMm": 8.659110177337744e-07,
+            "boundsMm": [
+              [
+                -11.998250795005687,
+                0.0017472312055721183
+              ],
+              [
+                11.998250795005687,
+                29.998253078574542
+              ]
+            ]
+          },
+          {
+            "zMm": 1.0,
+            "expectedNormalInsetMm": 0.03492076949174773,
+            "measuredOuterSectionAreaMm2": 568.3318148395401,
+            "expectedOffsetAreaMm2": 568.3318181415309,
+            "outerBoundaryHausdorffToExpectedMm": 8.000832574013219e-07,
+            "boundsMm": [
+              [
+                -11.965015900113723,
+                0.03494462411144236
+              ],
+              [
+                11.965015900113723,
+                29.965061571490843
+              ]
+            ]
+          },
+          {
+            "zMm": 2.725,
+            "expectedNormalInsetMm": 0.09515909686501257,
+            "measuredOuterSectionAreaMm2": 562.6165549693186,
+            "expectedOffsetAreaMm2": 562.6165562297267,
+            "outerBoundaryHausdorffToExpectedMm": 8.174505632992318e-07,
+            "boundsMm": [
+              [
+                -11.904668327809896,
+                0.09522410070368044
+              ],
+              [
+                11.904668327809896,
+                29.904792782312544
+              ]
+            ]
+          },
+          {
+            "zMm": 4.5,
+            "expectedNormalInsetMm": 0.15714346271286478,
+            "measuredOuterSectionAreaMm2": 556.7054747179425,
+            "expectedOffsetAreaMm2": 556.7054739050698,
+            "outerBoundaryHausdorffToExpectedMm": 8.353212682312229e-07,
+            "boundsMm": [
+              [
+                -11.842571550511755,
+                0.15725080850149062
+              ],
+              [
+                11.842571550511755,
+                29.842777071708788
+              ]
+            ]
+          },
+          {
+            "zMm": 5.35,
+            "expectedNormalInsetMm": 0.18682611678085034,
+            "measuredOuterSectionAreaMm2": 490.2674546934106,
+            "expectedOffsetAreaMm2": 553.8639824185309,
+            "outerBoundaryHausdorffToExpectedMm": 8.50300648537869e-07,
+            "boundsMm": [
+              [
+                -11.81283506560842,
+                0.18695373899621662
+              ],
+              [
+                11.81283506560842,
+                29.813079407476003
+              ]
+            ]
+          }
+        ],
+        "nested": true,
+        "measuredNominalAngleDegrees": 2.0
+      },
+      "face": {
+        "floorMm": 4.73,
+        "openingMm": 5.45,
+        "depthMm": 0.72,
+        "floorInsetMm": 0.24,
+        "openingInsetMm": 0.0,
+        "construction": "iteration 13 direct two-ring loft; cut extends 0.03 mm past front datum"
+      },
+      "stl": "public/sowers/prototypes/canopy-factors/stripe-present_draft-2deg.stl",
+      "sourcePins": {
+        "generatorPath": "tools/sowers-canopy-factors.py",
+        "generatorSha256": "c724741f029eb651df69b829a9711c33068a38a6241eedb2ace984ba465c3eca",
+        "canonicalHelperPath": "tools/sowers-candy-form.py",
+        "canonicalHelperSha256": "4ef0a7734123dc5504b4d5c960cfb603cd87e1a53f3e7a4bdc130e3d692b0a0d"
+      }
+    }
+  ],
+  "limits": [
+    "Review geometry only. No mold-release, food, supplier, tolerance, shrink, tooling or manufacturing approval.",
+    "Draft verification includes serialized loft rings and measured final-STL triangle/plane sections; section measurements are distinct from generator inputs.",
+    "The 30 mm character height is an XY envelope dimension; 2\u00b0 nominal draft is along +Z through the 5.45 mm body depth, yielding a maximum inward normal offset of 0.190318 mm at the front body station."
+  ]
+}

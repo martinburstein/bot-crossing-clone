@@ -16,7 +16,7 @@ The front contour is an original, explicitly authored sampled path rather than a
 
 ## Validation
 
-The exported STL has finite vertices, is watertight, has exactly two incident faces per edge, consistent winding, Euler number 2, positive volume, and one connected component. It measures 24 × 30 × 6 mm and has 3,081.08 mm³ volume. The geometry is one generated mesh; no view-specific geometry or hidden backing part is used.
+The exported STL has finite vertices, is watertight, has exactly two incident faces per edge, consistent winding, Euler number 2, positive volume, and one connected component. It measures 24 × 30 × 6 mm and has 3,079.51 mm³ volume. The geometry is one generated mesh; no view-specific geometry or hidden backing part is used.
 
 ## Contour/profile deviations and limits
 

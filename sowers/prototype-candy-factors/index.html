@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f1e5" />
+    <title>Sowers · Canopy candy factor study</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+  </head>
+  <body>
+    <main class="study">
+      <header>
+        <p class="eyebrow">SOWERS / GEOMETRY STUDY 14</p>
+        <h1>Two factors. Four solids.</h1>
+        <p class="dek">Compare crown stripe relief (absent/present) and outerwall draft (0°/2°). Every view loads the selected variant’s same STL.</p>
+        <span class="badge">CONTROLLED FACTORS · GEOMETRY REVIEW ONLY</span>
+      </header>
+      <section class="controls" aria-label="Variant and view selection">
+        <div><label>Variant</label><div class="button-row" id="variants"></div></div>
+        <div><label>Orthographic view</label><div class="button-row" id="views"><button data-view="front" aria-pressed="true">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="back" aria-pressed="false">Back</button></div></div>
+        <label class="check"><input type="checkbox" id="flat" /> Flat-shaded inspection</label>
+      </section>
+      <section class="viewer" aria-label="Interactive STL inspection">
+        <canvas id="model" aria-label="Orthographic rendering of selected canopy candy STL"></canvas>
+        <div class="load-state" id="load-state">Loading the selected STL…</div>
+        <p class="hint">Drag to inspect · scroll to zoom</p>
+      </section>
+      <section class="facts">
+        <div><span>Selected factor level</span><strong id="factor">Loading…</strong></div>
+        <div><span>Envelope</span><strong id="dimensions">24 × 30 × 6 mm</strong></div>
+        <div><span>Recomputed exported volume</span><strong id="volume">Loading…</strong></div>
+        <div><span>Selected STL SHA-256</span><code id="hash">Loading…</code></div>
+      </section>
+      <footer>2° draft runs along +Z through the 5.45 mm body depth (maximum inward normal offset 0.190318 mm). The crown stripe is shallow positive relief. These are geometry-review solids; no release, food, tooling, supplier, tolerance, shrink, or manufacturing approval is implied.</footer>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

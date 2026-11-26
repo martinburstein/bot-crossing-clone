@@ -1,0 +1,185 @@
+{
+  "iteration": 14,
+  "title": "Canopy hop comparison",
+  "type": "code-native fixed-template character contour study",
+  "status": "proposed contour comparison; not a source animation",
+  "basedOn": "Iteration 13 Paint hop study",
+  "characterDirection": {
+    "preferenceAnchor": "Goat 4",
+    "variants": [
+      {
+        "id": "helmet-control",
+        "name": "Helmet control",
+        "description": "Separate broad hood, protective lip, and compact torso."
+      },
+      {
+        "id": "modest-cowl",
+        "name": "Modest continuous cowl",
+        "description": "Single modest hood-to-shoulder contour without separate collar bar."
+      },
+      {
+        "id": "broad-canopy",
+        "name": "Broad canopy",
+        "description": "Wider integrated shoulder flare owning the outer silhouette."
+      }
+    ],
+    "shared": "All variants use the same six pose records, timing, palette, face arches, seed, limb paths, boots, ground marks, and envelope. Variant contours are fixed; poses change root and joint transforms only."
+  },
+  "renderer": {
+    "name": "drawFrame/drawSower Canvas 2D",
+    "resolution": {
+      "logical": [
+        360,
+        360
+      ],
+      "render": [
+        180,
+        180
+      ],
+      "upscale": 2
+    },
+    "imageSmoothingEnabled": false,
+    "palette": {
+      "paper": "#fff8e8",
+      "cream": "#f5ead0",
+      "orange": "#f58232",
+      "cocoa": "#70402a",
+      "outline": "#392317",
+      "ground": "#b75a32"
+    },
+    "timingProposal": {
+      "millisecondsPerPose": 320,
+      "cycleMilliseconds": 1920,
+      "interpolation": "none; discrete proposed poses",
+      "sourceAnimation": false
+    },
+    "pausedBehavior": "No animation-frame callback is scheduled while paused."
+  },
+  "poses": [
+    {
+      "index": 1,
+      "name": "Crouch"
+    },
+    {
+      "index": 2,
+      "name": "Push"
+    },
+    {
+      "index": 3,
+      "name": "Ascent"
+    },
+    {
+      "index": 4,
+      "name": "Apex"
+    },
+    {
+      "index": 5,
+      "name": "Landing"
+    },
+    {
+      "index": 6,
+      "name": "Settle"
+    }
+  ],
+  "controls": {
+    "variantSelector": true,
+    "playPause": true,
+    "scrub": "six discrete poses; scrubbing pauses playback",
+    "default": "paused on Settle",
+    "reducedMotion": "prefers-reduced-motion remains paused on Settle"
+  },
+  "sourcePins": [
+    {
+      "path": "sowers/prototype-canopy-hop/index.html",
+      "sha256": "e604ff41a7ccff8befcbc87535ca956fe8d0aae5e9ae3aac7c476063d4553099"
+    },
+    {
+      "path": "sowers/prototype-canopy-hop/main.js",
+      "sha256": "96e84239560631ea0b9ad8d96b704b03ef406522f91b2685efe3dea79dadeee9"
+    },
+    {
+      "path": "sowers/prototype-canopy-hop/style.css",
+      "sha256": "19bddc9ea19e70c63a05a5494c6aa4a5409b8d6e2438032be6aee7634d2a2846"
+    },
+    {
+      "path": "public/sowers/prototypes/canopy-hop/index.html",
+      "sha256": "e604ff41a7ccff8befcbc87535ca956fe8d0aae5e9ae3aac7c476063d4553099"
+    },
+    {
+      "path": "public/sowers/prototypes/canopy-hop/main.js",
+      "sha256": "96e84239560631ea0b9ad8d96b704b03ef406522f91b2685efe3dea79dadeee9"
+    },
+    {
+      "path": "public/sowers/prototypes/canopy-hop/style.css",
+      "sha256": "19bddc9ea19e70c63a05a5494c6aa4a5409b8d6e2438032be6aee7634d2a2846"
+    }
+  ],
+  "referencePins": [
+    {
+      "path": "/Users/martinburstein/Downloads/goat4.png",
+      "sha256": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7",
+      "role": "Goat 4 preference anchor; cream/orange/cocoa, broad hood, friendly face and original seedmark."
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-11-mb.png",
+      "sha256": "a93d84da2e5210b89772cd17e27b24d82245edacaee00e86a4b00fb481e22037",
+      "role": "Canopy/shoulder contour reference."
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-13-paint-hop-neutral.png",
+      "sha256": "05da5b7bbceff8bd8546191a1cfb0acd256f274f69feee2356bc5ca3b1fe730d",
+      "role": "Paint template and palette comparison."
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-13-paint-hop-sheet.png",
+      "sha256": "78fea0e638cc62d85c8db8e297107e1ad0e5fd96733330eb1e34ca965172706d",
+      "role": "Six-pose data and renderer comparison."
+    }
+  ],
+  "exports": [
+    {
+      "path": "public/sowers/prototypes/iteration-14-canopy-hop-neutral-comparison.png",
+      "sha256": "f20b3bc07333c82ea9b3ed0fc53a8bbc12d6d4afc77af8461f6db638e64798cb",
+      "kind": "three-variant neutral comparison",
+      "width": 1080,
+      "height": 420,
+      "format": "PNG"
+    },
+    {
+      "path": "public/sowers/prototypes/iteration-14-canopy-hop-18-pose-sheet.png",
+      "sha256": "670ae58cad4ea582263e6458259a4e0f0420c95ad7e3a1e3e19ea6491e84490b",
+      "kind": "three variants \u00d7 six poses contact sheet",
+      "width": 2160,
+      "height": 1188,
+      "format": "PNG"
+    }
+  ],
+  "observations": [
+    "The modest cowl removes the separate lip and carries one cream contour from hood into shoulder while keeping the torso and mitten tabs readable.",
+    "The broad canopy creates the clearest connected shoulder silhouette; its lower edge partly occludes arm and mitten cues, especially in crouch, push and settle.",
+    "All variants preserve the same recognizable face, seed, boots, palette and pose data. This comparison does not establish final proportions or production animation."
+  ],
+  "verification": {
+    "nodeSyntaxCheck": "passed",
+    "publicBrowserRoute": "loaded at /sowers/prototypes/canopy-hop/index.html",
+    "uniqueRenders": 18,
+    "pausedFrameStable": true,
+    "playPause": "advanced through poses; paused frame stable over 500ms",
+    "reducedMotion": "Chromium emulation opened paused on Settle",
+    "mobile390": {
+      "documentWidth": 390,
+      "clientWidth": 390,
+      "stageWidth": 358,
+      "horizontalOverflow": false
+    },
+    "pageErrors": [],
+    "publicSourceParity": true,
+    "visualSheetReview": "All 18 poses fit in labeled cells; neutral feet align to ground marks."
+  },
+  "limitations": [
+    "Authored art-direction comparison, not a measured preference test.",
+    "Proposed discrete poses and timing are not source animation or production timing.",
+    "No conclusions about physical dimensions or manufacturing behavior."
+  ],
+  "coordinatorReview": "Broad canopy is a silhouette experiment, not a final winner: scalloped edge dominates and partly hides mitten gestures. Modest cowl preserves more work-pose cues."
+}

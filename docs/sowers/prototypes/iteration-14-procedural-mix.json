@@ -1,0 +1,251 @@
+{
+  "iteration": 14,
+  "conceptId": "procedural-mix",
+  "title": "Procedural 3D mixture study",
+  "status": "controlled prototype; not a canonical avatar replacement",
+  "mixtureMeaning": "Authored numeric geometry interpolation, not measured style ownership, source attribution, or a learned classifier.",
+  "source": {
+    "viewer": "sowers/prototype-mix/index.html",
+    "entry": "sowers/prototype-mix/main.js",
+    "rig": "sowers/prototype-mix/rig.mjs",
+    "copiedAccepted13Rig": "sowers/prototype-mix/rig-base.mjs",
+    "parameters": "sowers/prototype-mix/parameters.mjs",
+    "sha256": {
+      "index.html": "70230fb1b9a6e04d455384dc7f76052b30ba35e42d41140b60ac88a465691c55",
+      "main.js": "7eac951755edd93faacfcfe2c72f32ad442231c6c4fb7df48722d954fdc8e211",
+      "rig.mjs": "09d90f656d7f3eb7542954bef8b4e7b19fc768a7000ad48c0b2491ae24b9c2a3",
+      "rig-base.mjs": "b84b3590f7edecab584acbe76b45dbe307728f3b07e54b7226836ab03a3ef6aa",
+      "parameters.mjs": "f2527de6aadc07136baf315f8bdedcdc2a69525943420e416ea534f16ca681a5",
+      "style.css": "04044c661a4413f2bafc9fefdfa28617ba6f139f99ebb6bad7da90b04b35f777"
+    }
+  },
+  "anchorPins": {
+    "privateGoat4": {
+      "path": ".cache/sowers-reference-corpus/goat4.png",
+      "sha256": "2da2122677cdbb1a494cbf99cbd89312f8bb38761fcdd1f5fe315278b228bfa7",
+      "role": "user preference anchor only"
+    },
+    "iteration12Balanced": {
+      "path": "public/sowers/prototypes/iteration-12-balanced.png",
+      "sha256": "f6eb5d63bbba7b50c8bc49647e438f9a1a52d1a9a8bad29c9c1cb42c3b70c6b3",
+      "role": "reviewed recipe concept, not geometry evidence"
+    },
+    "iteration13MascotCaptures": [
+      {
+        "path": "public/sowers/prototypes/mascot-blockout/neutral-front.png",
+        "sha256": "8cae5942ff7ede453fb9641ebc9132fe25ceaa7bb6b6b4e052ae976a320b56ca"
+      },
+      {
+        "path": "public/sowers/prototypes/mascot-blockout/neutral-threequarter.png",
+        "sha256": "0d4e4e7b08f9ffa00edcdf045f9f63199b520b2003eb56e25df0e6eafc0e302c"
+      }
+    ]
+  },
+  "palette": {
+    "cream": "#f3e4c8",
+    "orange": "#f17721",
+    "cocoa": "#4b3026",
+    "pale": "#fff3dd"
+  },
+  "endpoints": {
+    "M": {
+      "hoodWidth": 2.16,
+      "hoodHeight": 1.58,
+      "faceWindowRatio": 0.58,
+      "lowerCowlThickness": 0.3,
+      "torsoCompactness": 0.9,
+      "legCompactness": 0.84,
+      "orangeSideAccentAmount": 0.15,
+      "intent": "Protective broad hood, narrower opening and thicker lower cowl."
+    },
+    "W": {
+      "hoodWidth": 1.88,
+      "hoodHeight": 1.82,
+      "faceWindowRatio": 0.7,
+      "lowerCowlThickness": 0.17,
+      "torsoCompactness": 1.1,
+      "legCompactness": 1.3,
+      "orangeSideAccentAmount": 0.07,
+      "intent": "Readable moderate face, taller hood and longer limbs."
+    },
+    "B": {
+      "hoodWidth": 2.02,
+      "hoodHeight": 1.72,
+      "faceWindowRatio": 0.8,
+      "lowerCowlThickness": 0.24,
+      "torsoCompactness": 0.84,
+      "legCompactness": 0.8,
+      "orangeSideAccentAmount": 0.04,
+      "intent": "Round friendly face and compact body."
+    }
+  },
+  "recipes": [
+    {
+      "id": "m70",
+      "name": "Field Scout",
+      "weights": {
+        "M": 70,
+        "W": 15,
+        "B": 15
+      }
+    },
+    {
+      "id": "w70",
+      "name": "Hop Helper",
+      "weights": {
+        "M": 15,
+        "W": 70,
+        "B": 15
+      }
+    },
+    {
+      "id": "b70",
+      "name": "Pocket Companion",
+      "weights": {
+        "M": 15,
+        "W": 15,
+        "B": 70
+      }
+    },
+    {
+      "id": "mw",
+      "name": "Trail Tender",
+      "weights": {
+        "M": 45,
+        "W": 45,
+        "B": 10
+      }
+    },
+    {
+      "id": "mb",
+      "name": "Canopy Keeper",
+      "weights": {
+        "M": 45,
+        "W": 10,
+        "B": 45
+      }
+    },
+    {
+      "id": "wb",
+      "name": "Pod Pal",
+      "weights": {
+        "M": 10,
+        "W": 45,
+        "B": 45
+      }
+    },
+    {
+      "id": "balanced",
+      "name": "Sower Scout",
+      "weights": {
+        "M": 34,
+        "W": 33,
+        "B": 33
+      }
+    }
+  ],
+  "construction": {
+    "engine": "Existing project Three.js dependency",
+    "geometry": "Copied and adapted accepted13 rounded-box, shallow-extrusion, and curved stripe rig; explicitly named hood and face features; two continuously weighted flank accent meshes on every recipe; fresh geometry on recipe rebuild",
+    "uniqueGeometryCountAfterAccents": 21,
+    "poses": [
+      "neutral",
+      "reach",
+      "hop"
+    ],
+    "views": [
+      "front",
+      "threequarter"
+    ],
+    "responsiveCamera": "Shared camera framing envelope across recipes; canvas resizes without per-recipe height normalization.",
+    "motion": "Paused by default, no RAF while paused, reduced-motion disables playback, resize and controls repaint.",
+    "rebuildDisposesPreviousGeometry": true
+  },
+  "captures": [
+    {
+      "file": "public/sowers/prototypes/procedural-mix/recipe-contact-sheet.png",
+      "dimensions": [
+        1520,
+        2160
+      ],
+      "source": "Browser WebGL canvas captures of actual Three.js geometry, neutral pose, shared front camera; 2-column sheet of seven recipes.",
+      "sha256": "92b8c0e4eda6d08867b51f9073f4698fd208cb14850977e15831f30e2796e3dd",
+      "limits": "Visual comparison only; not evidence of mesh intersection, market preference, candy feasibility, or manufacturing performance."
+    }
+  ],
+  "verification": {
+    "mixtures": 66,
+    "poseSamples": 594,
+    "sampledPoses": [
+      "neutral",
+      "reach",
+      "hop"
+    ],
+    "progressSamples": [
+      0,
+      0.5,
+      1
+    ],
+    "finiteWorldMatrices": true,
+    "geometryIdentityStableWithinEachPoseSequence": true,
+    "partScalesStableAcrossPoseSequence": true,
+    "neutralAndReachGrounded": true,
+    "maximumGroundError": 5e-09,
+    "coarseTorsoLegAndLegBootBoundsChecked": true,
+    "crownStripeWithinHeadBoundsAtEndpoints": true,
+    "lowerCowlUsesStableNamedMeshLookup": true,
+    "namedFaceOnlyApertureScaling": true,
+    "measuredEndpoints": {
+      "M": {
+        "authoredHoodWidth": 2.16,
+        "measuredWorldHoodWidth": 2.15999995,
+        "authoredFaceWindowRatio": 0.58,
+        "measuredFaceToHoodRatio": 0.5783,
+        "sideAccentMeshWidthEach": 0.098
+      },
+      "W": {
+        "authoredHoodWidth": 1.88,
+        "measuredWorldHoodWidth": 1.87999996,
+        "authoredFaceWindowRatio": 0.7,
+        "measuredFaceToHoodRatio": 0.698,
+        "sideAccentMeshWidthEach": 0.0644
+      },
+      "B": {
+        "authoredHoodWidth": 2.02,
+        "measuredWorldHoodWidth": 2.01999995,
+        "authoredFaceWindowRatio": 0.8,
+        "measuredFaceToHoodRatio": 0.7977,
+        "sideAccentMeshWidthEach": 0.0518
+      }
+    },
+    "geometryCountMatchesUniqueGeometrySet": true,
+    "boundsProveExactIntersection": false,
+    "boundedReviewRepairs": {
+      "playSelectsAndHighlightsHop": true,
+      "pauseCancelsTheSinglePendingAnimationFrame": true,
+      "slidersHaveAssociatedAccessibleNames": [
+        "Mars Mission",
+        "Wobbly Life",
+        "Bot Crossing"
+      ],
+      "redistributionCopyMatchesBehavior": true,
+      "inputValidationRejectsNegativeOver100NonfiniteAndWrongTotal": true,
+      "browserCheck": "Changed Mars slider to 50; weights updated to 50/25/25. Play highlighted Hop and showed Playing; Pause returned to Paused. Balanced recipe and Neutral paused state restored."
+    }
+  },
+  "evidenceBoundary": "Corpus summaries and reference images ground art direction only. The interpolation is explicitly authored; no source-specific hidden geometry, motion, style attribution, preference, market, candy, or manufacturing claim is made.",
+  "coordinatorVerification": {
+    "independentEndpointHoodWidths": [
+      2.16,
+      1.88,
+      2.02
+    ],
+    "independentFaceToHoodRatios": [
+      0.578335732,
+      0.697991401,
+      0.797704458
+    ],
+    "actualGeometryCount": 21,
+    "materialCampfireRepair": "Aperture targets explicitly named face features only; hood width now matches authored parameter. Both accents always present with continuous width."
+  }
+}
